@@ -188,6 +188,9 @@
             st.className = `px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${getStatusColor(item.status).replace('bg-', 'bg-opacity-20 text-')}`;
             
             document.getElementById('navJob').href = `https://www.google.com/maps?q=${lat},${lng}`;
+            document.getElementById('btnEditCust').onclick = () => {
+                window.location.href = `edit-pelanggan.html?email=${item.email}`;
+            };
             document.getElementById('waJob').href = `https://wa.me/${formatWA(item.whatsapp)}`;
             document.getElementById('btnUpdate').onclick = () => window.location.href = `booking.html?id=${item.id}`;
             
