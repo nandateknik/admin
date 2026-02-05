@@ -12,7 +12,8 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; }
-        #map { height: 220px; border-radius: 1.5rem; border: 2px solid #f3f4f6; z-index: 10; }
+        #map-container { transition: all 0.5s ease; overflow: hidden; }
+        #map { height: 220px; border-radius: 1.5rem; border: 2px solid #f3f4f6; }
         .autocomplete-items {
             position: absolute; border-radius: 1.5rem; border: 1px solid #e5e7eb;
             background: white; z-index: 99; top: 100%; left: 0; right: 0; 
@@ -20,7 +21,6 @@
         }
         .autocomplete-item { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #f9fafb; transition: all 0.2s; }
         .autocomplete-item:hover { background-color: #eff6ff; }
-        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-gray-200">
@@ -44,7 +44,7 @@
 
                 <div class="relative">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Nama Pelanggan</label>
-                    <input type="text" id="nama" required placeholder="Cari atau ketik nama..." autocomplete="off" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none transition-all">
+                    <input type="text" id="nama" required placeholder="Cari nama pelanggan..." autocomplete="off" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
                     <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
                 </div>
 
@@ -60,21 +60,26 @@
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Jenis Layanan / Pekerjaan</label>
-                    <input type="text" id="pekerjaan" required placeholder="Contoh: Cuci AC, Bongkar Pasang..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none transition-all">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Jenis Pekerjaan</label>
+                    <input type="text" id="pekerjaan" required placeholder="Ketik jenis pekerjaan..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
                 </div>
 
-                <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Lokasi Pengerjaan (Geser Pin)</label>
-                    <div id="map"></div>
-                    <div class="flex gap-2 mt-3">
-                        <input type="text" id="lat" readonly class="flex-1 bg-gray-50 text-[9px] font-mono p-2 rounded-xl text-center text-gray-400 border border-gray-100">
-                        <input type="text" id="lang" readonly class="flex-1 bg-gray-50 text-[9px] font-mono p-2 rounded-xl text-center text-gray-400 border border-gray-100">
+                <div id="map-section">
+                    <label id="map-label" class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Lokasi Pengerjaan</label>
+                    <div id="map-container">
+                        <div id="map"></div>
                     </div>
+                    <div id="saved-location-info" class="hidden p-4 bg-blue-50 border-2 border-blue-100 rounded-[1.5rem] flex items-center space-x-3">
+                        <div class="bg-blue-500 p-2 rounded-full text-white">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+                        </div>
+                        <span class="text-[11px] font-bold text-blue-700">Menggunakan alamat rumah terdaftar (Maps disembunyikan)</span>
+                    </div>
+                    <input type="hidden" id="lat"><input type="hidden" id="lang">
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full bg-gray-900 text-white py-6 rounded-[2.5rem] font-black shadow-xl shadow-gray-300 active:scale-95 transition-all flex items-center justify-center mt-4">
-                    <span>Simpan & Kirim Notif</span>
+                <button type="submit" id="submitBtn" class="w-full bg-gray-900 text-white py-6 rounded-[2.5rem] font-black shadow-xl shadow-gray-300 active:scale-95 transition-all mt-4">
+                    SIMPAN BOOKING
                 </button>
             </form>
         </main>
@@ -90,13 +95,29 @@
             map = L.map('map').setView([-8.2191, 114.3691], 13);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
             marker = L.marker([-8.2191, 114.3691], {draggable: true}).addTo(map);
-            marker.on('dragend', function() {
+            marker.on('dragend', () => {
                 const pos = marker.getLatLng();
                 document.getElementById('lat').value = pos.lat.toFixed(6);
                 document.getElementById('lang').value = pos.lng.toFixed(6);
             });
-            document.getElementById('lat').value = -8.2191;
-            document.getElementById('lang').value = 114.3691;
+            updateCoords(-8.2191, 114.3691);
+        }
+
+        function updateCoords(lat, lng) {
+            document.getElementById('lat').value = lat;
+            document.getElementById('lang').value = lng;
+        }
+
+        function toggleMapVisibility(show) {
+            const mapCont = document.getElementById('map-container');
+            const infoCont = document.getElementById('saved-location-info');
+            if(show) {
+                mapCont.style.display = "block";
+                infoCont.classList.add('hidden');
+            } else {
+                mapCont.style.display = "none";
+                infoCont.classList.remove('hidden');
+            }
         }
 
         function setType(type) {
@@ -104,7 +125,8 @@
             document.getElementById('btnP').className = type === 'pelanggan' ? "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black tracking-widest transition-all bg-white shadow-sm text-blue-600" : "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black tracking-widest transition-all text-gray-400";
             document.getElementById('btnU').className = type === 'umum' ? "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black tracking-widest transition-all bg-white shadow-sm text-blue-600" : "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black tracking-widest transition-all text-gray-400";
             document.getElementById('bookingForm').reset();
-            marker.setLatLng([-8.2191, 114.3691]);
+            toggleMapVisibility(true); 
+            updateCoords(-8.2191, 114.3691);
         }
 
         async function loadDatabase() {
@@ -123,9 +145,7 @@
             list.innerHTML = "";
             if (!val || val.length < 2) { list.classList.add('hidden'); return; }
 
-            const filtered = pelangganData.filter(p => 
-                (p.nama_pelanggan && p.nama_pelanggan.toLowerCase().includes(val.toLowerCase()))
-            );
+            const filtered = pelangganData.filter(p => p.nama_pelanggan && p.nama_pelanggan.toLowerCase().includes(val.toLowerCase()));
 
             filtered.slice(0, 5).forEach(p => {
                 const div = document.createElement('div');
@@ -135,12 +155,12 @@
                     inputNama.value = p.nama_pelanggan;
                     document.getElementById('email').value = p.email;
                     document.getElementById('whatsapp').value = p.whatsapp;
+                    
                     if(p.lat_rumah && p.lang_rumah) {
-                        const latLng = [parseFloat(p.lat_rumah), parseFloat(p.lang_rumah)];
-                        marker.setLatLng(latLng);
-                        map.setView(latLng, 16);
-                        document.getElementById('lat').value = p.lat_rumah;
-                        document.getElementById('lang').value = p.lang_rumah;
+                        updateCoords(p.lat_rumah, p.lang_rumah);
+                        toggleMapVisibility(false); // SEMBUNYIKAN MAP KARENA DATA ADA
+                    } else {
+                        toggleMapVisibility(true);
                     }
                     list.classList.add('hidden');
                 };
@@ -152,8 +172,7 @@
         document.getElementById('bookingForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerHTML = "<span>Menyimpan...</span>";
+            btn.disabled = true; btn.innerText = "MENYIMPAN...";
 
             const payload = {
                 action: 'tambahBooking',
@@ -168,17 +187,14 @@
 
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                Swal.fire({ title: 'Berhasil!', text: 'Booking disimpan & Notifikasi dikirim.', icon: 'success' })
-                    .then(() => location.href = 'index.html');
+                Swal.fire('Berhasil!', 'Booking tersimpan.', 'success').then(() => location.reload());
             } catch (err) {
                 Swal.fire('Gagal', 'Terjadi kesalahan', 'error');
-                btn.disabled = false;
-                btn.innerHTML = "<span>Simpan & Kirim Notif</span>";
+                btn.disabled = false; btn.innerText = "SIMPAN BOOKING";
             }
         };
 
         window.onload = () => { initMap(); loadDatabase(); };
-        document.addEventListener('click', (e) => { if(e.target !== inputNama) list.classList.add('hidden'); });
     </script>
 </body>
 </html>
