@@ -109,7 +109,7 @@
 </div>
 
 <div id="modalNota" class="fixed inset-0 bg-black/80 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white w-full rounded-[2.5rem] overflow-hidden max-h-[90vh] flex flex-col max-w-sm shadow-2xl scale-up">
+    <div class="bg-white w-full rounded-[2.5rem] overflow-hidden max-h-[90vh] flex flex-col max-w-sm shadow-2xl">
         <div id="notaPrintArea" class="p-8 nota-kertas flex-1 overflow-y-auto">
             <div id="watermark"></div>
             <div class="text-center mb-6 border-b-2 border-black pb-4">
@@ -165,8 +165,7 @@
 </div>
 
 <script>
-    // --- KONFIGURASI ---
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzurPn1SIFCzhWuZdLhtQV1PYZKR__iKYvzjqJUoebZX4NkWn47HIVT7hGsDwKaT1vMLQ/exec"; // Masukkan URL Exec Anda di sini!
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzurPn1SIFCzhWuZdLhtQV1PYZKR__iKYvzjqJUoebZX4NkWn47HIVT7hGsDwKaT1vMLQ/exec";
     
     let pelangganData = [];
     let databaseNota = [];
@@ -174,7 +173,7 @@
     let currentPage = 1;
     const itemsPerPage = 5;
 
-    // --- FITUR AUTOCOMPLETE ---
+    // --- AUTOCOMPLETE ---
     const searchInput = document.getElementById('notaCustSearch');
     const autoList = document.getElementById('autocomplete-list');
 
@@ -184,15 +183,12 @@
             document.getElementById('finalEmail').value = val;
             return;
         }
-        
         autoList.innerHTML = "";
         if (!val || val.length < 1) { autoList.classList.add('hidden'); return; }
-
         const filtered = pelangganData.filter(p => 
             (p.nama && p.nama.toLowerCase().includes(val.toLowerCase())) || 
             (p.email && p.email.toLowerCase().includes(val.toLowerCase()))
         );
-
         if(filtered.length > 0) {
             filtered.slice(0, 5).forEach(p => {
                 const div = document.createElement('div');
@@ -206,9 +202,7 @@
                 autoList.appendChild(div);
             });
             autoList.classList.remove('hidden');
-        } else {
-            autoList.classList.add('hidden');
-        }
+        } else { autoList.classList.add('hidden'); }
     });
 
     function setNotaMode(mode) {
@@ -225,12 +219,12 @@
     function tambahItem() {
         const container = document.getElementById('itemContainer');
         const div = document.createElement('div');
-        div.className = "bg-white border border-gray-100 p-4 rounded-2xl shadow-sm space-y-3 item-row relative group";
+        div.className = "bg-white border border-gray-100 p-4 rounded-2xl shadow-sm space-y-3 item-row relative";
         div.innerHTML = `
             <button onclick="this.parentElement.remove(); hitungTotal();" class="absolute top-4 right-4 text-gray-300 hover:text-red-500">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
-            <input type="text" placeholder="Nama Jasa / Barang" class="w-full text-sm font-bold outline-none item-nama border-b pb-2 pr-8">
+            <input type="text" placeholder="Nama Jasa / Barang" class="w-full text-sm font-bold outline-none item-nama border-b pb-2">
             <div class="flex items-center gap-3">
                 <div class="flex-1">
                     <span class="text-[9px] text-gray-400 font-bold block mb-1">QTY</span>
@@ -240,23 +234,21 @@
                     <span class="text-[9px] text-gray-400 font-bold block mb-1">HARGA SATUAN</span>
                     <input type="number" oninput="hitungTotal()" placeholder="0" class="w-full bg-gray-50 p-2 rounded-lg text-sm font-bold item-harga text-right">
                 </div>
-            </div>
-        `;
+            </div>`;
         container.appendChild(div);
     }
 
     function hitungTotal() {
-        let grandTotal = 0;
+        let total = 0;
         document.querySelectorAll('.item-row').forEach(row => {
-            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-            const price = parseFloat(row.querySelector('.item-harga').value) || 0;
-            grandTotal += (qty * price);
+            const q = row.querySelector('.item-qty').value || 0;
+            const h = row.querySelector('.item-harga').value || 0;
+            total += (q * h);
         });
-        document.getElementById('totalDisplay').innerText = "Rp " + grandTotal.toLocaleString('id-ID');
-        return grandTotal;
+        document.getElementById('totalDisplay').innerText = "Rp " + total.toLocaleString('id-ID');
+        return total;
     }
 
-    // --- SIMPAN DATA ---
     async function simpanNota() {
         const email = document.getElementById('finalEmail').value || searchInput.value;
         const items = [];
@@ -266,37 +258,27 @@
             const harga = row.querySelector('.item-harga').value;
             if(nama && harga) items.push({ nama, qty, harga });
         });
-
-        if(!email) return Swal.fire('Error', 'Tujuan nota wajib diisi!', 'warning');
-        if(items.length === 0) return Swal.fire('Error', 'Pekerjaan belum diisi!', 'warning');
-
-        Swal.fire({title: 'Menyimpan Nota...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-
+        if(!email || items.length === 0) return Swal.fire('Error', 'Lengkapi data!', 'warning');
+        Swal.fire({title: 'Menyimpan...', didOpen: () => Swal.showLoading()});
         const payload = {
             action: 'simpanNota',
             id_nota: "INV-" + Date.now().toString().slice(-6),
-            email: email,
-            items: items,
-            total: hitungTotal(),
+            email: email, items: items, total: hitungTotal(),
             status: document.getElementById('notaStatus').value,
-            tanggal: new Date().toLocaleDateString('id-ID', {day: '2-digit', month: 'short', year: 'numeric'})
+            tanggal: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
         };
-
         try {
             await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)});
-            Swal.fire({icon:'success', title:'Tersimpan!', text:'Nota berhasil dicatat.', showConfirmButton: false, timer: 1500})
-            .then(() => location.reload());
-        } catch(e) {
-            Swal.fire('Gagal', 'Terjadi gangguan koneksi', 'error');
-        }
+            Swal.fire({icon:'success', title:'Berhasil'}).then(() => location.reload());
+        } catch(e) { Swal.fire('Gagal', 'Error koneksi', 'error'); }
     }
 
-    // --- RIWAYAT & PAGINATION ---
+    // --- RIWAYAT ---
     async function initData() {
         try {
             const res = await fetch(SCRIPT_URL + "?type=pelanggan");
             pelangganData = await res.json();
-        } catch(e) { console.log("Autocomplete mode offline"); }
+        } catch(e) { console.log("Offline mode"); }
     }
 
     async function loadRiwayat() {
@@ -306,107 +288,83 @@
             const res = await fetch(SCRIPT_URL + "?type=nota");
             databaseNota = await res.json();
             displayNota();
-        } catch(e) { list.innerHTML = "Gagal memuat riwayat."; }
+        } catch(e) { list.innerHTML = "Gagal memuat."; }
     }
 
+    // --- PERBAIKAN UTAMA DISINI ---
     function displayNota() {
         const list = document.getElementById('listRiwayat');
         list.innerHTML = "";
-        
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         const currentData = databaseNota.slice(start, end);
 
         if(currentData.length === 0) {
-            list.innerHTML = "<p class='text-center py-10 text-gray-400'>Belum ada data nota.</p>";
+            list.innerHTML = "<p class='text-center py-10 text-gray-400'>Belum ada data.</p>";
             return;
         }
 
-        currentData.forEach(n => {
+        currentData.forEach((n, index) => {
             const isPaid = n.status === 'PAID';
+            const actualIndex = ((currentPage - 1) * itemsPerPage) + index;
+
             list.innerHTML += `
-                <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm flex justify-between items-center active:scale-[0.98] transition-all cursor-pointer">
+                <div onclick='bukaDetail(databaseNota[${actualIndex}])' class="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm flex justify-between items-center cursor-pointer">
                     <div class="flex gap-4 items-center">
                         <div class="w-10 h-10 rounded-full ${isPaid ? 'bg-green-50' : 'bg-red-50'} flex items-center justify-center">
                             <svg class="w-5 h-5 ${isPaid ? 'text-green-500' : 'text-red-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <div>
-                            <p class="text-[9px] font-900 text-gray-400 uppercase tracking-tighter">${n.id_nota} • ${n.tanggal}</p>
+                            <p class="text-[9px] font-900 text-gray-400 uppercase">${n.id_nota} • ${n.tanggal}</p>
                             <p class="text-sm font-900 text-slate-800 truncate w-32">${n.email}</p>
                         </div>
                     </div>
                     <div class="text-right">
                         <p class="text-sm font-900 text-slate-800">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
-                        <span class="text-[9px] font-900 ${isPaid ? 'text-green-500' : 'text-red-500'} bg-gray-50 px-2 py-1 rounded-md uppercase">${n.status}</span>
+                        <span class="text-[9px] font-900 ${isPaid ? 'text-green-500' : 'text-red-500'} bg-gray-50 px-2 py-1 rounded-md">${n.status}</span>
                     </div>
                 </div>`;
         });
-
-        // Update Pagination UI
         const totalPages = Math.ceil(databaseNota.length / itemsPerPage);
         document.getElementById('pageNumber').innerText = `${currentPage} / ${totalPages}`;
         document.getElementById('prevBtn').disabled = currentPage === 1;
         document.getElementById('nextBtn').disabled = currentPage === totalPages;
     }
 
-    // --- POPUP DETAIL NOTA ---
-function bukaDetail(nota) {
-    // 1. Set Data Dasar (Proteksi jika data null)
-    document.getElementById('invId').innerText = nota.id_nota || "INV-000";
-    document.getElementById('invTgl').innerText = nota.tanggal || "-";
-    document.getElementById('invCust').innerText = nota.email || "Umum";
-    document.getElementById('invStatus').innerText = nota.status || "UNPAID";
-    document.getElementById('invStatus').className = "font-900 " + (nota.status === 'PAID' ? 'text-green-600' : 'text-red-600');
-    document.getElementById('invTotal').innerText = "Rp " + (parseInt(nota.total) || 0).toLocaleString('id-ID');
-    
-    // 2. Watermark Status
-    const wm = document.getElementById('watermark');
-    wm.innerHTML = `<span class="${nota.status === 'PAID' ? 'wm-paid' : 'wm-unpaid'}">${nota.status || 'UNPAID'}</span>`;
+    function bukaDetail(nota) {
+        document.getElementById('invId').innerText = nota.id_nota;
+        document.getElementById('invTgl').innerText = nota.tanggal;
+        document.getElementById('invCust').innerText = nota.email;
+        document.getElementById('invStatus').innerText = nota.status;
+        document.getElementById('invStatus').className = "font-900 " + (nota.status === 'PAID' ? 'text-green-600' : 'text-red-600');
+        document.getElementById('invTotal').innerText = "Rp " + (parseInt(nota.total) || 0).toLocaleString('id-ID');
+        
+        document.getElementById('watermark').innerHTML = `<span class="${nota.status === 'PAID' ? 'wm-paid' : 'wm-unpaid'}">${nota.status}</span>`;
 
-    const body = document.getElementById('invItems');
-    body.innerHTML = "";
+        const body = document.getElementById('invItems');
+        body.innerHTML = "";
+        let items = [];
+        try {
+            items = typeof nota.items === 'string' ? JSON.parse(nota.items) : nota.items;
+        } catch(e) { items = []; }
 
-    // 3. LOGIKA PARSING AMAN (Mengatasi Error forEach)
-    let items = [];
-    try {
-        if (typeof nota.items === 'string') {
-            // Jika data berupa string JSON, kita parse
-            items = JSON.parse(nota.items);
-        } else if (Array.isArray(nota.items)) {
-            // Jika sudah berupa Array (seperti data yang Kakak kirim), langsung pakai
-            items = nota.items;
+        if (Array.isArray(items) && items.length > 0) {
+            items.forEach(it => {
+                const q = parseFloat(it.qty) || 0;
+                const h = parseFloat(it.harga) || 0;
+                body.innerHTML += `
+                    <tr class="border-b border-gray-100">
+                        <td class="py-2 text-xs uppercase">${it.nama}<br><span class="text-[8px] text-gray-400">@${h.toLocaleString('id-ID')}</span></td>
+                        <td class="text-center py-2 text-xs">${q}</td>
+                        <td class="text-right py-2 font-bold text-xs">${(q*h).toLocaleString('id-ID')}</td>
+                    </tr>`;
+            });
+        } else {
+            body.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-400">Detail tidak ada</td></tr>`;
         }
-    } catch (e) {
-        console.error("Gagal membaca item nota:", e);
-        items = []; 
+        document.getElementById('modalNota').classList.replace('hidden', 'flex');
     }
 
-    // 4. Render ke Tabel jika items adalah Array
-    if (Array.isArray(items) && items.length > 0) {
-        items.forEach(it => {
-            const q = parseFloat(it.qty) || 0;
-            const h = parseFloat(it.harga) || 0;
-            const subtotal = q * h;
-            
-            body.innerHTML += `
-                <tr class="border-b border-gray-100">
-                    <td class="py-2 align-top text-xs uppercase">
-                        ${it.nama || 'Jasa/Barang'}
-                        <br>
-                        <span class="text-[8px] text-gray-400 font-normal">@${h.toLocaleString('id-ID')}</span>
-                    </td>
-                    <td class="text-center py-2 text-xs">${q}</td>
-                    <td class="text-right py-2 font-bold text-xs">${subtotal.toLocaleString('id-ID')}</td>
-                </tr>`;
-        });
-    } else {
-        body.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-400 italic text-[10px]">Detail item tidak tersedia</td></tr>`;
-    }
-
-    // 5. Tampilkan Modal
-    document.getElementById('modalNota').classList.replace('hidden', 'flex');
-}
-    // --- NAVIGASI ---
     function switchTab(tab) {
         document.getElementById('contentBuat').classList.toggle('hidden', tab !== 'buat');
         document.getElementById('contentRiwayat').classList.toggle('hidden', tab !== 'riwayat');
@@ -417,18 +375,11 @@ function bukaDetail(nota) {
 
     document.getElementById('prevBtn').onclick = () => { if(currentPage > 1) { currentPage--; displayNota(); } };
     document.getElementById('nextBtn').onclick = () => { if(currentPage < Math.ceil(databaseNota.length / itemsPerPage)) { currentPage++; displayNota(); } };
-
+    function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); }
     function unduhPDF() {
         const element = document.getElementById('notaPrintArea');
-        const opt = {
-            margin: 10, filename: `Nota-${document.getElementById('invId').innerText}.pdf`,
-            html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
+        html2pdf().set({ margin: 10, filename: `Nota-${document.getElementById('invId').innerText}.pdf`, html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(element).save();
     }
-
-    function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); }
-
     window.onload = initData;
 </script>
 </body>
