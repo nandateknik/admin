@@ -11,13 +11,18 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .mobile-container { max-width: 480px; min-height: 100vh; margin: 0 auto; background: #f9fafb; position: relative; }
-        #map { height: 350px; width: 100%; z-index: 1; border-bottom-left-radius: 3rem; border-bottom-right-radius: 3rem; }
-        .floating-card { transform: translateY(-60px); z-index: 20; position: relative; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        #map { height: 450px; width: 100%; z-index: 1; border-bottom-left-radius: 3rem; border-bottom-right-radius: 3rem; }
+        .floating-card { transform: translateY(-50px); z-index: 20; position: relative; }
         
-        /* Custom Marker Colors */
-        .marker-pending { filter: hue-rotate(0deg) saturate(2); }
-        .marker-progress { filter: hue-rotate(180deg) saturate(2); }
+        /* Marker Styling berdasarkan status */
+        .marker-icon { border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+        .status-abu { background-color: #9ca3af !important; } /* Belum Dikonfirmasi */
+        .status-biru { background-color: #3b82f6 !important; } /* Tunggu Antrian */
+        .status-kuning { background-color: #eab308 !important; } /* Proses */
+        .status-hijau { background-color: #22c55e !important; } /* Selesai */
+        .status-merah { background-color: #ef4444 !important; } /* Cancel */
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-gray-200">
@@ -27,66 +32,56 @@
         <div class="relative">
             <div id="map" class="shadow-lg"></div>
             
-            <div class="absolute top-10 left-6 right-6 z-[1000] flex justify-between items-center">
-                <div class="bg-white/90 backdrop-blur-md px-5 py-2 rounded-2xl shadow-xl border border-white/50 text-gray-800">
-                    <p class="text-[10px] font-black uppercase tracking-widest opacity-50">Admin Panel</p>
-                    <h1 class="text-sm font-bold">Banyuwangi Area</h1>
+            <div class="absolute top-10 left-6 right-6 z-[1000] space-y-2">
+                <div class="flex gap-2">
+                    <select id="filterPelanggan" onchange="filterData()" class="flex-1 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-white/50 text-[11px] font-bold uppercase tracking-wider outline-none">
+                        <option value="">Semua Pelanggan</option>
+                        </select>
+                    <select id="filterPekerjaan" onchange="filterData()" class="flex-1 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-white/50 text-[11px] font-bold uppercase tracking-wider outline-none">
+                        <option value="">Semua Pekerjaan</option>
+                        <option value="Repair">Repair</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Instalasi">Instalasi</option>
+                    </select>
                 </div>
-                <button onclick="loadData()" class="bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl active:rotate-180 transition-all duration-500">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                </button>
             </div>
+
+            <button onclick="locateUser()" class="absolute bottom-16 right-6 z-[1000] bg-white p-4 rounded-2xl shadow-2xl text-blue-600 active:scale-90 transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+            </button>
         </div>
 
         <main class="px-6 floating-card">
             <div class="bg-white rounded-[2.5rem] p-6 shadow-2xl shadow-blue-900/10 border border-white">
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-orange-50 rounded-3xl p-4 border border-orange-100">
-                        <p class="text-[10px] font-bold text-orange-400 uppercase tracking-widest">Pending</p>
-                        <h2 id="countPending" class="text-2xl font-black text-orange-600">0</h2>
-                    </div>
-                    <div class="bg-blue-50 rounded-3xl p-4 border border-blue-100">
-                        <p class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Progress</p>
-                        <h2 id="countProgress" class="text-2xl font-black text-blue-600">0</h2>
-                    </div>
+                <div class="flex justify-between items-center mb-6 px-2">
+                    <h3 class="font-black text-gray-800 text-xs uppercase tracking-widest">Status Monitor</h3>
+                    <span id="dataCount" class="text-[10px] bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-bold">0 Jobs</span>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between px-2">
-                        <h3 class="font-black text-gray-800 uppercase text-xs tracking-widest">Daftar Pekerjaan</h3>
-                        <div id="loadingStatus" class="hidden w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-
-                    <div id="workOrderContainer" class="space-y-3 min-h-[300px]">
-                        </div>
-
-                    <div class="flex items-center justify-between pt-4 px-2">
-                        <button id="prevBtn" onclick="changePage(-1)" class="p-2 bg-gray-100 rounded-xl disabled:opacity-30">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                        </button>
-                        <span id="pageInfo" class="text-xs font-bold text-gray-400 tracking-widest uppercase">Page 1 of 1</span>
-                        <button id="nextBtn" onclick="changePage(1)" class="p-2 bg-gray-100 rounded-xl disabled:opacity-30">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                        </button>
-                    </div>
+                <div class="grid grid-cols-3 gap-2 mb-8 text-[9px] font-bold uppercase tracking-tighter">
+                    <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-gray-400"></span> Konf.</div>
+                    <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Antri</div>
+                    <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> Proses</div>
+                    <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Selesai</div>
+                    <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Cancel</div>
                 </div>
+
+                <div id="workOrderContainer" class="space-y-4">
+                    </div>
             </div>
         </main>
 
         <nav class="fixed bottom-6 px-6 w-full z-[2000] max-w-[480px] left-1/2 -translate-x-1/2">
-            <div class="bg-gray-900/95 backdrop-blur-lg rounded-[2.5rem] p-4 flex justify-around items-center shadow-2xl border border-white/10">
+            <div class="bg-gray-900/95 backdrop-blur-lg rounded-[2.5rem] p-4 flex justify-around items-center shadow-2xl">
                 <a href="#" class="p-2 text-white"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></a>
-                <a href="booking.html" class="p-2 text-gray-500"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg></a>
-                <a href="nota.html" class="p-2 text-gray-500"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></a>
+                <a href="booking.html" class="p-2 text-gray-500"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></a>
             </div>
         </nav>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbws1kskfQWXl0ReZtnhRFd3rHl-3bozP1ulpIyomWX7sAffsR6NBTTfo-j3IWclgDmvlg/exec";
+        const SCRIPT_URL = "URL_WEB_APP_GAS_LU";
         let map, markerGroup, allData = [];
-        let currentPage = 1;
-        const itemsPerPage = 5;
 
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([-8.2191, 114.3691], 12);
@@ -95,69 +90,93 @@
         }
 
         async function loadData() {
-            document.getElementById('loadingStatus').classList.remove('hidden');
             try {
                 const response = await fetch(SCRIPT_URL);
                 allData = await response.json();
-                renderDashboard();
-            } catch (err) {
-                console.error(err);
-            } finally {
-                document.getElementById('loadingStatus').classList.add('hidden');
+                
+                // Populate Filter Pelanggan Unique
+                const pelangganList = [...new Set(allData.map(item => item.email))];
+                const select = document.getElementById('filterPelanggan');
+                pelangganList.forEach(email => {
+                    select.innerHTML += `<option value="${email}">${email.split('@')[0]}</option>`;
+                });
+
+                filterData();
+            } catch (err) { console.error(err); }
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Belum Dikonfirmasi': return 'status-abu';
+                case 'Tunggu Antrian': return 'status-biru';
+                case 'Proses': return 'status-kuning';
+                case 'Selesai': return 'status-hijau';
+                case 'Cancel': return 'status-merah';
+                default: return 'status-abu';
             }
         }
 
-        function renderDashboard() {
+        function filterData() {
+            const fPelanggan = document.getElementById('filterPelanggan').value;
+            const fPekerjaan = document.getElementById('filterPekerjaan').value;
+            
+            markerGroup.clearLayers();
             const container = document.getElementById('workOrderContainer');
             container.innerHTML = "";
-            markerGroup.clearLayers();
 
-            // Statistik
-            const pending = allData.filter(i => i.status === 'Pending').length;
-            const progress = allData.filter(i => i.status === 'Progress' || i.status === 'Active').length;
-            document.getElementById('countPending').innerText = pending;
-            document.getElementById('countProgress').innerText = progress;
+            const filtered = allData.filter(item => {
+                return (fPelanggan === "" || item.email === fPelanggan) &&
+                       (fPekerjaan === "" || item.pekerjaan === fPekerjaan);
+            });
 
-            // Pagination Logic
-            const unfinished = allData.filter(i => i.status !== 'Selesai');
-            const totalPages = Math.ceil(unfinished.length / itemsPerPage);
-            const start = (currentPage - 1) * itemsPerPage;
-            const paginatedData = unfinished.slice(start, start + itemsPerPage);
+            document.getElementById('dataCount').innerText = `${filtered.length} Jobs`;
 
-            paginatedData.forEach(item => {
-                const isPending = item.status === 'Pending';
-                
-                // Add Marker
+            filtered.forEach(item => {
+                const sClass = getStatusClass(item.status);
+
+                // Add Marker with Navigation Button in Popup
                 if(item.lat && item.lang) {
-                    const m = L.marker([item.lat, item.lang]).addTo(markerGroup);
-                    m._icon.classList.add(isPending ? 'marker-pending' : 'marker-progress');
+                    const customIcon = L.divIcon({
+                        className: `marker-icon ${sClass}`,
+                        iconSize: [15, 15]
+                    });
+
+                    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lang}`;
+                    
+                    L.marker([item.lat, item.lang], {icon: customIcon})
+                        .addTo(markerGroup)
+                        .bindPopup(`
+                            <div class="p-2">
+                                <b class="text-xs">${item.pekerjaan}</b><br>
+                                <span class="text-[10px]">${item.email}</span><br>
+                                <a href="${googleMapsUrl}" target="_blank" class="mt-2 block bg-blue-600 text-white text-[10px] px-2 py-1 rounded text-center font-bold">Petunjuk Jalan</a>
+                            </div>
+                        `);
                 }
 
                 // Render Card
                 container.innerHTML += `
-                    <div onclick="window.location.href='booking.html?id=${item.id}'" class="group bg-gray-50 p-5 rounded-[2rem] border border-gray-100 flex items-center justify-between active:scale-95 transition-all">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-1.5 h-10 rounded-full ${isPending ? 'bg-orange-400' : 'bg-blue-500'}"></div>
-                            <div>
-                                <h4 class="font-black text-gray-800 text-sm tracking-tight">${item.pekerjaan}</h4>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase">${item.email.split('@')[0]}</p>
-                            </div>
+                    <div onclick="window.location.href='booking.html?id=${item.id}'" class="flex items-center gap-4 bg-gray-50 p-4 rounded-3xl border border-gray-100 active:scale-95 transition-all">
+                        <div class="w-3 h-3 rounded-full ${sClass.replace('status-', 'bg-').replace('abu', 'gray-400').replace('biru', 'blue-500').replace('kuning', 'yellow-500').replace('hijau', 'green-500').replace('merah', 'red-500')}"></div>
+                        <div class="flex-1">
+                            <h4 class="text-xs font-black text-gray-800 uppercase tracking-tighter">${item.pekerjaan}</h4>
+                            <p class="text-[10px] text-gray-400 font-bold">${item.email.split('@')[0]}</p>
                         </div>
                         <div class="text-right">
-                             <p class="text-[9px] font-black text-gray-300 uppercase">${item.tanggal}</p>
-                             <span class="text-[8px] font-black ${isPending ? 'text-orange-500' : 'text-blue-500'} uppercase tracking-tighter">${item.status}</span>
+                            <p class="text-[9px] font-black text-gray-300">#${item.id}</p>
                         </div>
-                    </div>`;
+                    </div>
+                `;
             });
 
-            document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages || 1}`;
-            document.getElementById('prevBtn').disabled = currentPage === 1;
-            document.getElementById('nextBtn').disabled = currentPage === totalPages || totalPages === 0;
+            // Jika filter pelanggan dipilih, auto zoom ke marker pertama
+            if(fPelanggan !== "" && filtered.length > 0) {
+                map.setView([filtered[0].lat, filtered[0].lang], 14);
+            }
         }
 
-        function changePage(dir) {
-            currentPage += dir;
-            renderDashboard();
+        function locateUser() {
+            map.locate({setView: true, maxZoom: 15});
         }
 
         window.onload = () => { initMap(); loadData(); };
