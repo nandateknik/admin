@@ -11,18 +11,18 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .mobile-container { max-width: 480px; min-height: 100vh; margin: 0 auto; background: #f9fafb; position: relative; }
-        #map { height: 450px; width: 100%; z-index: 1; border-bottom-left-radius: 3rem; border-bottom-right-radius: 3rem; }
-        .floating-card { transform: translateY(-50px); z-index: 20; position: relative; }
+        #map { height: 500px; width: 100%; z-index: 1; border-bottom-left-radius: 3.5rem; border-bottom-right-radius: 3.5rem; }
         
-        /* Marker Styling berdasarkan status */
-        .marker-icon { border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-        .status-abu { background-color: #9ca3af !important; } /* Belum Dikonfirmasi */
-        .status-biru { background-color: #3b82f6 !important; } /* Tunggu Antrian */
-        .status-kuning { background-color: #eab308 !important; } /* Proses */
-        .status-hijau { background-color: #22c55e !important; } /* Selesai */
-        .status-merah { background-color: #ef4444 !important; } /* Cancel */
+        /* Marker Styling */
+        .dot-marker { border-radius: 50%; border: 2px solid white; box-shadow: 0 0 8px rgba(0,0,0,0.3); }
+        .bg-konf { background-color: #9ca3af; } /* Abu */
+        .bg-antri { background-color: #3b82f6; } /* Biru */
+        .bg-proses { background-color: #eab308; } /* Kuning */
+        .bg-selesai { background-color: #22c55e; } /* Hijau */
+        .bg-cancel { background-color: #ef4444; } /* Merah */
+        .bg-pelanggan { background-color: #8b5cf6; } /* Ungu untuk Mode Pelanggan */
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .switch-active { background-color: #111827; color: white; }
     </style>
 </head>
 <body class="bg-gray-200">
@@ -32,56 +32,48 @@
         <div class="relative">
             <div id="map" class="shadow-lg"></div>
             
-            <div class="absolute top-10 left-6 right-6 z-[1000] space-y-2">
-                <div class="flex gap-2">
-                    <select id="filterPelanggan" onchange="filterData()" class="flex-1 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-white/50 text-[11px] font-bold uppercase tracking-wider outline-none">
-                        <option value="">Semua Pelanggan</option>
-                        </select>
-                    <select id="filterPekerjaan" onchange="filterData()" class="flex-1 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-white/50 text-[11px] font-bold uppercase tracking-wider outline-none">
-                        <option value="">Semua Pekerjaan</option>
-                        <option value="Repair">Repair</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Instalasi">Instalasi</option>
-                    </select>
+            <div class="absolute top-10 left-6 right-6 z-[1000]">
+                <div class="bg-white/80 backdrop-blur-md p-1.5 rounded-[2rem] shadow-2xl border border-white/50 flex">
+                    <button id="modePekerjaan" onclick="switchMode('pekerjaan')" class="flex-1 py-3 px-4 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all switch-active">
+                        Pekerjaan
+                    </button>
+                    <button id="modePelanggan" onclick="switchMode('pelanggan')" class="flex-1 py-3 px-4 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all text-gray-400">
+                        Pelanggan
+                    </button>
                 </div>
             </div>
 
-            <button onclick="locateUser()" class="absolute bottom-16 right-6 z-[1000] bg-white p-4 rounded-2xl shadow-2xl text-blue-600 active:scale-90 transition-all">
+            <button onclick="locateUser()" class="absolute bottom-16 right-8 z-[1000] bg-white p-4 rounded-2xl shadow-2xl text-blue-600 active:scale-90">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
             </button>
         </div>
 
-        <main class="px-6 floating-card">
-            <div class="bg-white rounded-[2.5rem] p-6 shadow-2xl shadow-blue-900/10 border border-white">
-                <div class="flex justify-between items-center mb-6 px-2">
-                    <h3 class="font-black text-gray-800 text-xs uppercase tracking-widest">Status Monitor</h3>
-                    <span id="dataCount" class="text-[10px] bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-bold">0 Jobs</span>
+        <main class="px-6 -mt-8 relative z-20">
+            <div id="legendBox" class="bg-white rounded-[2.5rem] p-6 shadow-2xl border border-white">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="modeTitle" class="font-black text-gray-800 text-xs uppercase tracking-widest font-mono">Mode Pekerjaan</h3>
+                    <span id="jobCount" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">0 Data</span>
                 </div>
-
-                <div class="grid grid-cols-3 gap-2 mb-8 text-[9px] font-bold uppercase tracking-tighter">
-                    <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-gray-400"></span> Konf.</div>
+                
+                <div id="statusLegend" class="grid grid-cols-3 gap-2 text-[8px] font-bold uppercase text-gray-400">
+                    <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-gray-400"></span> Konf</div>
                     <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Antri</div>
                     <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> Proses</div>
                     <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Selesai</div>
                     <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Cancel</div>
                 </div>
-
-                <div id="workOrderContainer" class="space-y-4">
-                    </div>
+                
+                <p id="modeDesc" class="text-[10px] text-gray-400 font-medium leading-relaxed mt-2">
+                    Menampilkan lokasi pekerjaan aktif. Klik node untuk update status.
+                </p>
             </div>
         </main>
-
-        <nav class="fixed bottom-6 px-6 w-full z-[2000] max-w-[480px] left-1/2 -translate-x-1/2">
-            <div class="bg-gray-900/95 backdrop-blur-lg rounded-[2.5rem] p-4 flex justify-around items-center shadow-2xl">
-                <a href="#" class="p-2 text-white"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></a>
-                <a href="booking.html" class="p-2 text-gray-500"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></a>
-            </div>
-        </nav>
     </div>
 
     <script>
-        const SCRIPT_URL = "URL_WEB_APP_GAS_LU";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbws1kskfQWXl0ReZtnhRFd3rHl-3bozP1ulpIyomWX7sAffsR6NBTTfo-j3IWclgDmvlg/exec";
         let map, markerGroup, allData = [];
+        let currentView = 'pekerjaan'; // 'pekerjaan' atau 'pelanggan'
 
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([-8.2191, 114.3691], 12);
@@ -93,91 +85,84 @@
             try {
                 const response = await fetch(SCRIPT_URL);
                 allData = await response.json();
-                
-                // Populate Filter Pelanggan Unique
-                const pelangganList = [...new Set(allData.map(item => item.email))];
-                const select = document.getElementById('filterPelanggan');
-                pelangganList.forEach(email => {
-                    select.innerHTML += `<option value="${email}">${email.split('@')[0]}</option>`;
-                });
-
-                filterData();
+                renderMarkers();
             } catch (err) { console.error(err); }
         }
 
-        function getStatusClass(status) {
+        function switchMode(mode) {
+            currentView = mode;
+            // Update UI Button
+            document.getElementById('modePekerjaan').className = `flex-1 py-3 px-4 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all ${mode === 'pekerjaan' ? 'switch-active' : 'text-gray-400'}`;
+            document.getElementById('modePelanggan').className = `flex-1 py-3 px-4 rounded-[1.8rem] text-[10px] font-black uppercase tracking-widest transition-all ${mode === 'pelanggan' ? 'switch-active' : 'text-gray-400'}`;
+            
+            // Update Legend Box
+            document.getElementById('modeTitle').innerText = `Mode ${mode}`;
+            document.getElementById('statusLegend').style.display = mode === 'pekerjaan' ? 'grid' : 'none';
+            document.getElementById('modeDesc').innerText = mode === 'pekerjaan' 
+                ? "Menampilkan lokasi pekerjaan aktif. Klik node untuk update status."
+                : "Menampilkan database pelanggan. Klik node untuk profil pelanggan.";
+
+            renderMarkers();
+        }
+
+        function getStatusColor(status) {
             switch(status) {
-                case 'Belum Dikonfirmasi': return 'status-abu';
-                case 'Tunggu Antrian': return 'status-biru';
-                case 'Proses': return 'status-kuning';
-                case 'Selesai': return 'status-hijau';
-                case 'Cancel': return 'status-merah';
-                default: return 'status-abu';
+                case 'Tunggu Antrian': return 'bg-antri';
+                case 'Proses': return 'bg-proses';
+                case 'Selesai': return 'bg-selesai';
+                case 'Cancel': return 'bg-cancel';
+                default: return 'bg-konf';
             }
         }
 
-        function filterData() {
-            const fPelanggan = document.getElementById('filterPelanggan').value;
-            const fPekerjaan = document.getElementById('filterPekerjaan').value;
-            
+        function renderMarkers() {
             markerGroup.clearLayers();
-            const container = document.getElementById('workOrderContainer');
-            container.innerHTML = "";
+            let dataToShow = [];
 
-            const filtered = allData.filter(item => {
-                return (fPelanggan === "" || item.email === fPelanggan) &&
-                       (fPekerjaan === "" || item.pekerjaan === fPekerjaan);
-            });
+            if (currentView === 'pekerjaan') {
+                dataToShow = allData; // Tampilkan semua pekerjaan
+            } else {
+                // Mode Pelanggan: Ambil unik berdasarkan email
+                const uniqueEmails = new Set();
+                dataToShow = allData.filter(item => {
+                    const isDuplicate = uniqueEmails.has(item.email);
+                    uniqueEmails.add(item.email);
+                    return !isDuplicate;
+                });
+            }
 
-            document.getElementById('dataCount').innerText = `${filtered.length} Jobs`;
+            document.getElementById('jobCount').innerText = `${dataToShow.length} Data`;
 
-            filtered.forEach(item => {
-                const sClass = getStatusClass(item.status);
+            dataToShow.forEach(item => {
+                if(!item.lat || !item.lang) return;
 
-                // Add Marker with Navigation Button in Popup
-                if(item.lat && item.lang) {
-                    const customIcon = L.divIcon({
-                        className: `marker-icon ${sClass}`,
-                        iconSize: [15, 15]
-                    });
+                const colorClass = currentView === 'pekerjaan' ? getStatusColor(item.status) : 'bg-pelanggan';
+                const customIcon = L.divIcon({
+                    className: `dot-marker ${colorClass}`,
+                    iconSize: [12, 12]
+                });
 
-                    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lang}`;
-                    
-                    L.marker([item.lat, item.lang], {icon: customIcon})
-                        .addTo(markerGroup)
-                        .bindPopup(`
-                            <div class="p-2">
-                                <b class="text-xs">${item.pekerjaan}</b><br>
-                                <span class="text-[10px]">${item.email}</span><br>
-                                <a href="${googleMapsUrl}" target="_blank" class="mt-2 block bg-blue-600 text-white text-[10px] px-2 py-1 rounded text-center font-bold">Petunjuk Jalan</a>
-                            </div>
-                        `);
-                }
+                const marker = L.marker([item.lat, item.lang], {icon: customIcon}).addTo(markerGroup);
+                
+                // Logika Redirect
+                const targetUrl = currentView === 'pekerjaan' 
+                    ? `booking.html?id=${item.id}` 
+                    : `detail-pelanggan.html?email=${encodeURIComponent(item.email)}`;
 
-                // Render Card
-                container.innerHTML += `
-                    <div onclick="window.location.href='booking.html?id=${item.id}'" class="flex items-center gap-4 bg-gray-50 p-4 rounded-3xl border border-gray-100 active:scale-95 transition-all">
-                        <div class="w-3 h-3 rounded-full ${sClass.replace('status-', 'bg-').replace('abu', 'gray-400').replace('biru', 'blue-500').replace('kuning', 'yellow-500').replace('hijau', 'green-500').replace('merah', 'red-500')}"></div>
-                        <div class="flex-1">
-                            <h4 class="text-xs font-black text-gray-800 uppercase tracking-tighter">${item.pekerjaan}</h4>
-                            <p class="text-[10px] text-gray-400 font-bold">${item.email.split('@')[0]}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[9px] font-black text-gray-300">#${item.id}</p>
-                        </div>
+                const popupContent = `
+                    <div class="p-2 text-center">
+                        <b class="text-[10px] uppercase">${currentView === 'pekerjaan' ? item.pekerjaan : item.email.split('@')[0]}</b>
+                        <button onclick="window.location.href='${targetUrl}'" class="mt-2 block w-full bg-gray-900 text-white text-[9px] px-3 py-1.5 rounded-full font-bold uppercase tracking-tighter">
+                            ${currentView === 'pekerjaan' ? 'Update Kerja' : 'Detail Pelanggan'}
+                        </button>
                     </div>
                 `;
+                
+                marker.bindPopup(popupContent);
             });
-
-            // Jika filter pelanggan dipilih, auto zoom ke marker pertama
-            if(fPelanggan !== "" && filtered.length > 0) {
-                map.setView([filtered[0].lat, filtered[0].lang], 14);
-            }
         }
 
-        function locateUser() {
-            map.locate({setView: true, maxZoom: 15});
-        }
+        function locateUser() { map.locate({setView: true, maxZoom: 15}); }
 
         window.onload = () => { initMap(); loadData(); };
     </script>
