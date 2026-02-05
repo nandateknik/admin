@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Update Pekerjaan - Nanda Teknik</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .mobile-container { max-width: 480px; min-height: 100vh; margin: 0 auto; background: #ffffff; position: relative; }
-        .status-btn.active-Tunggu { background-color: #3b82f6; color: white; border-color: #3b82f6; }
-        .status-btn.active-Proses { background-color: #eab308; color: white; border-color: #eab308; }
-        .status-btn.active-Cancel { background-color: #ef4444; color: white; border-color: #ef4444; }
-        .status-btn.active-Selesai { background-color: #22c55e; color: white; border-color: #22c55e; }
+        .status-btn.active-Tunggu { background-color: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3); }
+        .status-btn.active-Proses { background-color: #eab308; color: white; border-color: #eab308; box-shadow: 0 10px 15px -3px rgba(234, 179, 8, 0.3); }
+        .status-btn.active-Cancel { background-color: #ef4444; color: white; border-color: #ef4444; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3); }
+        .status-btn.active-Selesai { background-color: #22c55e; color: white; border-color: #22c55e; box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.3); }
     </style>
 </head>
 <body class="bg-gray-200">
@@ -20,10 +21,10 @@
     <div class="mobile-container shadow-2xl flex flex-col pb-10">
         
         <div class="p-8 pb-4 flex items-center justify-between">
-            <a href="dashboard.html" class="bg-gray-100 p-3 rounded-2xl active:scale-90 transition-all text-gray-800">
+            <button onclick="window.history.back()" class="bg-gray-100 p-3 rounded-2xl active:scale-90 transition-all text-gray-800 border border-gray-200">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            </a>
-            <h1 class="text-xl font-black text-gray-800 tracking-tight">Manajemen Kerja</h1>
+            </button>
+            <h1 class="text-xl font-black text-gray-800 tracking-tight">Update Progres</h1>
             <div class="w-10"></div>
         </div>
 
@@ -71,67 +72,104 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbws1kskfQWXl0ReZtnhRFd3rHl-3bozP1ulpIyomWX7sAffsR6NBTTfo-j3IWclgDmvlg/exec";
+        // 1. KONFIGURASI
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec";
+        const DASHBOARD_URL = "dashboard.html"; // Ganti ke dashboard.html jika nama filenya itu
+        
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('id');
 
+        // 2. FITUR REDIRECT JIKA ID KOSONG
+        if (!orderId) {
+            window.location.href = DASHBOARD_URL;
+        }
+
+        // Fungsi Pilih Status
         function setStatus(status) {
-            // Reset kabeh style
             document.querySelectorAll('.status-btn').forEach(btn => {
                 btn.className = "status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all";
             });
 
-            // Aktifkan yang dipilih
-            const activeBtn = document.getElementById('btn-' + status.split(' ')[0]);
             const colorKey = status.split(' ')[0];
-            activeBtn.classList.add('active-' + colorKey);
+            const activeBtn = document.getElementById('btn-' + colorKey);
+            if(activeBtn) activeBtn.classList.add('active-' + colorKey);
             document.getElementById('statusValue').value = status;
         }
 
+        // 3. LOAD DATA DARI SERVER
         async function loadData() {
-            if(!orderId) return;
             document.getElementById('orderId').value = "#" + orderId;
 
             try {
-                // Tarik data dari GAS untuk ID ini
                 const response = await fetch(SCRIPT_URL);
                 const allData = await response.json();
-                const item = allData.find(i => i.id == orderId);
+                
+                // Cari data berdasarkan ID
+                const item = allData.find(i => i.id.toString() === orderId.toString());
 
                 if(item) {
-                    document.getElementById('email').value = item.email;
-                    document.getElementById('pekerjaan').value = item.pekerjaan;
+                    document.getElementById('email').value = item.nama_pelanggan || item.email;
+                    document.getElementById('pekerjaan').value = item.pekerjaan || "Layanan Umum";
                     document.getElementById('keterangan').value = item.Keterangan || "";
                     if(item.status) setStatus(item.status);
+                } else {
+                    // Jika ID ada di link tapi tidak ada di database
+                    Swal.fire({
+                        title: 'Data Tidak Ada',
+                        text: 'Pekerjaan dengan ID ini tidak ditemukan di database.',
+                        icon: 'error',
+                        confirmButtonText: 'Kembali'
+                    }).then(() => { window.location.href = DASHBOARD_URL; });
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error(err);
+                Swal.fire('Error', 'Gagal terhubung ke database Nanda Teknik.', 'error');
+            }
         }
 
+        // 4. KIRIM UPDATE KE GOOGLE SHEETS
         document.getElementById('updateForm').onsubmit = async (e) => {
             e.preventDefault();
+            
+            const status = document.getElementById('statusValue').value;
+            if(!status) {
+                Swal.fire('Pilih Status', 'Status pekerjaan belum dipilih!', 'warning');
+                return;
+            }
+
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = "Menyimpan...";
+            submitBtn.innerHTML = `<span>Memproses...</span>`;
 
             const payload = {
                 id: orderId,
-                status: document.getElementById('statusValue').value,
+                status: status,
                 keterangan: document.getElementById('keterangan').value,
-                action: 'updateStatus' // Flag buat di GAS
+                action: 'updateStatus'
             };
 
             try {
-                // Kita pake POST ke GAS
+                // Menggunakan POST ke Apps Script
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors', 
                     body: JSON.stringify(payload)
                 });
-                alert('Data berhasil diupdate!');
-                window.location.href = 'dashboard.html';
+
+                // Sweet Alert Sukses
+                Swal.fire({
+                    title: 'Berhasil Update!',
+                    text: 'Data pengerjaan telah diperbarui di server.',
+                    icon: 'success',
+                    confirmButtonColor: '#111827'
+                }).then(() => {
+                    window.location.href = DASHBOARD_URL;
+                });
+
             } catch (err) {
-                alert('Gagal simpan data');
+                Swal.fire('Gagal Simpan', 'Koneksi bermasalah, coba lagi.', 'error');
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = "Simpan Perubahan";
+                submitBtn.innerHTML = `<span>Simpan Perubahan</span>`;
             }
         };
 
