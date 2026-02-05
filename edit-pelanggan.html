@@ -60,23 +60,30 @@
         // Redirect jika email tidak ada di URL
         if (!targetEmail) window.location.href = 'index.html';
 
-        async function loadCustData() {
-            try {
-                const response = await fetch(SCRIPT_URL);
-                const allData = await response.json();
-                // Cari data di array pelanggan
-                const item = allData.find(i => i.email === targetEmail);
+       async function loadCustData() {
+    try {
+        const response = await fetch(SCRIPT_URL);
+        const allData = await response.json();
+        const item = allData.find(i => i.email === targetEmail);
 
-                if (item) {
-                    document.getElementById('custEmail').value = item.email;
-                    document.getElementById('custName').value = item.nama_pelanggan || "";
-                    document.getElementById('custWA').value = item.whatsapp || "";
-                    document.getElementById('custUltah').value = item.tanggal_lahir || "";
-                }
-            } catch (err) {
-                Swal.fire('Error', 'Gagal memuat data pelanggan', 'error');
+        if (item) {
+            document.getElementById('custEmail').value = item.email;
+            document.getElementById('custName').value = item.nama_pelanggan || "";
+            document.getElementById('custWA').value = item.whatsapp || "";
+            
+            // PERBAIKAN FORMAT TANGGAL DI SINI
+            if (item.tanggal_lahir) {
+                // Mengambil 10 karakter pertama saja (YYYY-MM-DD)
+                const dateOnly = item.tanggal_lahir.split('T')[0];
+                document.getElementById('custUltah').value = dateOnly;
+            } else {
+                document.getElementById('custUltah').value = "";
             }
         }
+    } catch (err) {
+        Swal.fire('Error', 'Gagal memuat data pelanggan', 'error');
+    }
+}
 
         document.getElementById('editCustForm').onsubmit = async (e) => {
             e.preventDefault();
