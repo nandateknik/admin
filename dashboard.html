@@ -122,8 +122,7 @@
         </div>
     </div>
 
-    <script>
-        // GANTI INI DENGAN URL DEPLOY ANDA
+  <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec";
         
         let map, markerGroup, allData = [];
@@ -157,7 +156,10 @@
 
         function renderMarkers() {
             markerGroup.clearLayers();
-            let displayData = currentMode === 'pekerjaan' ? allData.filter(d => d.status !== 'Selesai') : [...new Map(allData.map(item => [item.email, item])).values()];
+            // Filter: mode pekerjaan (tampilkan yang belum selesai), mode pelanggan (unique by email)
+            let displayData = currentMode === 'pekerjaan' 
+                ? allData.filter(d => d.status !== 'Selesai') 
+                : [...new Map(allData.map(item => [item.email, item])).values()];
 
             displayData.forEach(item => {
                 const lat = (currentMode === 'pekerjaan') ? item.lat : item.lat_rumah;
@@ -187,10 +189,8 @@
             st.innerText = item.status || "PENDING";
             st.className = `px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${getStatusColor(item.status).replace('bg-', 'bg-opacity-20 text-')}`;
             
+            // Perbaikan Link Navigasi & WA
             document.getElementById('navJob').href = `https://www.google.com/maps?q=${lat},${lng}`;
-            document.getElementById('btnEditCust').onclick = () => {
-                window.location.href = `edit-pelanggan.html?email=${item.email}`;
-            };
             document.getElementById('waJob').href = `https://wa.me/${formatWA(item.whatsapp)}`;
             document.getElementById('btnUpdate').onclick = () => window.location.href = `booking.html?id=${item.id}`;
             
@@ -207,7 +207,13 @@
             document.getElementById('custWA').innerText = item.whatsapp || "-";
             document.getElementById('custUltah').innerText = item.tanggal_lahir || "-";
             
+            // Link Navigasi Rumah
             document.getElementById('navCust').href = `https://www.google.com/maps?q=${item.lat_rumah},${item.lang_rumah}`;
+            
+            // FITUR EDIT PELANGGAN
+            document.getElementById('btnEditCust').onclick = () => {
+                window.location.href = `edit-pelanggan.html?email=${encodeURIComponent(item.email)}`;
+            };
             
             document.getElementById('bottomSheet').classList.add('active');
             map.flyTo([lat, lng], 15);
