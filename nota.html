@@ -350,33 +350,62 @@
     }
 
     // --- POPUP DETAIL NOTA ---
-    function bukaDetail(nota) {
-        document.getElementById('invId').innerText = nota.id_nota;
-        document.getElementById('invTgl').innerText = nota.tanggal;
-        document.getElementById('invCust').innerText = nota.email;
-        document.getElementById('invStatus').innerText = nota.status;
-        document.getElementById('invStatus').className = "font-900 " + (nota.status === 'PAID' ? 'text-green-600' : 'text-red-600');
-        document.getElementById('invTotal').innerText = "Rp " + parseInt(nota.total).toLocaleString('id-ID');
-        
-        const wm = document.getElementById('watermark');
-        wm.innerHTML = `<span class="${nota.status === 'PAID' ? 'wm-paid' : 'wm-unpaid'}">${nota.status}</span>`;
+function bukaDetail(nota) {
+    // 1. Set Data Dasar (Proteksi jika data null)
+    document.getElementById('invId').innerText = nota.id_nota || "INV-000";
+    document.getElementById('invTgl').innerText = nota.tanggal || "-";
+    document.getElementById('invCust').innerText = nota.email || "Umum";
+    document.getElementById('invStatus').innerText = nota.status || "UNPAID";
+    document.getElementById('invStatus').className = "font-900 " + (nota.status === 'PAID' ? 'text-green-600' : 'text-red-600');
+    document.getElementById('invTotal').innerText = "Rp " + (parseInt(nota.total) || 0).toLocaleString('id-ID');
+    
+    // 2. Watermark Status
+    const wm = document.getElementById('watermark');
+    wm.innerHTML = `<span class="${nota.status === 'PAID' ? 'wm-paid' : 'wm-unpaid'}">${nota.status || 'UNPAID'}</span>`;
 
-        const items = typeof nota.items === 'string' ? JSON.parse(nota.items) : nota.items;
-        const body = document.getElementById('invItems');
-        body.innerHTML = "";
-        items.forEach(it => {
-            const subtotal = (it.qty || 1) * it.harga;
-            body.innerHTML += `
-                <tr class="border-b border-gray-100">
-                    <td class="py-2 align-top">${it.nama} <br> <span class="text-[8px] text-gray-500">@${parseInt(it.harga).toLocaleString('id-ID')}</span></td>
-                    <td class="text-center py-2">${it.qty}</td>
-                    <td class="text-right py-2 font-bold">${subtotal.toLocaleString('id-ID')}</td>
-                </tr>`;
-        });
+    const body = document.getElementById('invItems');
+    body.innerHTML = "";
 
-        document.getElementById('modalNota').classList.replace('hidden', 'flex');
+    // 3. LOGIKA PARSING AMAN (Mengatasi Error forEach)
+    let items = [];
+    try {
+        if (typeof nota.items === 'string') {
+            // Jika data berupa string JSON, kita parse
+            items = JSON.parse(nota.items);
+        } else if (Array.isArray(nota.items)) {
+            // Jika sudah berupa Array (seperti data yang Kakak kirim), langsung pakai
+            items = nota.items;
+        }
+    } catch (e) {
+        console.error("Gagal membaca item nota:", e);
+        items = []; 
     }
 
+    // 4. Render ke Tabel jika items adalah Array
+    if (Array.isArray(items) && items.length > 0) {
+        items.forEach(it => {
+            const q = parseFloat(it.qty) || 0;
+            const h = parseFloat(it.harga) || 0;
+            const subtotal = q * h;
+            
+            body.innerHTML += `
+                <tr class="border-b border-gray-100">
+                    <td class="py-2 align-top text-xs uppercase">
+                        ${it.nama || 'Jasa/Barang'}
+                        <br>
+                        <span class="text-[8px] text-gray-400 font-normal">@${h.toLocaleString('id-ID')}</span>
+                    </td>
+                    <td class="text-center py-2 text-xs">${q}</td>
+                    <td class="text-right py-2 font-bold text-xs">${subtotal.toLocaleString('id-ID')}</td>
+                </tr>`;
+        });
+    } else {
+        body.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-400 italic text-[10px]">Detail item tidak tersedia</td></tr>`;
+    }
+
+    // 5. Tampilkan Modal
+    document.getElementById('modalNota').classList.replace('hidden', 'flex');
+}
     // --- NAVIGASI ---
     function switchTab(tab) {
         document.getElementById('contentBuat').classList.toggle('hidden', tab !== 'buat');
