@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Booking Service - Nanda Teknik</title>
+    <title>Update Pekerjaan - Nanda Teknik</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .mobile-container { max-width: 480px; min-height: 100vh; margin: 0 auto; background: #ffffff; position: relative; }
-        .input-group:focus-within label { color: #2563eb; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #2563eb; }
+        .status-btn.active-Tunggu { background-color: #3b82f6; color: white; border-color: #3b82f6; }
+        .status-btn.active-Proses { background-color: #eab308; color: white; border-color: #eab308; }
+        .status-btn.active-Cancel { background-color: #ef4444; color: white; border-color: #ef4444; }
+        .status-btn.active-Selesai { background-color: #22c55e; color: white; border-color: #22c55e; }
     </style>
 </head>
 <body class="bg-gray-200">
@@ -18,69 +20,50 @@
     <div class="mobile-container shadow-2xl flex flex-col pb-10">
         
         <div class="p-8 pb-4 flex items-center justify-between">
-            <a href="dashboard.html" class="bg-gray-100 p-3 rounded-2xl active:scale-90 transition-all">
-                <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <a href="dashboard.html" class="bg-gray-100 p-3 rounded-2xl active:scale-90 transition-all text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </a>
-            <h1 class="text-xl font-black text-gray-800 tracking-tight">Detail Pesanan</h1>
-            <div class="w-10"></div> </div>
+            <h1 class="text-xl font-black text-gray-800 tracking-tight">Manajemen Kerja</h1>
+            <div class="w-10"></div>
+        </div>
 
         <main class="px-8 pt-4">
-            <form id="bookingForm" class="space-y-6">
+            <form id="updateForm" class="space-y-6">
                 
-                <div class="input-group">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Order ID</label>
-                    <input type="text" id="orderId" readonly class="w-full bg-gray-50 border-2 border-gray-50 text-gray-400 font-bold px-6 py-4 rounded-[2rem] transition-all" value="#WAITING">
+                <div class="bg-gray-50 rounded-[2rem] p-6 border border-gray-100 mb-2">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Order ID</p>
+                    <input type="text" id="orderId" readonly class="bg-transparent font-black text-lg text-gray-800 outline-none w-full" value="#LOADING...">
                 </div>
 
-                <div class="input-group">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Email Pelanggan</label>
-                    <input type="email" id="email" required placeholder="example@mail.com" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-medium transition-all">
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Pelanggan</label>
+                    <input type="text" id="email" readonly class="w-full bg-white border-2 border-gray-50 px-6 py-4 rounded-[2rem] font-bold text-gray-600 transition-all">
                 </div>
 
-                <div class="input-group">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Jenis Pekerjaan</label>
-                    <select id="pekerjaan" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-medium appearance-none transition-all">
-                        <option value="Repair">Repair (Perbaikan)</option>
-                        <option value="Maintenance">Maintenance (Perawatan)</option>
-                        <option value="Instalasi">Instalasi Baru</option>
-                    </select>
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Layanan</label>
+                    <input type="text" id="pekerjaan" readonly class="w-full bg-white border-2 border-gray-50 px-6 py-4 rounded-[2rem] font-bold text-gray-600 transition-all">
                 </div>
 
-                <div id="statusSection" class="input-group">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Update Status</label>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="setStatus('Pending')" class="status-btn flex-1 py-3 rounded-2xl border-2 border-orange-100 text-[10px] font-black uppercase text-orange-500" id="btnPending">Pending</button>
-                        <button type="button" onclick="setStatus('Progress')" class="status-btn flex-1 py-3 rounded-2xl border-2 border-blue-100 text-[10px] font-black uppercase text-blue-500" id="btnProgress">Progress</button>
-                        <button type="button" onclick="setStatus('Selesai')" class="status-btn flex-1 py-3 rounded-2xl border-2 border-green-100 text-[10px] font-black uppercase text-green-500" id="btnSelesai">Selesai</button>
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-3 block">Update Status</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" onclick="setStatus('Tunggu Antrian')" id="btn-Tunggu" class="status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all">Tunggu Antrian</button>
+                        <button type="button" onclick="setStatus('Proses')" id="btn-Proses" class="status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all">Proses</button>
+                        <button type="button" onclick="setStatus('Cancel')" id="btn-Cancel" class="status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all">Cancel</button>
+                        <button type="button" onclick="setStatus('Selesai')" id="btn-Selesai" class="status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all">Selesai</button>
                     </div>
-                    <input type="hidden" id="status" value="Pending">
+                    <input type="hidden" id="statusValue" name="status">
                 </div>
 
-                <div class="bg-blue-600 rounded-[2.5rem] p-6 text-white shadow-xl shadow-blue-200 relative overflow-hidden">
-                    <div class="absolute right-0 top-0 w-24 h-24 bg-white/10 rounded-full -mr-10 -mt-10"></div>
-                    <div class="relative z-10 flex justify-between items-center">
-                        <div>
-                            <p class="text-[9px] font-bold uppercase opacity-80 tracking-widest">Biaya Akomodasi</p>
-                            <h3 id="ongkosDisplay" class="text-xl font-black">Rp 0</h3>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[9px] font-bold uppercase opacity-80 tracking-widest">Koordinat</p>
-                            <p id="coordDisplay" class="text-[10px] font-mono">0.00, 0.00</p>
-                        </div>
-                    </div>
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Keterangan / Catatan Teknisi</label>
+                    <textarea id="keterangan" rows="4" placeholder="Tambahkan catatan progres atau alasan cancel..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-medium transition-all outline-none text-sm text-gray-700"></textarea>
                 </div>
 
-                <div class="input-group">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Keterangan Tambahan</label>
-                    <textarea id="keterangan" rows="3" placeholder="Contoh: AC merk Samsung, bocor air..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-medium transition-all"></textarea>
-                </div>
-
-                <input type="hidden" id="lat">
-                <input type="hidden" id="lang">
-
-                <button type="submit" id="submitBtn" class="w-full bg-gray-900 text-white py-6 rounded-[2rem] font-black shadow-xl shadow-gray-300 active:scale-95 transition-all flex items-center justify-center space-x-3">
-                    <span id="btnText">Simpan Data Pesanan</span>
-                    <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <button type="submit" id="submitBtn" class="w-full bg-gray-900 text-white py-6 rounded-[2rem] font-black shadow-xl shadow-gray-300 active:scale-95 transition-all flex items-center justify-center space-x-3 mt-4">
+                    <span>Simpan Perubahan</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 </button>
 
             </form>
@@ -88,63 +71,71 @@
     </div>
 
     <script>
-        // Tangkap parameter ID dari URL (untuk Admin)
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbws1kskfQWXl0ReZtnhRFd3rHl-3bozP1ulpIyomWX7sAffsR6NBTTfo-j3IWclgDmvlg/exec";
         const urlParams = new URLSearchParams(window.location.search);
-        const orderIdParam = urlParams.get('id');
+        const orderId = urlParams.get('id');
 
-        window.onload = () => {
-            if (orderIdParam) {
-                // MODE EDIT (Admin)
-                document.getElementById('orderId').value = "#" + orderIdParam;
-                document.getElementById('btnText').innerText = "Update Status Kerja";
-                loadExistingData(orderIdParam);
-            } else {
-                // MODE BARU (Customer dari Cek Ongkos)
-                const tempLat = sessionStorage.getItem('tempLat');
-                const tempLang = sessionStorage.getItem('tempLang');
-                const tempOngkos = sessionStorage.getItem('tempOngkos');
+        function setStatus(status) {
+            // Reset kabeh style
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.className = "status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all";
+            });
 
-                if (tempLat) {
-                    document.getElementById('lat').value = tempLat;
-                    document.getElementById('lang').value = tempLang;
-                    document.getElementById('coordDisplay').innerText = `${parseFloat(tempLat).toFixed(4)}, ${parseFloat(tempLang).toFixed(4)}`;
-                    document.getElementById('ongkosDisplay').innerText = `Rp ${parseInt(tempOngkos).toLocaleString('id-ID')}`;
+            // Aktifkan yang dipilih
+            const activeBtn = document.getElementById('btn-' + status.split(' ')[0]);
+            const colorKey = status.split(' ')[0];
+            activeBtn.classList.add('active-' + colorKey);
+            document.getElementById('statusValue').value = status;
+        }
+
+        async function loadData() {
+            if(!orderId) return;
+            document.getElementById('orderId').value = "#" + orderId;
+
+            try {
+                // Tarik data dari GAS untuk ID ini
+                const response = await fetch(SCRIPT_URL);
+                const allData = await response.json();
+                const item = allData.find(i => i.id == orderId);
+
+                if(item) {
+                    document.getElementById('email').value = item.email;
+                    document.getElementById('pekerjaan').value = item.pekerjaan;
+                    document.getElementById('keterangan').value = item.Keterangan || "";
+                    if(item.status) setStatus(item.status);
                 }
+            } catch (err) { console.error(err); }
+        }
+
+        document.getElementById('updateForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "Menyimpan...";
+
+            const payload = {
+                id: orderId,
+                status: document.getElementById('statusValue').value,
+                keterangan: document.getElementById('keterangan').value,
+                action: 'updateStatus' // Flag buat di GAS
+            };
+
+            try {
+                // Kita pake POST ke GAS
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                alert('Data berhasil diupdate!');
+                window.location.href = 'dashboard.html';
+            } catch (err) {
+                alert('Gagal simpan data');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = "Simpan Perubahan";
             }
         };
 
-        function setStatus(val) {
-            document.getElementById('status').value = val;
-            // Reset kabeh tombol
-            document.querySelectorAll('.status-btn').forEach(btn => {
-                btn.classList.remove('bg-orange-500', 'bg-blue-600', 'bg-green-600', 'text-white');
-            });
-            // Highlight tombol terpilih
-            const activeBtn = document.getElementById('btn' + val);
-            if(val === 'Pending') activeBtn.classList.add('bg-orange-500', 'text-white');
-            if(val === 'Progress') activeBtn.classList.add('bg-blue-600', 'text-white');
-            if(val === 'Selesai') activeBtn.classList.add('bg-green-600', 'text-white');
-        }
-
-        async function loadExistingData(id) {
-            // Logika ambil data dari GAS berdasarkan ID
-            // Lu bisa panggil fungsi fetch yang sama kayak di dashboard
-            // Terus isi field-nya pake document.getElementById().value = ...
-        }
-
-        document.getElementById('bookingForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.classList.add('opacity-50');
-            document.getElementById('btnText').innerText = "Mengirim...";
-
-            // Logika Kirim ke GAS (doPost)
-            // ... (Kode fetch POST ke Google Apps Script)
-            
-            alert('Data Berhasil Disimpan!');
-            window.location.href = 'dashboard.html';
-        };
+        window.onload = loadData;
     </script>
 </body>
 </html>
