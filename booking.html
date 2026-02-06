@@ -10,10 +10,11 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .mobile-container { max-width: 480px; min-height: 100vh; margin: 0 auto; background: #ffffff; position: relative; }
-        .status-btn.active-Tunggu { background-color: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3); }
-        .status-btn.active-Proses { background-color: #eab308; color: white; border-color: #eab308; box-shadow: 0 10px 15px -3px rgba(234, 179, 8, 0.3); }
-        .status-btn.active-Cancel { background-color: #ef4444; color: white; border-color: #ef4444; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3); }
-        .status-btn.active-Selesai { background-color: #22c55e; color: white; border-color: #22c55e; box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.3); }
+        /* Perbaikan CSS Status agar lebih tegas */
+        .status-btn.active-Tunggu { background-color: #3b82f6 !important; color: white !important; border-color: #3b82f6 !important; }
+        .status-btn.active-Proses { background-color: #eab308 !important; color: white !important; border-color: #eab308 !important; }
+        .status-btn.active-Cancel { background-color: #ef4444 !important; color: white !important; border-color: #ef4444 !important; }
+        .status-btn.active-Selesai { background-color: #22c55e !important; color: white !important; border-color: #22c55e !important; }
     </style>
 </head>
 <body class="bg-gray-200">
@@ -33,37 +34,37 @@
                 
                 <div class="bg-gray-50 rounded-[2rem] p-6 border border-gray-100 mb-2">
                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Order ID</p>
-                    <input type="text" id="orderId" readonly class="bg-transparent font-black text-lg text-gray-800 outline-none w-full" value="#LOADING...">
+                    <input type="text" id="orderIdDisplay" readonly class="bg-transparent font-black text-lg text-gray-800 outline-none w-full">
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Pelanggan</label>
-                    <input type="text" id="email" readonly class="w-full bg-white border-2 border-gray-50 px-6 py-4 rounded-[2rem] font-bold text-gray-600 transition-all">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Nama Pelanggan</label>
+                    <input type="text" id="pelangganName" readonly class="w-full bg-gray-50 border-2 border-gray-50 px-6 py-4 rounded-[2rem] font-bold text-gray-600 outline-none">
                 </div>
 
                 <div>
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Layanan</label>
-                    <input type="text" id="pekerjaan" readonly class="w-full bg-white border-2 border-gray-50 px-6 py-4 rounded-[2rem] font-bold text-gray-600 transition-all">
+                    <input type="text" id="pekerjaan" readonly class="w-full bg-gray-50 border-2 border-gray-50 px-6 py-4 rounded-[2rem] font-bold text-gray-600 outline-none">
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-3 block">Update Status</label>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-3 block">Update Status Terbaru</label>
                     <div class="grid grid-cols-2 gap-3">
                         <button type="button" onclick="setStatus('Tunggu Antrian')" id="btn-Tunggu" class="status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all">Tunggu Antrian</button>
                         <button type="button" onclick="setStatus('Proses')" id="btn-Proses" class="status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all">Proses</button>
                         <button type="button" onclick="setStatus('Cancel')" id="btn-Cancel" class="status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all">Cancel</button>
                         <button type="button" onclick="setStatus('Selesai')" id="btn-Selesai" class="status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all">Selesai</button>
                     </div>
-                    <input type="hidden" id="statusValue" name="status">
+                    <input type="hidden" id="statusValue">
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Keterangan / Catatan Teknisi</label>
-                    <textarea id="keterangan" rows="4" placeholder="Tambahkan catatan progres atau alasan cancel..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-medium transition-all outline-none text-sm text-gray-700"></textarea>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Catatan Pengerjaan</label>
+                    <textarea id="keterangan" rows="4" placeholder="Contoh: Freon bocor sudah dilas, tinggal vacuum..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-medium transition-all outline-none text-sm text-gray-700"></textarea>
                 </div>
 
                 <button type="submit" id="submitBtn" class="w-full bg-gray-900 text-white py-6 rounded-[2rem] font-black shadow-xl shadow-gray-300 active:scale-95 transition-all flex items-center justify-center space-x-3 mt-4">
-                    <span>Simpan Perubahan</span>
+                    <span>SIMPAN PERUBAHAN</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 </button>
 
@@ -72,74 +73,74 @@
     </div>
 
     <script>
-        // 1. KONFIGURASI
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxBFrqXssPPrb41nq5zov2ASPDzqvoC0jKafKDDYbET5KDPzkZViJg0p6K0IrxOlsllaQ/exec";
-        const DASHBOARD_URL = "dashboard.html"; // Ganti ke dashboard.html jika nama filenya itu
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygguAe-O1a52xfhcNrEUeOe111ZK7IQ2cZgcdfTFuBXNvPsbLxV8QNq9xBRgVEcu5EWg/exec";
+        const DASHBOARD_URL = "dashboard.html"; 
         
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('id');
 
-        // 2. FITUR REDIRECT JIKA ID KOSONG
         if (!orderId) {
             window.location.href = DASHBOARD_URL;
         }
 
-        // Fungsi Pilih Status
         function setStatus(status) {
             document.querySelectorAll('.status-btn').forEach(btn => {
-                btn.className = "status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all";
+                btn.className = "status-btn py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase transition-all text-gray-400 bg-white";
             });
 
             const colorKey = status.split(' ')[0];
             const activeBtn = document.getElementById('btn-' + colorKey);
-            if(activeBtn) activeBtn.classList.add('active-' + colorKey);
+            if(activeBtn) {
+                activeBtn.classList.add('active-' + colorKey);
+            }
             document.getElementById('statusValue').value = status;
         }
 
-        // 3. LOAD DATA DARI SERVER
         async function loadData() {
-            document.getElementById('orderId').value = "#" + orderId;
+            document.getElementById('orderIdDisplay').value = "#" + orderId;
+            
+            // Efek Loading pada input
+            document.getElementById('pelangganName').value = "Memuat data...";
 
             try {
                 const response = await fetch(SCRIPT_URL);
                 const allData = await response.json();
                 
-                // Cari data berdasarkan ID
-                const item = allData.find(i => i.id.toString() === orderId.toString());
+                // Cari data (ID dari URL biasanya string, pastikan pencarian aman)
+                const item = allData.find(i => String(i.id) === String(orderId));
 
                 if(item) {
-                    document.getElementById('email').value = item.nama_pelanggan || item.email;
-                    document.getElementById('pekerjaan').value = item.pekerjaan || "Layanan Umum";
-                    document.getElementById('keterangan').value = item.Keterangan || "";
-                    if(item.status) setStatus(item.status);
+                    document.getElementById('pelangganName').value = item.nama_pelanggan || "Tanpa Nama";
+                    document.getElementById('pekerjaan').value = item.pekerjaan || "Layanan Teknik";
+                    document.getElementById('keterangan').value = item.keterangan || ""; // Sesuaikan huruf kecil 'keterangan'
+                    
+                    if(item.status) {
+                        setStatus(item.status);
+                    }
                 } else {
-                    // Jika ID ada di link tapi tidak ada di database
-                    Swal.fire({
-                        title: 'Data Tidak Ada',
-                        text: 'Pekerjaan dengan ID ini tidak ditemukan di database.',
-                        icon: 'error',
-                        confirmButtonText: 'Kembali'
-                    }).then(() => { window.location.href = DASHBOARD_URL; });
+                    Swal.fire('Data Tidak Ditemukan', 'ID #' + orderId + ' tidak ada di database.', 'error')
+                    .then(() => { window.location.href = DASHBOARD_URL; });
                 }
             } catch (err) { 
                 console.error(err);
-                Swal.fire('Error', 'Gagal terhubung ke database Nanda Teknik.', 'error');
+                Swal.fire('Error', 'Gagal memuat data dari pusat.', 'error');
             }
         }
 
-        // 4. KIRIM UPDATE KE GOOGLE SHEETS
         document.getElementById('updateForm').onsubmit = async (e) => {
             e.preventDefault();
             
             const status = document.getElementById('statusValue').value;
             if(!status) {
-                Swal.fire('Pilih Status', 'Status pekerjaan belum dipilih!', 'warning');
+                Swal.fire('Pilih Status', 'Anda belum memilih status terbaru.', 'warning');
                 return;
             }
 
             const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span>Memproses...</span>`;
+            submitBtn.innerHTML = `<span>MENGIRIM NOTIFIKASI...</span>`;
 
             const payload = {
                 id: orderId,
@@ -149,27 +150,29 @@
             };
 
             try {
-                // Menggunakan POST ke Apps Script
+                // Kirim ke GAS
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors', 
                     body: JSON.stringify(payload)
                 });
 
-                // Sweet Alert Sukses
-                Swal.fire({
-                    title: 'Berhasil Update!',
-                    text: 'Data pengerjaan telah diperbarui di server.',
-                    icon: 'success',
-                    confirmButtonColor: '#111827'
-                }).then(() => {
-                    window.location.href = DASHBOARD_URL;
-                });
+                // Tampilkan sukses (Gunakan jeda agar terasa prosesnya)
+                setTimeout(() => {
+                    Swal.fire({
+                        title: 'Update Berhasil!',
+                        text: 'Pelanggan telah menerima email notifikasi otomatis.',
+                        icon: 'success',
+                        confirmButtonColor: '#111827'
+                    }).then(() => {
+                        window.location.href = DASHBOARD_URL;
+                    });
+                }, 1000);
 
             } catch (err) {
-                Swal.fire('Gagal Simpan', 'Koneksi bermasalah, coba lagi.', 'error');
+                Swal.fire('Gagal Simpan', 'Koneksi terputus.', 'error');
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = `<span>Simpan Perubahan</span>`;
+                submitBtn.innerHTML = originalText;
             }
         };
 
