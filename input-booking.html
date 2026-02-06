@@ -86,7 +86,8 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxBFrqXssPPrb41nq5zov2ASPDzqvoC0jKafKDDYbET5KDPzkZViJg0p6K0IrxOlsllaQ/exec"; 
+        // GANTI INI DENGAN URL SCRIPT TERBARU ANDA
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygguAe-O1a52xfhcNrEUeOe111ZK7IQ2cZgcdfTFuBXNvPsbLxV8QNq9xBRgVEcu5EWg/exec"; 
         let pelangganData = [];
         let currentType = 'pelanggan';
         let map, marker;
@@ -131,9 +132,10 @@
 
         async function loadDatabase() {
             try {
-                const res = await fetch(SCRIPT_URL);
+                // Gunakan parameter type=pelanggan agar sesuai dengan doGet di GAS
+                const res = await fetch(SCRIPT_URL + "?type=pelanggan");
                 pelangganData = await res.json();
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Gagal load database pelanggan:", e); }
         }
 
         const inputNama = document.getElementById('nama');
@@ -145,20 +147,20 @@
             list.innerHTML = "";
             if (!val || val.length < 2) { list.classList.add('hidden'); return; }
 
-            const filtered = pelangganData.filter(p => p.nama_pelanggan && p.nama_pelanggan.toLowerCase().includes(val.toLowerCase()));
+            const filtered = pelangganData.filter(p => p.nama && p.nama.toLowerCase().includes(val.toLowerCase()));
 
             filtered.slice(0, 5).forEach(p => {
                 const div = document.createElement('div');
                 div.className = "autocomplete-item";
-                div.innerHTML = `<div class="font-black text-gray-800 text-sm">${p.nama_pelanggan}</div><div class="text-[10px] text-gray-400 font-bold uppercase">${p.email}</div>`;
+                div.innerHTML = `<div class="font-black text-gray-800 text-sm">${p.nama}</div><div class="text-[10px] text-gray-400 font-bold uppercase">${p.email}</div>`;
                 div.onclick = () => {
-                    inputNama.value = p.nama_pelanggan;
+                    inputNama.value = p.nama;
                     document.getElementById('email').value = p.email;
                     document.getElementById('whatsapp').value = p.whatsapp;
                     
-                    if(p.lat_rumah && p.lang_rumah) {
-                        updateCoords(p.lat_rumah, p.lang_rumah);
-                        toggleMapVisibility(false); // SEMBUNYIKAN MAP KARENA DATA ADA
+                    if(p.lat && p.lang) {
+                        updateCoords(p.lat, p.lang);
+                        toggleMapVisibility(false);
                     } else {
                         toggleMapVisibility(true);
                     }
@@ -171,26 +173,56 @@
 
         document.getElementById('bookingForm').onsubmit = async (e) => {
             e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            if (!email.includes('@')) {
+                Swal.fire('Email Tidak Valid', 'Mohon isi email dengan benar agar notifikasi terkirim.', 'warning');
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerText = "MENYIMPAN...";
+            const originalText = btn.innerText;
+            
+            btn.disabled = true; 
+            btn.innerText = "MENGIRIM NOTIFIKASI...";
+            btn.classList.replace('bg-gray-900', 'bg-gray-500');
 
             const payload = {
                 action: 'tambahBooking',
                 nama: inputNama.value,
-                email: document.getElementById('email').value,
+                email: email,
                 whatsapp: document.getElementById('whatsapp').value,
                 pekerjaan: document.getElementById('pekerjaan').value,
                 keterangan: "Input Manual Admin",
-                lat: document.getElementById('lat').value,
-                lang: document.getElementById('lang').value
+                lat: document.getElementById('lat').value || "-8.2191",
+                lang: document.getElementById('lang').value || "114.3691"
             };
 
             try {
-                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                Swal.fire('Berhasil!', 'Booking tersimpan.', 'success').then(() => location.reload());
+                // Kirim data ke Google Apps Script
+                await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    body: JSON.stringify(payload) 
+                });
+
+                // Beri jeda visual sedikit karena mode no-cors instan
+                setTimeout(() => {
+                    Swal.fire({
+                        title: 'Booking Berhasil!',
+                        text: 'Email Konfirmasi & Notif Telegram telah dikirim.',
+                        icon: 'success',
+                        confirmButtonColor: '#111827'
+                    }).then(() => {
+                        location.reload();
+                    });
+                }, 1000);
+
             } catch (err) {
-                Swal.fire('Gagal', 'Terjadi kesalahan', 'error');
-                btn.disabled = false; btn.innerText = "SIMPAN BOOKING";
+                Swal.fire('Gagal', 'Terjadi kesalahan jaringan.', 'error');
+                btn.disabled = false; 
+                btn.innerText = originalText;
+                btn.classList.replace('bg-gray-500', 'bg-gray-900');
             }
         };
 
