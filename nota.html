@@ -96,7 +96,7 @@
                 <button onclick="simpanNota()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-900 text-xs shadow-lg transition-all active:scale-95">SIMPAN</button>
             </div>
         </div>
-    </main>
+    </header>
 
     <main id="contentRiwayat" class="p-6 hidden bg-gray-50 flex-1">
         <div id="listRiwayat" class="space-y-4"></div>
@@ -165,7 +165,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzurPn1SIFCzhWuZdLhtQV1PYZKR__iKYvzjqJUoebZX4NkWn47HIVT7hGsDwKaT1vMLQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNhaNl_8z45SAK4YlaxiLMlhw5NNylRaookZrrjeDlbwuYI5HBQnlgxHafcAVk_OI_Sg/exec";
     
     let pelangganData = [];
     let databaseNota = [];
@@ -291,7 +291,6 @@
         } catch(e) { list.innerHTML = "Gagal memuat."; }
     }
 
-    // --- PERBAIKAN UTAMA DISINI ---
     function displayNota() {
         const list = document.getElementById('listRiwayat');
         list.innerHTML = "";
@@ -309,13 +308,13 @@
             const actualIndex = ((currentPage - 1) * itemsPerPage) + index;
 
             list.innerHTML += `
-                <div onclick='bukaDetail(databaseNota[${actualIndex}])' class="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm flex justify-between items-center cursor-pointer">
+                <div onclick='bukaDetail(databaseNota[${actualIndex}])' class="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm flex justify-between items-center cursor-pointer active:bg-gray-50 transition-all">
                     <div class="flex gap-4 items-center">
                         <div class="w-10 h-10 rounded-full ${isPaid ? 'bg-green-50' : 'bg-red-50'} flex items-center justify-center">
                             <svg class="w-5 h-5 ${isPaid ? 'text-green-500' : 'text-red-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <div>
-                            <p class="text-[9px] font-900 text-gray-400 uppercase">${n.id_nota} • ${n.tanggal}</p>
+                            <p class="text-[9px] font-900 text-gray-400 uppercase tracking-tighter">${n.id || n.id_nota} • ${n.tanggal}</p>
                             <p class="text-sm font-900 text-slate-800 truncate w-32">${n.email}</p>
                         </div>
                     </div>
@@ -332,7 +331,8 @@
     }
 
     function bukaDetail(nota) {
-        document.getElementById('invId').innerText = nota.id_nota;
+        // Sesuaikan dengan nama kolom: id, tanggal, email, status, total
+        document.getElementById('invId').innerText = nota.id || nota.id_nota;
         document.getElementById('invTgl').innerText = nota.tanggal;
         document.getElementById('invCust').innerText = nota.email;
         document.getElementById('invStatus').innerText = nota.status;
@@ -343,10 +343,16 @@
 
         const body = document.getElementById('invItems');
         body.innerHTML = "";
+        
         let items = [];
         try {
-            items = typeof nota.items === 'string' ? JSON.parse(nota.items) : nota.items;
-        } catch(e) { items = []; }
+            // Membaca dari kolom items_json sesuai request Anda
+            const rawItems = nota.items_json || nota.items;
+            items = typeof rawItems === 'string' ? JSON.parse(rawItems) : rawItems;
+        } catch(e) { 
+            console.error("JSON Error:", e);
+            items = []; 
+        }
 
         if (Array.isArray(items) && items.length > 0) {
             items.forEach(it => {
@@ -360,7 +366,7 @@
                     </tr>`;
             });
         } else {
-            body.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-400">Detail tidak ada</td></tr>`;
+            body.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-400 italic font-mono">Detail item tidak ditemukan</td></tr>`;
         }
         document.getElementById('modalNota').classList.replace('hidden', 'flex');
     }
