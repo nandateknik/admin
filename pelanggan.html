@@ -11,168 +11,127 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; overflow: hidden; }
         .mobile-container { max-width: 480px; height: 100vh; margin: 0 auto; background: #fff; position: relative; overflow: hidden; }
-        
         #map { height: 100%; width: 100%; z-index: 1; }
 
-        /* Marker Pelanggan - Hijau Premium */
-        .cust-marker {
-            width: 32px !important;
-            height: 32px !important;
-            background: #10b981;
-            border: 2px solid white;
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        /* Sidebar Style */
+        .sidebar {
+            position: absolute; top: 0; left: -280px; width: 280px; height: 100%;
+            background: white; z-index: 3000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
         }
-        .cust-icon {
-            transform: rotate(45deg);
-            color: white;
-            font-size: 14px;
+        .sidebar.active { left: 0; }
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); z-index: 2999; display: none;
         }
+        .overlay.active { display: block; }
 
-        /* Info Panel Atas */
+        /* Marker & UI */
+        .cust-marker {
+            width: 32px; height: 32px; background: #10b981; border: 2px solid white;
+            border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cust-icon { transform: rotate(45deg); color: white; font-size: 14px; }
         .info-panel {
             position: absolute; top: 20px; left: 20px; right: 20px;
             background: white; border-radius: 20px; padding: 12px;
-            z-index: 1001; display: flex; flex-direction: column; gap: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;
+            z-index: 1001; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
-
-        /* Bottom Sheet */
         .bottom-sheet {
             position: absolute; bottom: 0; left: 0; right: 0; 
             background: white; border-top-left-radius: 32px; border-top-right-radius: 32px;
-            z-index: 2000; transform: translateY(105%); transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-            padding: 24px; box-shadow: 0 -15px 40px rgba(0,0,0,0.08);
+            z-index: 2000; transform: translateY(105%); transition: 0.5s;
+            padding: 24px;
         }
         .bottom-sheet.active { transform: translateY(0); }
-        .handle { width: 40px; height: 4px; background: #e2e8f0; border-radius: 10px; margin: -10px auto 20px; }
     </style>
 </head>
 <body>
 
     <div class="mobile-container">
-        
-        <div class="info-panel">
-            <div class="flex items-center justify-between px-2">
-                <div class="flex items-center gap-3">
-                    <button onclick="window.location.href='index.html'" class="text-slate-600 bg-slate-50 p-2 rounded-lg">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                    </button>
-                    <div>
-                        <h2 class="text-slate-800 font-extrabold text-sm leading-none">Database Pelanggan</h2>
-                        <p class="text-emerald-600 text-[10px] font-bold uppercase tracking-widest mt-1">Total: <span id="totalCust">0</span> User</p>
-                    </div>
-                </div>
-            </div>
-            <div class="relative group">
-                <input type="text" id="searchBox" oninput="filterData()" placeholder="Cari nama atau WhatsApp..." 
-                       class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 pl-11 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
-                <svg class="w-5 h-5 text-slate-400 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </div>
+        <button onclick="toggleSidebar()" class="absolute top-8 left-6 z-[1002] bg-white p-3 rounded-xl shadow-md">
+            <svg class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+
+        <div id="sidebar" class="sidebar p-8">
+            <h2 class="text-2xl font-extrabold text-slate-800 mb-8 italic">Nanda<span class="text-emerald-500">Teknik</span></h2>
+            <nav class="space-y-4">
+                <a href="index.html" class="flex items-center gap-4 text-slate-600 font-bold p-3 rounded-xl hover:bg-slate-50">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> Dashboard Kerja
+                </a>
+                <a href="pelanggan.html" class="flex items-center gap-4 text-emerald-600 bg-emerald-50 font-bold p-3 rounded-xl">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg> Data Pelanggan
+                </a>
+            </nav>
+        </div>
+        <div id="overlay" onclick="toggleSidebar()" class="overlay"></div>
+
+        <div class="info-panel ml-14"> <input type="text" id="searchBox" oninput="filterData()" placeholder="Cari nama pelanggan..." 
+                   class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 text-sm font-semibold outline-none">
         </div>
 
         <div id="map"></div>
 
-        <div id="bottomSheet" class="bottom-sheet">
-            <div class="handle"></div>
-            <div class="flex justify-between items-start mb-6">
-                <div>
-                    <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">Pelanggan Terdaftar</span>
-                    <h2 id="detNama" class="text-2xl font-extrabold text-slate-800 leading-tight mt-2 italic">Nama Pelanggan</h2>
-                    <p id="detWA" class="text-slate-400 text-[11px] font-bold mt-1 uppercase">WA: 0812-xxxx-xxxx</p>
-                </div>
-                <a id="linkWA" href="#" target="_blank" class="bg-green-500 p-4 rounded-2xl text-white shadow-lg shadow-green-100">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.187-2.59-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.667.072-1.097-.066-.264-.085-1.492-.475-2.528-1.445-1.008-.943-1.748-2.494-1.748-2.494-.047-.061-.382-.505-.382-1.028 0-.523.271-.78.369-.885.097-.105.215-.132.285-.132.07 0 .141 0 .202.003l.5-.01c.153-.004.225-.015.324.227l.436 1.054c.052.127.088.252.003.422-.085.17-.128.276-.254.425-.127.149-.267.33-.381.444-.127.127-.26.265-.112.52.148.255.658 1.085 1.415 1.761.972.866 1.792 1.135 2.047 1.262.255.128.404.106.554-.064.148-.17.637-.744.807-1.001.17-.255.339-.212.573-.127.234.085 1.487.702 1.742.829.255.127.425.191.488.318.064.127.064.737-.08 1.142z"/></svg>
-                </a>
-            </div>
-
-            <div class="space-y-4 mb-8 text-sm">
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Email / Kontak Lain</p>
-                    <p id="detEmail" class="font-extrabold text-slate-700">Tidak ada email</p>
-                </div>
-                <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100">
-                    <p class="text-[10px] text-emerald-400 font-bold uppercase mb-1">Terakhir Update</p>
-                    <p id="detTgl" class="text-slate-600 font-bold"></p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-                <a id="linkNav" target="_blank" class="bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase text-center flex items-center justify-center gap-2">Buka Map</a>
-                <button onclick="window.location.href='input-booking.html'" class="bg-emerald-600 text-white py-4 rounded-2xl font-black text-xs uppercase shadow-xl shadow-emerald-100">Panggil Jasa</button>
+        <div id="bottomSheet" class="bottom-sheet shadow-2xl border-t border-slate-100">
+            <h2 id="detNama" class="text-2xl font-black text-slate-800 italic">Nama Pelanggan</h2>
+            <p id="detWA" class="text-slate-400 font-bold text-xs mt-1 uppercase tracking-widest">WhatsApp</p>
+            <div class="grid grid-cols-2 gap-3 mt-6">
+                <a id="linkWA" href="#" class="bg-green-500 text-white py-4 rounded-2xl font-bold text-center text-xs uppercase">WhatsApp</a>
+                <a id="linkNav" href="#" class="bg-slate-900 text-white py-4 rounded-2xl font-bold text-center text-xs uppercase">Lokasi</a>
             </div>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec?sheet=pelanggan";
+        const SCRIPT_URL = "URL_APPS_SCRIPT_ANDA?sheet=Pelanggan";
         let map, markerGroup, allData = [];
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
 
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([-8.2191, 114.3691], 12);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
             markerGroup = L.layerGroup().addTo(map);
-            map.on('click', () => document.getElementById('bottomSheet').classList.remove('active'));
         }
 
         async function loadData() {
             try {
                 const response = await fetch(SCRIPT_URL);
                 allData = await response.json();
-                document.getElementById('totalCust').innerText = allData.length;
                 renderMarkers(allData);
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Gagal ambil data:", err); }
         }
 
         function renderMarkers(data) {
             markerGroup.clearLayers();
-            data.forEach((item) => {
-                if(item.latitude && item.longitude) {
-                    const customIcon = L.divIcon({
-                        className: 'custom-icon',
+            data.forEach(item => {
+                // PENYESUAIAN: Menggunakan kolom 'lat' dan 'lng' sesuai isi Google Sheet Anda 
+                if(item.lat && item.lng) {
+                    const icon = L.divIcon({
+                        className: 'custom-div-icon',
                         html: `<div class="cust-marker"><span class="cust-icon">👤</span></div>`,
-                        iconSize: [32, 42],
-                        iconAnchor: [16, 42]
+                        iconSize: [32, 32], iconAnchor: [16, 32]
                     });
 
-                    L.marker([item.latitude, item.longitude], {icon: customIcon}).addTo(markerGroup).on('click', () => {
-                        showDetail(item);
+                    L.marker([item.lat, item.lng], {icon: icon}).addTo(markerGroup).on('click', () => {
+                        document.getElementById('detNama').innerText = item.nama;
+                        document.getElementById('detWA').innerText = "WA: " + item.whatsapp;
+                        document.getElementById('linkWA').href = "https://wa.me/" + item.whatsapp;
+                        document.getElementById('linkNav').href = `https://www.google.com/maps?q=${item.lat},${item.lng}`;
+                        document.getElementById('bottomSheet').classList.add('active');
                     });
                 }
             });
         }
 
-        function showDetail(item) {
-            const sheet = document.getElementById('bottomSheet');
-            document.getElementById('detNama').innerText = item.nama_pelanggan || "No Name";
-            document.getElementById('detWA').innerText = "WA: " + (item.whatsapp || "-");
-            document.getElementById('detEmail').innerText = item.email || "Tidak ada email";
-            document.getElementById('detTgl').innerText = item.tanggal || "-";
-
-            document.getElementById('linkNav').href = `https://www.google.com/maps?q=${item.latitude},${item.longitude}`;
-            document.getElementById('linkWA').href = `https://wa.me/${formatWA(item.whatsapp)}`;
-
-            sheet.classList.add('active');
-            map.flyTo([item.latitude, item.longitude], 15);
-        }
-
         function filterData() {
-            const keyword = document.getElementById('searchBox').value.toLowerCase();
-            const filtered = allData.filter(item => 
-                (item.nama_pelanggan && item.nama_pelanggan.toLowerCase().includes(keyword)) ||
-                (item.whatsapp && item.whatsapp.toString().includes(keyword))
-            );
+            const val = document.getElementById('searchBox').value.toLowerCase();
+            const filtered = allData.filter(i => i.nama.toLowerCase().includes(val));
             renderMarkers(filtered);
-        }
-
-        function formatWA(num) {
-            if(!num) return "";
-            let c = num.toString().replace(/\D/g, '');
-            return c.startsWith('0') ? '62' + c.slice(1) : c;
         }
 
         window.onload = () => { initMap(); loadData(); };
