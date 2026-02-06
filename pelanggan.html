@@ -11,28 +11,34 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; overflow: hidden; }
         .mobile-container { max-width: 480px; height: 100vh; margin: 0 auto; background: #fff; position: relative; overflow: hidden; }
+        
         #map { height: 100%; width: 100%; z-index: 1; }
 
-        /* Marker Pelanggan Tetap - Warna Hijau */
-        .user-marker {
-            width: 30px !important; height: 30px !important;
-            background: #10b981; border: 2px solid white;
-            border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        /* Marker Pelanggan - Hijau Premium */
+        .cust-marker {
+            width: 32px !important;
+            height: 32px !important;
+            background: #10b981;
+            border: 2px solid white;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
-        .user-icon { transform: rotate(45deg); color: white; font-size: 12px; }
+        .cust-icon {
+            transform: rotate(45deg);
+            color: white;
+            font-size: 14px;
+        }
 
-        /* Search Bar Floating */
-        .search-panel {
+        /* Info Panel Atas */
+        .info-panel {
             position: absolute; top: 20px; left: 20px; right: 20px;
-            z-index: 1001;
-        }
-        .search-input {
-            width: 100%; padding: 16px 20px; border-radius: 20px;
-            background: white; border: 1px solid #f1f5f9;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            font-size: 0.9rem; font-weight: 600; outline: none;
+            background: white; border-radius: 20px; padding: 12px;
+            z-index: 1001; display: flex; flex-direction: column; gap: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;
         }
 
         /* Bottom Sheet */
@@ -49,12 +55,23 @@
 <body>
 
     <div class="mobile-container">
-        <div class="search-panel">
-            <div class="relative">
-                <input type="text" id="searchInput" class="search-input shadow-xl" placeholder="Cari nama pelanggan..." oninput="searchPelanggan()">
-                <div class="absolute right-4 top-4 text-slate-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        
+        <div class="info-panel">
+            <div class="flex items-center justify-between px-2">
+                <div class="flex items-center gap-3">
+                    <button onclick="window.location.href='index.html'" class="text-slate-600 bg-slate-50 p-2 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    </button>
+                    <div>
+                        <h2 class="text-slate-800 font-extrabold text-sm leading-none">Database Pelanggan</h2>
+                        <p class="text-emerald-600 text-[10px] font-bold uppercase tracking-widest mt-1">Total: <span id="totalCust">0</span> User</p>
+                    </div>
                 </div>
+            </div>
+            <div class="relative group">
+                <input type="text" id="searchBox" oninput="filterData()" placeholder="Cari nama atau WhatsApp..." 
+                       class="w-full bg-slate-50 border-none rounded-xl py-3 px-4 pl-11 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                <svg class="w-5 h-5 text-slate-400 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
         </div>
 
@@ -64,60 +81,65 @@
             <div class="handle"></div>
             <div class="flex justify-between items-start mb-6">
                 <div>
-                    <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">Pelanggan Tetap</span>
-                    <h2 id="custName" class="text-2xl font-extrabold text-slate-800 leading-tight mt-2 italic">Nama Pelanggan</h2>
-                    <p id="custID" class="text-slate-400 text-[11px] font-bold uppercase mt-1">ID: #---</p>
+                    <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">Pelanggan Terdaftar</span>
+                    <h2 id="detNama" class="text-2xl font-extrabold text-slate-800 leading-tight mt-2 italic">Nama Pelanggan</h2>
+                    <p id="detWA" class="text-slate-400 text-[11px] font-bold mt-1 uppercase">WA: 0812-xxxx-xxxx</p>
                 </div>
-                <a id="waCust" target="_blank" class="bg-green-500 p-4 rounded-2xl text-white shadow-lg">
+                <a id="linkWA" href="#" target="_blank" class="bg-green-500 p-4 rounded-2xl text-white shadow-lg shadow-green-100">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.187-2.59-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.667.072-1.097-.066-.264-.085-1.492-.475-2.528-1.445-1.008-.943-1.748-2.494-1.748-2.494-.047-.061-.382-.505-.382-1.028 0-.523.271-.78.369-.885.097-.105.215-.132.285-.132.07 0 .141 0 .202.003l.5-.01c.153-.004.225-.015.324.227l.436 1.054c.052.127.088.252.003.422-.085.17-.128.276-.254.425-.127.149-.267.33-.381.444-.127.127-.26.265-.112.52.148.255.658 1.085 1.415 1.761.972.866 1.792 1.135 2.047 1.262.255.128.404.106.554-.064.148-.17.637-.744.807-1.001.17-.255.339-.212.573-.127.234.085 1.487.702 1.742.829.255.127.425.191.488.318.064.127.064.737-.08 1.142z"/></svg>
                 </a>
             </div>
 
-            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 mb-6">
-                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Alamat Lengkap</p>
-                <p id="custAddress" class="text-sm text-slate-700 font-semibold leading-relaxed">Alamat belum tersedia.</p>
+            <div class="space-y-4 mb-8 text-sm">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Email / Kontak Lain</p>
+                    <p id="detEmail" class="font-extrabold text-slate-700">Tidak ada email</p>
+                </div>
+                <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100">
+                    <p class="text-[10px] text-emerald-400 font-bold uppercase mb-1">Terakhir Update</p>
+                    <p id="detTgl" class="text-slate-600 font-bold"></p>
+                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
-                <a id="navCust" target="_blank" class="bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase text-center">Navigasi Ke Lokasi</a>
-                <button onclick="window.location.href='input-booking.html'" class="bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase shadow-xl shadow-blue-100">Buat Booking</button>
+                <a id="linkNav" target="_blank" class="bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase text-center flex items-center justify-center gap-2">Buka Map</a>
+                <button onclick="window.location.href='input-booking.html'" class="bg-emerald-600 text-white py-4 rounded-2xl font-black text-xs uppercase shadow-xl shadow-emerald-100">Panggil Jasa</button>
             </div>
-            <button onclick="document.getElementById('bottomSheet').classList.remove('active')" class="w-full mt-4 text-slate-400 font-bold text-[10px] uppercase tracking-widest">Tutup Detail</button>
         </div>
     </div>
 
     <script>
-        // URL Apps Script (Gunakan Web App URL Anda yang mengarah ke sheet 'pelanggan')
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec?sheet=pelanggan";
-        
-        let map, markerGroup, allPelanggan = [];
+        let map, markerGroup, allData = [];
 
         function initMap() {
-            map = L.map('map', { zoomControl: false }).setView([-8.2191, 114.3691], 11);
+            map = L.map('map', { zoomControl: false }).setView([-8.2191, 114.3691], 12);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
             markerGroup = L.layerGroup().addTo(map);
+            map.on('click', () => document.getElementById('bottomSheet').classList.remove('active'));
         }
 
-        async function loadPelanggan() {
+        async function loadData() {
             try {
                 const response = await fetch(SCRIPT_URL);
-                allPelanggan = await response.json();
-                renderMarkers(allPelanggan);
-            } catch (err) { console.error("Gagal load data pelanggan", err); }
+                allData = await response.json();
+                document.getElementById('totalCust').innerText = allData.length;
+                renderMarkers(allData);
+            } catch (err) { console.error(err); }
         }
 
         function renderMarkers(data) {
             markerGroup.clearLayers();
-            data.forEach(item => {
-                if(item.lat && item.lang) {
-                    const icon = L.divIcon({
+            data.forEach((item) => {
+                if(item.latitude && item.longitude) {
+                    const customIcon = L.divIcon({
                         className: 'custom-icon',
-                        html: `<div class="user-marker"><div class="user-icon">👤</div></div>`,
-                        iconSize: [30, 42],
-                        iconAnchor: [15, 42]
+                        html: `<div class="cust-marker"><span class="cust-icon">👤</span></div>`,
+                        iconSize: [32, 42],
+                        iconAnchor: [16, 42]
                     });
 
-                    L.marker([item.lat, item.lang], {icon: icon}).addTo(markerGroup).on('click', () => {
+                    L.marker([item.latitude, item.longitude], {icon: customIcon}).addTo(markerGroup).on('click', () => {
                         showDetail(item);
                     });
                 }
@@ -126,27 +148,25 @@
 
         function showDetail(item) {
             const sheet = document.getElementById('bottomSheet');
-            document.getElementById('custName').innerText = item.nama_pelanggan || "Tanpa Nama";
-            document.getElementById('custID').innerText = `ID: #${item.id || '---'}`;
-            document.getElementById('custAddress').innerText = item.alamat || "Alamat tidak tersimpan di database.";
-            
-            document.getElementById('waCust').href = `https://wa.me/${formatWA(item.whatsapp)}`;
-            document.getElementById('navCust').href = `https://www.google.com/maps?q=${item.lat},${item.lang}`;
-            
+            document.getElementById('detNama').innerText = item.nama_pelanggan || "No Name";
+            document.getElementById('detWA').innerText = "WA: " + (item.whatsapp || "-");
+            document.getElementById('detEmail').innerText = item.email || "Tidak ada email";
+            document.getElementById('detTgl').innerText = item.tanggal || "-";
+
+            document.getElementById('linkNav').href = `https://www.google.com/maps?q=${item.latitude},${item.longitude}`;
+            document.getElementById('linkWA').href = `https://wa.me/${formatWA(item.whatsapp)}`;
+
             sheet.classList.add('active');
-            map.flyTo([item.lat, item.lang], 16);
+            map.flyTo([item.latitude, item.longitude], 15);
         }
 
-        function searchPelanggan() {
-            const val = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allPelanggan.filter(p => 
-                p.nama_pelanggan.toLowerCase().includes(val) || 
-                (p.alamat && p.alamat.toLowerCase().includes(val))
+        function filterData() {
+            const keyword = document.getElementById('searchBox').value.toLowerCase();
+            const filtered = allData.filter(item => 
+                (item.nama_pelanggan && item.nama_pelanggan.toLowerCase().includes(keyword)) ||
+                (item.whatsapp && item.whatsapp.toString().includes(keyword))
             );
             renderMarkers(filtered);
-            if(filtered.length === 1) {
-                map.flyTo([filtered[0].lat, filtered[0].lang], 14);
-            }
         }
 
         function formatWA(num) {
@@ -155,7 +175,7 @@
             return c.startsWith('0') ? '62' + c.slice(1) : c;
         }
 
-        window.onload = () => { initMap(); loadPelanggan(); };
+        window.onload = () => { initMap(); loadData(); };
     </script>
 </body>
 </html>
