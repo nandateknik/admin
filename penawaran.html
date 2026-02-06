@@ -7,273 +7,358 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Courier+Prime&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
-        .tab-active { border-bottom: 3px solid #111827; color: #111827; }
-        .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; color: #000; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; }
+        .tab-active { border-bottom: 4px solid #1e3a8a; color: #1e3a8a; font-weight: 800; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Desain Surat Penawaran Premium */
+        .premium-quote { background: white; width: 210mm; min-height: 297mm; padding: 20mm; margin: auto; color: #1f2937; }
+        .quote-header { border-bottom: 3px solid #1e3a8a; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .quote-title { font-family: 'Playfair Display', serif; font-size: 32px; color: #1e3a8a; text-transform: uppercase; letter-spacing: 2px; }
+        .table-quote { width: 100%; border-collapse: collapse; margin: 30px 0; }
+        .table-quote th { background: #1e3a8a; color: white; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase; }
+        .table-quote td { padding: 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
+        .total-box { background: #f8fafc; padding: 20px; border-radius: 12px; border-left: 5px solid #1e3a8a; }
     </style>
 </head>
-<body class="p-4 pb-20">
-    <div class="max-w-md mx-auto">
-        <div class="flex items-center gap-4 mb-6">
-            <a href="dashboard.html" class="p-3 bg-white shadow-sm rounded-2xl text-gray-900 border border-gray-100">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            </a>
-            <h1 class="text-2xl font-black text-gray-900 tracking-tighter">Penawaran & Email</h1>
-        </div>
+<body class="p-2 md:p-6">
 
-        <div class="flex border-b border-gray-200 mb-6 bg-white rounded-t-2xl">
-            <button onclick="switchTab('buat')" id="tabBuat" class="flex-1 py-4 text-xs font-black tracking-widest tab-active uppercase">Buat Penawaran</button>
-            <button onclick="switchTab('riwayat')" id="tabRiwayat" class="flex-1 py-4 text-xs font-black tracking-widest text-gray-400 uppercase">Riwayat</button>
-            <button onclick="switchTab('email')" id="tabEmail" class="flex-1 py-4 text-xs font-black tracking-widest text-gray-400 uppercase">Kirim Email</button>
-        </div>
-
-        <div id="sectionBuat" class="space-y-5">
-            <div class="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 space-y-4">
-                <div class="flex bg-gray-100 p-1 rounded-xl mb-2">
-                    <button onclick="setCust('lama')" id="btnLama" class="flex-1 py-2 text-[10px] font-black bg-white rounded-lg shadow-sm">MEMBER LAMA</button>
-                    <button onclick="setCust('baru')" id="btnBaru" class="flex-1 py-2 text-[10px] font-black text-gray-400">MEMBER BARU</button>
-                </div>
-                
-                <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-1 block">Email / Nama Tujuan</label>
-                    <input type="text" id="custInput" placeholder="Ketik nama atau email..." class="w-full bg-gray-50 p-4 rounded-2xl outline-none font-bold text-sm border-2 border-transparent focus:border-blue-500 transition-all">
-                </div>
-
-                <div id="itemContainer" class="space-y-3">
-                    </div>
-
-                <button onclick="addRow()" class="w-full py-3 border-2 border-dashed border-gray-200 rounded-2xl text-[10px] font-black text-gray-400 uppercase hover:bg-gray-50">+ Tambah Item Jasa</button>
-            </div>
-
-            <div class="bg-gray-900 p-6 rounded-[2.5rem] text-white flex justify-between items-end shadow-2xl">
-                <div>
-                    <span class="text-[10px] font-bold text-gray-400 block mb-1">TOTAL ESTIMASI</span>
-                    <span id="totalP" class="text-2xl font-black text-blue-400">Rp 0</span>
-                </div>
-                <button onclick="simpanPenawaran()" class="bg-blue-600 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">Simpan & Draft</button>
-            </div>
-        </div>
-
-        <div id="sectionRiwayat" class="hidden space-y-4">
+<div class="max-w-xl mx-auto bg-white rounded-[2.5rem] shadow-2xl overflow-hidden min-h-screen flex flex-col">
+    <header class="p-6 bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-800 tracking-tighter text-blue-900">NANDA <span class="text-blue-500 font-400">TEKNIK</span></h1>
             <div class="flex gap-2">
-                <input type="text" id="searchR" oninput="filterR()" placeholder="Cari ID/Email..." class="flex-[2] p-4 bg-white rounded-2xl border border-gray-100 text-xs font-bold outline-none shadow-sm">
-                <input type="date" id="dateR" onchange="filterR()" class="flex-1 p-4 bg-white rounded-2xl border border-gray-100 text-xs font-bold outline-none shadow-sm">
+                <button onclick="switchTab('buat')" id="tabBuat" class="px-4 py-2 text-[10px] uppercase tracking-widest tab-active">Buat</button>
+                <button onclick="switchTab('riwayat')" id="tabRiwayat" class="px-4 py-2 text-[10px] uppercase tracking-widest text-gray-400">Riwayat</button>
+                <button onclick="switchTab('email')" id="tabEmail" class="px-4 py-2 text-[10px] uppercase tracking-widest text-gray-400">Email</button>
             </div>
-            <div id="listR" class="space-y-3"></div>
         </div>
+    </header>
 
-        <div id="sectionEmail" class="hidden">
-            <form id="emailForm" class="space-y-5">
-                <div class="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 space-y-4">
-                    <div>
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 block mb-2">Penerima</label>
-                        <input type="email" id="penerima" required placeholder="customer@mail.com" class="w-full bg-gray-50 p-4 rounded-2xl outline-none focus:ring-2 ring-blue-500 font-bold text-sm">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 block mb-2">Subjek</label>
-                        <input type="text" id="subjek" required placeholder="Penawaran Harga - Nanda Teknik" class="w-full bg-gray-50 p-4 rounded-2xl outline-none focus:ring-2 ring-blue-500 font-bold text-sm">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 block mb-2">Pesan</label>
-                        <textarea id="pesan" rows="4" required class="w-full bg-gray-50 p-4 rounded-2xl outline-none focus:ring-2 ring-blue-500 font-medium text-sm"></textarea>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 block mb-2">Lampiran</label>
-                        <input type="file" id="lampiran" class="hidden" onchange="showName()">
-                        <label for="lampiran" class="w-full border-2 border-dashed border-gray-200 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer">
-                            <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="2"/></svg>
-                            <span id="fileName" class="text-[11px] font-bold text-gray-400 uppercase">Pilih File...</span>
-                        </label>
-                    </div>
+    <main id="sectionBuat" class="p-6 space-y-6">
+        <div class="space-y-4">
+            <div>
+                <label class="text-[10px] font-800 text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Penerima Penawaran</label>
+                <input type="text" id="custEmail" placeholder="Nama Perusahaan / Personal / Email" class="w-full bg-gray-50 p-4 rounded-2xl outline-none font-bold border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all">
+            </div>
+
+            <div id="itemContainer" class="space-y-3">
                 </div>
-                <button type="submit" id="btnSubmit" class="w-full bg-gray-900 text-white py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-2xl active:scale-95 transition-all">Kirim Email Sekarang</button>
-            </form>
-        </div>
-    </div>
 
-    <div id="pdfTemplate" class="hidden">
-        <div id="printArea" class="p-8 nota-kertas" style="width: 210mm;">
-            <div class="text-center border-b-2 border-black pb-4 mb-4">
-                <h2 class="text-xl font-black uppercase">PENAWARAN HARGA</h2>
-                <p style="font-size: 10px;">NANDA TEKNIK BANYUWANGI - 0823-3120-1148</p>
-            </div>
-            <div style="display: flex; justify-between; font-size: 12px; margin-bottom: 20px;">
-                <div><p>ID: <span id="pID"></span></p><p>KE: <span id="pEmail"></span></p></div>
-                <div style="text-align: right;"><p id="pTgl"></p></div>
-            </div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                <thead><tr style="border-bottom: 1px solid #000; text-align: left;"><th style="padding: 10px 0;">ITEM PEKERJAAN</th><th>QTY</th><th style="text-align: right;">TOTAL</th></tr></thead>
-                <tbody id="pBody"></tbody>
-            </table>
-            <div style="margin-top: 20px; border-top: 2px solid #000; padding-top: 10px; text-align: right;">
-                <h3 class="font-black">GRAND TOTAL: <span id="pTotal"></span></h3>
+            <button onclick="addRow()" class="w-full py-4 border-2 border-dashed border-gray-200 rounded-2xl text-[10px] font-800 text-gray-400 hover:bg-gray-50 transition-all uppercase">+ Tambah Pekerjaan / Unit</button>
+        </div>
+
+        <div class="bg-blue-900 p-8 rounded-[2.5rem] text-white shadow-xl shadow-blue-200">
+            <div class="flex justify-between items-end">
+                <div>
+                    <span class="text-[10px] font-bold text-blue-300 block mb-1">TOTAL ESTIMASI</span>
+                    <span id="displayTotal" class="text-3xl font-800">Rp 0</span>
+                </div>
+                <button onclick="saveOffer()" class="bg-blue-500 hover:bg-blue-400 px-8 py-4 rounded-2xl font-800 text-xs shadow-lg active:scale-95 transition-all">SIMPAN DATA</button>
             </div>
         </div>
-    </div>
+    </main>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLkx1H8hTDGlXbokOziXL8kZQg1gXuyTIoW18wSLu3Vj5PF1J-x1AL-GnyRYuRcVziDw/exec";
-        let rData = [];
+    <main id="sectionRiwayat" class="hidden p-6 space-y-4 bg-gray-50 flex-1">
+        <div class="flex gap-2">
+            <input type="text" id="searchR" oninput="filterR()" placeholder="Cari ID / Email..." class="flex-1 p-4 bg-white rounded-2xl text-xs font-bold outline-none border border-gray-100">
+            <input type="date" id="dateR" onchange="filterR()" class="p-4 bg-white rounded-2xl text-xs font-bold outline-none border border-gray-100 text-blue-900">
+        </div>
+        <div id="listRiwayat" class="space-y-3"></div>
+    </main>
 
-        function switchTab(t) {
-            document.getElementById('sectionBuat').classList.toggle('hidden', t !== 'buat');
-            document.getElementById('sectionRiwayat').classList.toggle('hidden', t !== 'riwayat');
-            document.getElementById('sectionEmail').classList.toggle('hidden', t !== 'email');
+    <main id="sectionEmail" class="hidden p-6 space-y-5">
+        <div class="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm space-y-4">
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                <button onclick="applyTemplate('penawaran')" class="px-5 py-2 bg-blue-900 text-white rounded-full text-[10px] font-800 whitespace-nowrap">TEMPLATE PENAWARAN</button>
+                <button onclick="applyTemplate('reminder')" class="px-5 py-2 bg-gray-100 text-gray-600 rounded-full text-[10px] font-800 whitespace-nowrap">TEMPLATE REMINDER</button>
+            </div>
             
-            ['tabBuat', 'tabRiwayat', 'tabEmail'].forEach(id => {
-                document.getElementById(id).classList.toggle('tab-active', id === 'tab' + t.charAt(0).toUpperCase() + t.slice(1));
-                document.getElementById(id).classList.toggle('text-gray-400', id !== 'tab' + t.charAt(0).toUpperCase() + t.slice(1));
-            });
+            <input type="email" id="mailTo" placeholder="Email Tujuan" class="w-full bg-gray-50 p-4 rounded-xl text-sm font-bold outline-none">
+            <input type="text" id="mailSubject" placeholder="Subjek Email" class="w-full bg-gray-50 p-4 rounded-xl text-sm font-bold outline-none border-b">
+            
+            <div id="editorToolbar" class="flex gap-4 border-b pb-2 px-2">
+                <button onclick="document.execCommand('bold')" class="font-black">B</button>
+                <button onclick="document.execCommand('italic')" class="italic">I</button>
+                <button onclick="document.execCommand('insertUnorderedList')">• List</button>
+            </div>
+            <div id="mailBody" contenteditable="true" class="min-h-[250px] p-4 bg-white text-sm outline-none leading-relaxed border border-gray-100 rounded-xl">
+                Pilih template atau ketik pesan di sini...
+            </div>
 
-            if(t === 'riwayat') loadRiwayat();
-        }
+            <input type="file" id="mailFile" class="hidden" onchange="showFileName()">
+            <label for="mailFile" class="flex items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:bg-gray-50">
+                <span id="fileName" class="text-[10px] font-800 text-gray-400 uppercase">Lampirkan PDF Penawaran</span>
+            </label>
 
-        function setCust(mode) {
-            document.getElementById('btnLama').className = mode === 'lama' ? "flex-1 py-2 text-[10px] font-black bg-white rounded-lg shadow-sm" : "flex-1 py-2 text-[10px] font-black text-gray-400";
-            document.getElementById('btnBaru').className = mode === 'baru' ? "flex-1 py-2 text-[10px] font-black bg-white rounded-lg shadow-sm" : "flex-1 py-2 text-[10px] font-black text-gray-400";
-        }
+            <button onclick="sendEmail()" id="btnSend" class="w-full bg-blue-600 py-5 rounded-2xl text-white font-800 text-xs tracking-widest uppercase shadow-xl active:scale-95 transition-all">Kirim Sekarang</button>
+        </div>
+    </main>
+</div>
 
-        function addRow() {
-            const div = document.createElement('div');
-            div.className = "item-row bg-gray-50 p-4 rounded-2xl flex gap-3 relative border border-gray-100";
-            div.innerHTML = `
-                <div class="flex-1">
-                    <input type="text" placeholder="Item" class="w-full bg-transparent font-bold text-xs outline-none border-b border-gray-200 mb-2 i-nama">
-                    <div class="flex gap-2">
-                        <input type="number" value="1" oninput="calc()" class="w-12 bg-white rounded-lg p-1 text-center font-bold text-xs i-qty">
-                        <input type="number" placeholder="Harga" oninput="calc()" class="flex-1 bg-white rounded-lg p-1 px-3 font-bold text-xs i-harga">
+<div id="modalPreview" class="fixed inset-0 bg-black/90 z-[100] hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="max-w-4xl w-full">
+        <div id="captureArea" class="premium-quote shadow-2xl overflow-hidden">
+            <div class="quote-header">
+                <div>
+                    <h1 class="quote-title">Quotation</h1>
+                    <p style="font-size: 12px; color: #64748b;">No: <span id="vId" class="font-bold"></span></p>
+                </div>
+                <div style="text-align: right;">
+                    <h2 style="font-weight: 800; color: #1e3a8a; font-size: 18px;">NANDA TEKNIK</h2>
+                    <p style="font-size: 10px; line-height: 1.5;">Jl. Raya Banyuwangi, Jawa Timur<br>WA: 0823-3120-1148<br>Email: nandateknik@mail.com</p>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 40px; font-size: 12px;">
+                <div>
+                    <p style="text-transform: uppercase; color: #94a3b8; font-weight: 800; margin-bottom: 5px;">Ditujukan Kepada:</p>
+                    <p id="vCust" style="font-size: 16px; font-weight: 800; color: #1e3a8a;"></p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="text-transform: uppercase; color: #94a3b8; font-weight: 800; margin-bottom: 5px;">Tanggal Penawaran:</p>
+                    <p id="vTgl" style="font-size: 14px; font-weight: 600;"></p>
+                </div>
+            </div>
+
+            <table class="table-quote">
+                <thead><tr><th>Deskripsi Pekerjaan / Sparepart</th><th style="text-align: center;">Qty</th><th style="text-align: right;">Harga Satuan</th><th style="text-align: right;">Total</th></tr></thead>
+                <tbody id="vBody"></tbody>
+            </table>
+
+            <div style="display: flex; justify-content: flex-end;">
+                <div class="total-box" style="width: 300px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11px; font-weight: 800; color: #64748b;">GRAND TOTAL</span>
+                        <span id="vTotal" style="font-size: 20px; font-weight: 800; color: #1e3a8a;"></span>
                     </div>
                 </div>
-                <button onclick="this.parentElement.remove(); calc();" class="text-red-300 font-bold">×</button>`;
-            document.getElementById('itemContainer').appendChild(div);
-        }
+            </div>
 
-        function calc() {
-            let total = 0;
-            document.querySelectorAll('.item-row').forEach(row => {
-                total += (row.querySelector('.i-qty').value * row.querySelector('.i-harga').value);
-            });
-            document.getElementById('totalP').innerText = "Rp " + total.toLocaleString('id-ID');
-            return total;
-        }
+            <div style="margin-top: 60px; font-size: 11px; color: #64748b; line-height: 1.8;">
+                <p style="font-weight: 800; color: #1e3a8a; margin-bottom: 5px;">Syarat & Ketentuan:</p>
+                <ol>
+                    <li>Penawaran ini berlaku selama 14 hari sejak diterbitkan.</li>
+                    <li>Pengerjaan akan dilakukan setelah adanya persetujuan (PO) atau konfirmasi balik.</li>
+                    <li>Pembayaran dapat dilakukan melalui transfer Bank BCA: 123-456-7890 a/n Nanda Kurniawan.</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex gap-4 no-print">
+            <button onclick="closePreview()" class="flex-1 py-4 bg-white/20 text-white rounded-2xl font-800 text-xs">BATAL</button>
+            <button onclick="downloadQuote()" class="flex-1 py-4 bg-blue-500 text-white rounded-2xl font-800 text-xs shadow-xl">DOWNLOAD PDF PENAWARAN</button>
+        </div>
+    </div>
+</div>
 
-        async function simpanPenawaran() {
-            const email = document.getElementById('custInput').value;
-            const items = [];
-            document.querySelectorAll('.item-row').forEach(r => {
-                if(r.querySelector('.i-nama').value) {
-                    items.push({nama: r.querySelector('.i-nama').value, qty: r.querySelector('.i-qty').value, harga: r.querySelector('.i-harga').value});
-                }
-            });
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLEIwhlUvxhtVezTLwpt-ZRNw6rCtjXhWEFj1fbCPElp2_5lxyeIUFjI4BalockbNGnw/exec";
+    let riwayatData = [];
 
-            if(!email || items.length === 0) return alert("Lengkapi data!");
-
-            Swal.fire({title: 'Menyimpan...', didOpen: () => Swal.showLoading()});
-
-            const payload = {
-                action: "simpanPenawaran",
-                id_nota: "OFF-" + Date.now().toString().slice(-6),
-                email: email,
-                items: items,
-                total: calc(),
-                status: "OFFER",
-                tanggal: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
-            };
-
-            try {
-                await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)});
-                Swal.fire('Tersimpan!', 'Data penawaran masuk ke sheet. Silakan kirim email manual jika perlu.', 'success');
-                // Auto fill email tab
-                document.getElementById('penerima').value = email;
-                document.getElementById('subjek').value = "PENAWARAN HARGA - NANDA TEKNIK (" + payload.id_nota + ")";
-                document.getElementById('pesan').value = "Halo, berikut kami lampirkan penawaran harga untuk pengerjaan Anda. Terima kasih.";
-            } catch(e) { alert("Gagal Simpan"); }
-        }
-
-        async function loadRiwayat() {
-            const list = document.getElementById('listR');
-            list.innerHTML = "<p class='text-center text-xs font-bold py-10 animate-pulse'>MEMUAT...</p>";
-            try {
-                const res = await fetch(SCRIPT_URL + "?type=penawaran");
-                rData = await res.json();
-                filterR();
-            } catch(e) { list.innerHTML = "Gagal memuat."; }
-        }
-
-        function filterR() {
-            const search = document.getElementById('searchR').value.toLowerCase();
-            const date = document.getElementById('dateR').value;
-            const list = document.getElementById('listR');
-            list.innerHTML = "";
-
-            rData.filter(n => {
-                const matchS = (n.id_nota + n.email).toLowerCase().includes(search);
-                const matchD = date ? new Date(n.tanggal).toDateString() === new Date(date).toDateString() : true;
-                return matchS && matchD;
-            }).forEach(n => {
-                list.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
-                        <div>
-                            <p class="text-[8px] font-black text-gray-400">${n.id_nota} | ${n.tanggal}</p>
-                            <p class="text-[11px] font-black uppercase text-gray-800">${n.email}</p>
-                        </div>
-                        <p class="text-[11px] font-black text-blue-600">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
-                    </div>`;
-            });
-        }
-
-        // FUNGSI EMAIL ASLI ANDA
-        function showName() {
-            const input = document.getElementById('lampiran');
-            document.getElementById('fileName').innerText = input.files[0].name;
-            document.getElementById('fileName').classList.replace('text-gray-400', 'text-blue-600');
-        }
-
-        document.getElementById('emailForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmit');
-            const fileInput = document.getElementById('lampiran');
-            btn.disabled = true;
-            btn.innerHTML = "MENGIRIM...";
-
-            let fileData = null;
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                fileData = await new Promise((resolve) => {
-                    reader.onload = (e) => resolve({
-                        base64: e.target.result.split(',')[1],
-                        name: file.name,
-                        type: file.type
-                    });
-                    reader.readAsDataURL(file);
-                });
+    // --- NAVIGATION ---
+    function switchTab(t) {
+        document.getElementById('sectionBuat').classList.toggle('hidden', t !== 'buat');
+        document.getElementById('sectionRiwayat').classList.toggle('hidden', t !== 'riwayat');
+        document.getElementById('sectionEmail').classList.toggle('hidden', t !== 'email');
+        
+        ['tabBuat', 'tabRiwayat', 'tabEmail'].forEach(id => {
+            const el = document.getElementById(id);
+            if(id === 'tab' + t.charAt(0).toUpperCase() + t.slice(1)) {
+                el.classList.add('tab-active'); el.classList.remove('text-gray-400');
+            } else {
+                el.classList.remove('tab-active'); el.classList.add('text-gray-400');
             }
+        });
+        if(t === 'riwayat') loadRiwayat();
+    }
 
-            const payload = {
-                action: "kirimEmail",
-                penerima: document.getElementById('penerima').value,
-                subjek: document.getElementById('subjek').value,
-                pesan: document.getElementById('pesan').value,
-                file: fileData
-            };
+    // --- PENAWARAN LOGIC ---
+    function addRow() {
+        const id = Date.now();
+        const div = document.createElement('div');
+        div.className = "bg-gray-50 p-5 rounded-[2rem] border border-gray-100 item-row relative group transition-all";
+        div.innerHTML = `
+            <button onclick="this.parentElement.remove(); calcTotal();" class="absolute -top-2 -right-2 bg-red-500 text-white w-8 h-8 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all text-xl">×</button>
+            <input type="text" placeholder="Nama Pekerjaan / Barang" class="w-full bg-transparent border-b border-gray-200 mb-3 font-800 text-sm outline-none p-1 i-nama">
+            <div class="flex gap-4">
+                <div class="flex-1"><label class="text-[8px] font-800 text-gray-400 block mb-1">QTY</label><input type="number" value="1" oninput="calcTotal()" class="w-full bg-white p-2 rounded-xl font-bold text-xs i-qty"></div>
+                <div class="flex-[2]"><label class="text-[8px] font-800 text-gray-400 block mb-1">HARGA SATUAN</label><input type="number" placeholder="0" oninput="calcTotal()" class="w-full bg-white p-2 rounded-xl font-bold text-xs i-harga"></div>
+            </div>`;
+        document.getElementById('itemContainer').appendChild(div);
+    }
 
-            try {
-                const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-                const result = await response.json();
-                if(result.result === "success") {
-                    Swal.fire('Berhasil!', 'Email telah terkirim ke pelanggan.', 'success');
-                    document.getElementById('emailForm').reset();
-                    document.getElementById('fileName').innerText = "Pilih File...";
-                }
-            } catch (err) { Swal.fire('Error', err.toString(), 'error'); }
-            finally { btn.disabled = false; btn.innerHTML = "Kirim Email Sekarang"; }
+    function calcTotal() {
+        let t = 0;
+        document.querySelectorAll('.item-row').forEach(r => {
+            const q = r.querySelector('.i-qty').value || 0;
+            const h = r.querySelector('.i-harga').value || 0;
+            t += (q * h);
+        });
+        document.getElementById('displayTotal').innerText = "Rp " + t.toLocaleString('id-ID');
+        return t;
+    }
+
+    async function saveOffer() {
+        const cust = document.getElementById('custEmail').value;
+        const items = [];
+        document.querySelectorAll('.item-row').forEach(r => {
+            const n = r.querySelector('.i-nama').value;
+            const q = r.querySelector('.i-qty').value;
+            const h = r.querySelector('.i-harga').value;
+            if(n && h) items.push({nama: n, qty: q, harga: h});
+        });
+
+        if(!cust || items.length === 0) return Swal.fire('Oops!', 'Lengkapi data penawaran', 'warning');
+
+        Swal.fire({title: 'Menyimpan ke Sheet Penawaran...', didOpen: () => Swal.showLoading()});
+
+        const data = {
+            action: "simpanPenawaran",
+            id_nota: "OFF-" + Date.now().toString().slice(-6),
+            email: cust, items: items, total: calcTotal(),
+            tanggal: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
         };
 
-        window.onload = () => addRow();
-    </script>
+        try {
+            await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(data)});
+            Swal.fire('Berhasil!', 'Penawaran tersimpan di database.', 'success');
+            // Auto fill Email Tab
+            document.getElementById('mailTo').value = cust.includes('@') ? cust : "";
+            document.getElementById('mailSubject').value = "PENAWARAN HARGA: " + data.id_nota + " - NANDA TEKNIK";
+            applyTemplate('penawaran');
+        } catch(e) { Swal.fire('Error', 'Gagal menyimpan', 'error'); }
+    }
+
+    // --- RIWAYAT LOGIC ---
+    async function loadRiwayat() {
+        const list = document.getElementById('listRiwayat');
+        list.innerHTML = `<div class="p-20 text-center animate-pulse text-xs font-800 text-blue-900">LOADING DATA...</div>`;
+        try {
+            const res = await fetch(SCRIPT_URL + "?type=penawaran");
+            riwayatData = await res.json();
+            filterR();
+        } catch(e) { list.innerHTML = "Gagal memuat riwayat."; }
+    }
+
+    function filterR() {
+        const key = document.getElementById('searchR').value.toLowerCase();
+        const date = document.getElementById('dateR').value;
+        const list = document.getElementById('listRiwayat');
+        list.innerHTML = "";
+
+        riwayatData.filter(n => {
+            const matchS = (n.id_nota + n.email).toLowerCase().includes(key);
+            const matchD = date ? new Date(n.tanggal).toDateString() === new Date(date).toDateString() : true;
+            return matchS && matchD;
+        }).forEach(n => {
+            list.innerHTML += `
+                <div onclick='viewQuote(${JSON.stringify(n)})' class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center cursor-pointer active:scale-95 transition-all">
+                    <div>
+                        <p class="text-[8px] font-800 text-gray-400 uppercase">${n.id_nota} | ${n.tanggal}</p>
+                        <p class="text-xs font-800 text-blue-900 uppercase">${n.email}</p>
+                    </div>
+                    <p class="text-xs font-800 text-blue-500">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
+                </div>`;
+        });
+    }
+
+    // --- PREVIEW & PDF ---
+    function viewQuote(n) {
+        document.getElementById('vId').innerText = n.id_nota;
+        document.getElementById('vCust').innerText = n.email;
+        document.getElementById('vTgl').innerText = n.tanggal;
+        document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
+
+        const body = document.getElementById('vBody');
+        body.innerHTML = "";
+        const items = typeof n.items_json === 'string' ? JSON.parse(n.items_json) : n.items_json;
+        items.forEach(it => {
+            body.innerHTML += `
+                <tr>
+                    <td class="font-600">${it.nama}</td>
+                    <td style="text-align: center;">${it.qty}</td>
+                    <td style="text-align: right;">${parseInt(it.harga).toLocaleString('id-ID')}</td>
+                    <td style="text-align: right; font-weight: 800;">${(it.qty * it.harga).toLocaleString('id-ID')}</td>
+                </tr>`;
+        });
+        document.getElementById('modalPreview').classList.replace('hidden', 'flex');
+    }
+
+    function downloadQuote() {
+        const el = document.getElementById('captureArea');
+        const opt = { margin: 0, filename: `Penawaran-${document.getElementById('vId').innerText}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        html2pdf().set(opt).from(el).save();
+    }
+
+    function closePreview() { document.getElementById('modalPreview').classList.replace('flex', 'hidden'); }
+
+    // --- CMS EMAIL LOGIC ---
+    function showFileName() {
+        const name = document.getElementById('mailFile').files[0].name;
+        document.getElementById('fileName').innerText = name;
+        document.getElementById('fileName').classList.replace('text-gray-400', 'text-blue-600');
+    }
+
+    function applyTemplate(type) {
+        const body = document.getElementById('mailBody');
+        const templates = {
+            penawaran: `
+                <div style="font-family: sans-serif;">
+                    <h2 style="color: #1e3a8a;">PENAWARAN LAYANAN TEKNIK</h2>
+                    <p>Halo,</p>
+                    <p>Terima kasih telah menghubungi <strong>Nanda Teknik</strong>. Berdasarkan permintaan Anda, berikut kami lampirkan dokumen penawaran harga (Quotation) untuk pengerjaan unit Anda.</p>
+                    <p>Kami menjamin pengerjaan dilakukan oleh tenaga profesional dengan suku cadang berkualitas.</p>
+                    <p>Silakan tinjau dokumen terlampir dan hubungi kami jika ada pertanyaan.</p>
+                    <br><p>Hormat Kami,<br><strong>Nanda Teknik Banyuwangi</strong></p>
+                </div>`,
+            reminder: `
+                <div style="font-family: sans-serif;">
+                    <p>Halo,</p>
+                    <p>Kami ingin menginformasikan bahwa dokumen penawaran yang kami kirimkan sebelumnya akan segera berakhir masa berlakunya.</p>
+                    <p>Apakah ada yang bisa kami bantu terkait penawaran tersebut?</p>
+                    <br><p>Salam,<br><strong>Nanda Teknik</strong></p>
+                </div>`
+        };
+        body.innerHTML = templates[type];
+    }
+
+    async function sendEmail() {
+        const btn = document.getElementById('btnSend');
+        const fileInput = document.getElementById('mailFile');
+        btn.disabled = true; btn.innerText = "SEDANG MENGIRIM...";
+
+        let fileData = null;
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            fileData = await new Promise(r => {
+                reader.onload = (e) => r({ base64: e.target.result.split(',')[1], name: file.name, type: file.type });
+                reader.readAsDataURL(file);
+            });
+        }
+
+        const payload = {
+            action: "kirimEmail",
+            penerima: document.getElementById('mailTo').value,
+            subjek: document.getElementById('mailSubject').value,
+            pesan: document.getElementById('mailBody').innerHTML,
+            file: fileData
+        };
+
+        try {
+            const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+            const result = await res.json();
+            if(result.result === "success") {
+                Swal.fire('Email Terkirim!', 'Penawaran telah dikirim ke pelanggan.', 'success');
+            }
+        } catch(e) { Swal.fire('Error', 'Gagal kirim email', 'error'); }
+        finally { btn.disabled = false; btn.innerText = "KIRIM SEKARANG"; }
+    }
+
+    window.onload = () => addRow();
+</script>
 </body>
 </html>
