@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Management System - Nanda Teknik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Courier+Prime&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
+        .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 900; }
+        .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; position: relative; color: #000; }
+        #watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 50px; font-weight: 900; opacity: 0.1; pointer-events: none; z-index: 10; }
+        .wm-paid { color: #16a34a; border: 4px solid #16a34a; padding: 5px; border-radius: 8px; }
+        .wm-offer { color: #2563eb; border: 4px solid #2563eb; padding: 5px; border-radius: 8px; }
+        .autocomplete-items { position: absolute; border-radius: 1rem; border: 1px solid #e2e8f0; background: white; z-index: 100; top: 100%; left: 0; right: 0; margin-top: 5px; overflow-y: auto; max-height: 200px; }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container shadow-2xl">
+    <header class="p-4 bg-white sticky top-0 z-50 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-lg font-900 tracking-tighter text-blue-600 italic">NANDA TEKNIK</h1>
+            <span id="currentTypeLabel" class="text-[9px] bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-800">NAVIGASI</span>
+        </div>
+        <nav class="flex border-b border-gray-100 overflow-x-auto no-scrollbar">
+            <button onclick="switchMode('nota')" id="modeNota" class="flex-1 py-3 text-[10px] font-700 tab-active">NOTA</button>
+            <button onclick="switchMode('penawaran')" id="modePenawaran" class="flex-1 py-3 text-[10px] font-700 text-gray-400">PENAWARAN</button>
+            <button onclick="switchMode('riwayat')" id="modeRiwayat" class="flex-1 py-3 text-[10px] font-700 text-gray-400">RIWAYAT</button>
+        </nav>
+    </header>
+
+    <main id="contentForm" class="p-6 space-y-5">
+        <div class="flex bg-gray-100 p-1 rounded-2xl">
+            <button onclick="setCustMode('pelanggan')" id="btnCustP" class="flex-1 py-2 rounded-xl text-[10px] font-800 bg-white shadow-sm text-blue-600">PELANGGAN LAMA</button>
+            <button onclick="setCustMode('umum')" id="btnCustU" class="flex-1 py-2 rounded-xl text-[10px] font-800 text-gray-400">PELANGGAN BARU</button>
+        </div>
+
+        <div class="relative">
+            <label id="labelPenerima" class="text-[10px] font-800 text-gray-400 uppercase tracking-widest ml-2 mb-1 block">Tujuan Dokumen</label>
+            <input type="text" id="custSearch" placeholder="Cari nama/email..." class="w-full bg-gray-50 border-2 border-transparent p-4 rounded-2xl font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
+            <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
+            <input type="hidden" id="finalEmail">
+        </div>
+
+        <div id="itemContainer" class="space-y-3">
+            </div>
+
+        <button onclick="tambahItem()" class="w-full py-4 text-[10px] font-800 text-gray-400 border-2 border-dashed border-gray-200 rounded-2xl">+ TAMBAH BARIS PEKERJAAN</button>
+
+        <div class="bg-slate-900 p-6 rounded-[2rem] text-white shadow-xl">
+            <div class="flex justify-between items-center mb-6" id="statusWrapper">
+                <span class="text-[10px] font-800 text-slate-400 uppercase">Status</span>
+                <select id="docStatus" class="bg-slate-800 text-[10px] font-900 p-2 rounded-xl border-none outline-none">
+                    <option value="PAID">PAID</option>
+                    <option value="UNPAID">UNPAID</option>
+                </select>
+            </div>
+            <div class="flex justify-between items-end">
+                <div>
+                    <span id="labelTotal" class="text-[10px] font-800 text-slate-400 block mb-1 uppercase">Total Estimasi</span>
+                    <span id="totalDisplay" class="text-3xl font-900 text-blue-400 leading-none">Rp 0</span>
+                </div>
+                <button onclick="prosesSimpan()" id="btnSimpan" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-900 text-xs shadow-lg transition-all active:scale-95 uppercase">Simpan</button>
+            </div>
+        </div>
+    </main>
+
+    <main id="contentRiwayat" class="p-6 hidden bg-gray-50 flex-1 space-y-4">
+        <div class="flex gap-2">
+            <button onclick="loadRiwayat('nota')" id="btnRNota" class="flex-1 py-2 rounded-lg text-[9px] font-900 bg-blue-600 text-white shadow-md">RIWAYAT NOTA</button>
+            <button onclick="loadRiwayat('penawaran')" id="btnRPen" class="flex-1 py-2 rounded-lg text-[9px] font-900 bg-white text-gray-400 border border-gray-200">RIWAYAT PENAWARAN</button>
+        </div>
+        <div class="space-y-2">
+            <input type="text" id="searchR" oninput="filterR()" placeholder="Cari Nama/Email/ID..." class="w-full p-4 bg-white border border-gray-100 rounded-xl text-xs font-bold outline-none shadow-sm">
+            <input type="date" id="dateR" onchange="filterR()" class="w-full p-4 bg-white border border-gray-100 rounded-xl text-xs font-bold outline-none shadow-sm">
+        </div>
+        <div id="listR" class="space-y-4"></div>
+        <div class="flex justify-center items-center gap-4 py-6" id="paginationUI">
+            <button id="prevBtn" class="p-2 bg-white rounded-lg border disabled:opacity-30"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2"/></svg></button>
+            <span id="pageNumber" class="text-[10px] font-900 text-gray-400 uppercase tracking-tighter">1 / 1</span>
+            <button id="nextBtn" class="p-2 bg-white rounded-lg border disabled:opacity-30"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2"/></svg></button>
+        </div>
+    </main>
+</div>
+
+<div id="modalNota" class="fixed inset-0 bg-black/80 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white w-full rounded-[2rem] overflow-hidden max-h-[90vh] flex flex-col max-w-sm">
+        <div id="printArea" class="p-8 nota-kertas flex-1 overflow-y-auto">
+            <div id="watermark"></div>
+            <div class="text-center mb-6 border-b-2 border-black pb-4">
+                <h2 id="printTitle" class="font-900 text-lg uppercase leading-tight">Nota Transaksi</h2>
+                <p class="text-[8px]">NANDA TEKNIK BANYUWANGI</p>
+                <p class="text-[7px]">WA: 0823-3120-1148 | Maintenance Specialist</p>
+            </div>
+            <div class="text-[10px] flex justify-between mb-4">
+                <div><p>ID: <span id="vId" class="font-bold"></span></p><p>KE: <span id="vCust" class="font-bold"></span></p></div>
+                <div class="text-right"><p id="vTgl" class="font-bold"></p><p id="vStatus" class="font-900 italic uppercase"></p></div>
+            </div>
+            <table class="w-full text-[10px] mb-6">
+                <thead><tr class="border-b border-black text-left"><th class="py-1">ITEM</th><th class="text-center">QTY</th><th class="text-right">TOTAL</th></tr></thead>
+                <tbody id="vItems"></tbody>
+            </table>
+            <div class="border-t-2 border-black pt-2 mb-6">
+                <div class="flex justify-between font-900 text-xs"><span>GRAND TOTAL</span><span id="vTotal"></span></div>
+            </div>
+            <div class="text-[8px] flex justify-between">
+                <div><p class="font-bold underline italic">Hormat Kami,</p><br><p class="font-bold uppercase">Nanda Teknik</p></div>
+                <div class="text-right"><p class="font-bold">Note:</p><p>Barang servis yang sudah dibawa<br>tidak dapat dikembalikan.</p></div>
+            </div>
+        </div>
+        <div class="p-6 bg-slate-50 flex gap-3">
+            <button onclick="tutupModal()" class="flex-1 py-4 rounded-xl font-800 text-xs bg-white text-gray-400">TUTUP</button>
+            <button onclick="unduhPDF()" class="flex-1 py-4 rounded-xl font-800 text-xs text-white bg-blue-600 flex items-center justify-center gap-2 uppercase">PDF</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLEIwhlUvxhtVezTLwpt-ZRNw6rCtjXhWEFj1fbCPElp2_5lxyeIUFjI4BalockbNGnw/exec";
+    
+    let currentMode = 'nota'; // nota / penawaran / riwayat
+    let currentCustMode = 'pelanggan';
+    let pData = [];
+    let rData = [];
+    let filteredR = [];
+    let currentPage = 1;
+    const itemsPerPage = 6;
+
+    // --- NAVIGASI ---
+    function switchMode(mode) {
+        currentMode = mode;
+        const isRiwayat = mode === 'riwayat';
+        
+        document.getElementById('contentForm').classList.toggle('hidden', isRiwayat);
+        document.getElementById('contentRiwayat').classList.toggle('hidden', !isRiwayat);
+        
+        document.getElementById('modeNota').className = mode === 'nota' ? "flex-1 py-3 text-[10px] tab-active" : "flex-1 py-3 text-[10px] font-700 text-gray-400";
+        document.getElementById('modePenawaran').className = mode === 'penawaran' ? "flex-1 py-3 text-[10px] tab-active" : "flex-1 py-3 text-[10px] font-700 text-gray-400";
+        document.getElementById('modeRiwayat').className = mode === 'riwayat' ? "flex-1 py-3 text-[10px] tab-active" : "flex-1 py-3 text-[10px] font-700 text-gray-400";
+        
+        if(mode !== 'riwayat') {
+            document.getElementById('statusWrapper').classList.toggle('hidden', mode === 'penawaran');
+            document.getElementById('btnSimpan').innerText = mode === 'nota' ? 'SIMPAN NOTA' : 'SIMPAN PENAWARAN';
+            document.getElementById('currentTypeLabel').innerText = mode.toUpperCase();
+        } else {
+            loadRiwayat('nota');
+        }
+    }
+
+    // --- PELANGGAN ---
+    function setCustMode(m) {
+        currentCustMode = m;
+        document.getElementById('btnCustP').className = m === 'pelanggan' ? "flex-1 py-2 rounded-xl text-[10px] font-800 bg-white shadow-sm text-blue-600" : "flex-1 py-2 rounded-xl text-[10px] font-800 text-gray-400";
+        document.getElementById('btnCustU').className = m === 'umum' ? "flex-1 py-2 rounded-xl text-[10px] font-800 bg-white shadow-sm text-blue-600" : "flex-1 py-2 rounded-xl text-[10px] font-800 text-gray-400";
+        document.getElementById('custSearch').value = "";
+        document.getElementById('finalEmail').value = "";
+    }
+
+    const searchInput = document.getElementById('custSearch');
+    const autoList = document.getElementById('autocomplete-list');
+
+    searchInput.addEventListener('input', function() {
+        const val = this.value;
+        if(currentCustMode === 'umum') { document.getElementById('finalEmail').value = val; return; }
+        autoList.innerHTML = "";
+        if (!val) { autoList.classList.add('hidden'); return; }
+        const f = pData.filter(p => (p.nama+p.email).toLowerCase().includes(val.toLowerCase()));
+        f.slice(0, 5).forEach(p => {
+            const d = document.createElement('div');
+            d.className = "p-3 text-sm border-b cursor-pointer hover:bg-blue-50";
+            d.innerHTML = `<div class="font-bold">${p.nama}</div><div class="text-[10px] text-gray-400">${p.email}</div>`;
+            d.onclick = () => { searchInput.value = p.nama; document.getElementById('finalEmail').value = p.email; autoList.classList.add('hidden'); };
+            autoList.appendChild(d);
+        });
+        autoList.classList.toggle('hidden', f.length === 0);
+    });
+
+    // --- ITEMS ---
+    function tambahItem() {
+        const div = document.createElement('div');
+        div.className = "bg-white border border-gray-100 p-4 rounded-2xl shadow-sm space-y-3 item-row relative";
+        div.innerHTML = `
+            <button onclick="this.parentElement.remove(); hitungTotal();" class="absolute top-4 right-4 text-gray-300">×</button>
+            <input type="text" placeholder="Deskripsi Jasa / Barang" class="w-full text-sm font-bold item-nama border-b pb-1 outline-none">
+            <div class="flex gap-3">
+                <div class="flex-1"><span class="text-[8px] text-gray-400 block uppercase">Qty</span><input type="number" oninput="hitungTotal()" value="1" class="w-full bg-gray-50 p-2 rounded-lg text-sm font-bold item-qty"></div>
+                <div class="flex-[2] text-right"><span class="text-[8px] text-gray-400 block uppercase">Harga Satuan</span><input type="number" oninput="hitungTotal()" placeholder="0" class="w-full bg-gray-50 p-2 rounded-lg text-sm font-bold item-harga text-right"></div>
+            </div>`;
+        document.getElementById('itemContainer').appendChild(div);
+    }
+
+    function hitungTotal() {
+        let t = 0;
+        document.querySelectorAll('.item-row').forEach(r => {
+            t += (r.querySelector('.item-qty').value * r.querySelector('.item-harga').value);
+        });
+        document.getElementById('totalDisplay').innerText = "Rp " + t.toLocaleString('id-ID');
+        return t;
+    }
+
+    // --- PROSES SIMPAN ---
+    async function prosesSimpan() {
+        const email = document.getElementById('finalEmail').value || searchInput.value;
+        const items = [];
+        document.querySelectorAll('.item-row').forEach(r => {
+            const n = r.querySelector('.item-nama').value;
+            const q = r.querySelector('.item-qty').value;
+            const h = r.querySelector('.item-harga').value;
+            if(n && h) items.push({ nama: n, qty: q, harga: h });
+        });
+        if(!email || items.length === 0) return Swal.fire('Error', 'Data belum lengkap', 'warning');
+
+        Swal.fire({title: 'Memproses...', didOpen: () => Swal.showLoading()});
+        
+        const payload = {
+            action: currentMode === 'nota' ? 'simpanNota' : 'simpanPenawaran',
+            id_nota: (currentMode === 'nota' ? 'INV-' : 'OFF-') + Date.now().toString().slice(-6),
+            email: email, items: items, total: hitungTotal(),
+            status: currentMode === 'nota' ? document.getElementById('docStatus').value : 'OFFER',
+            tanggal: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
+        };
+
+        try {
+            await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)});
+            Swal.fire({icon:'success', title: 'Berhasil!'}).then(() => location.reload());
+        } catch(e) { Swal.fire('Error', 'Gagal kirim data', 'error'); }
+    }
+
+    // --- RIWAYAT ---
+    async function loadRiwayat(type) {
+        document.getElementById('btnRNota').className = type === 'nota' ? "flex-1 py-2 rounded-lg text-[9px] font-900 bg-blue-600 text-white shadow-md" : "flex-1 py-2 rounded-lg text-[9px] font-900 bg-white text-gray-400 border border-gray-200";
+        document.getElementById('btnRPen').className = type === 'penawaran' ? "flex-1 py-2 rounded-lg text-[9px] font-900 bg-blue-600 text-white shadow-md" : "flex-1 py-2 rounded-lg text-[9px] font-900 bg-white text-gray-400 border border-gray-200";
+        
+        const list = document.getElementById('listR');
+        list.innerHTML = `<div class="text-center py-20 animate-pulse text-xs font-bold text-gray-300">LOADING DATA...</div>`;
+        
+        try {
+            const res = await fetch(SCRIPT_URL + "?type=" + type);
+            rData = await res.json();
+            filteredR = [...rData];
+            displayR();
+        } catch(e) { list.innerHTML = "Gagal memuat."; }
+    }
+
+    function filterR() {
+        const k = document.getElementById('searchR').value.toLowerCase();
+        const d = document.getElementById('dateR').value;
+        
+        filteredR = rData.filter(n => {
+            const matchK = (n.id+n.email+n.id_nota).toLowerCase().includes(k);
+            let matchD = true;
+            if(d) {
+                const docD = new Date(n.tanggal).toDateString();
+                const filterD = new Date(d).toDateString();
+                matchD = docD === filterD;
+            }
+            return matchK && matchD;
+        });
+        currentPage = 1;
+        displayR();
+    }
+
+    function displayR() {
+        const list = document.getElementById('listR');
+        list.innerHTML = "";
+        const start = (currentPage - 1) * itemsPerPage;
+        const currentData = filteredR.slice(start, start + itemsPerPage);
+
+        currentData.forEach(n => {
+            const isPaid = n.status === 'PAID' || n.status === 'OFFER';
+            list.innerHTML += `
+                <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all">
+                    <div>
+                        <p class="text-[8px] font-900 text-gray-400 uppercase tracking-tighter">${n.id || n.id_nota} • ${n.tanggal}</p>
+                        <p class="text-xs font-900 text-slate-800 truncate w-32 uppercase">${n.email}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-900 text-slate-800">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
+                        <span class="text-[8px] font-900 ${isPaid ? 'text-blue-500 bg-blue-50' : 'text-red-500 bg-red-50'} px-2 py-1 rounded uppercase">${n.status}</span>
+                    </div>
+                </div>`;
+        });
+        
+        const totalP = Math.ceil(filteredR.length / itemsPerPage) || 1;
+        document.getElementById('pageNumber').innerText = `${currentPage} / ${totalP}`;
+        document.getElementById('prevBtn').disabled = currentPage === 1;
+        document.getElementById('nextBtn').disabled = currentPage === totalP;
+    }
+
+    function bukaDetail(n) {
+        const isOffer = (n.id || n.id_nota).startsWith('OFF');
+        document.getElementById('printTitle').innerText = isOffer ? "Penawaran Harga" : "Nota Transaksi";
+        document.getElementById('vId').innerText = n.id || n.id_nota;
+        document.getElementById('vTgl').innerText = n.tanggal;
+        document.getElementById('vCust').innerText = n.email;
+        document.getElementById('vStatus').innerText = n.status;
+        document.getElementById('vStatus').className = "font-900 italic " + (n.status === 'PAID' ? 'text-green-600' : 'text-blue-600');
+        document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
+        document.getElementById('watermark').innerHTML = `<span class="${n.status === 'PAID' ? 'wm-paid' : 'wm-offer'}">${n.status}</span>`;
+
+        const body = document.getElementById('vItems');
+        body.innerHTML = "";
+        const items = typeof n.items_json === 'string' ? JSON.parse(n.items_json) : (n.items_json || []);
+        items.forEach(it => {
+            body.innerHTML += `
+                <tr class="border-b border-gray-100">
+                    <td class="py-2 text-[9px] uppercase">${it.nama}<br><span class="text-[7px] text-gray-400">@${parseInt(it.harga).toLocaleString('id-ID')}</span></td>
+                    <td class="text-center text-[9px]">${it.qty}</td>
+                    <td class="text-right font-bold text-[9px]">${(it.qty * it.harga).toLocaleString('id-ID')}</td>
+                </tr>`;
+        });
+        document.getElementById('modalNota').classList.replace('hidden', 'flex');
+    }
+
+    function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); }
+    function unduhPDF() {
+        const el = document.getElementById('printArea');
+        html2pdf().set({ margin: 10, filename: `${document.getElementById('vId').innerText}.pdf`, html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4' } }).from(el).save();
+    }
+
+    window.onload = async () => {
+        tambahItem();
+        try {
+            const res = await fetch(SCRIPT_URL + "?type=pelanggan");
+            pData = await res.json();
+        } catch(e) {}
+    };
+
+    document.getElementById('prevBtn').onclick = () => { if(currentPage > 1) { currentPage--; displayR(); } };
+    document.getElementById('nextBtn').onclick = () => { if(currentPage < Math.ceil(filteredR.length / itemsPerPage)) { currentPage++; displayR(); } };
+</script>
+</body>
+</html>
