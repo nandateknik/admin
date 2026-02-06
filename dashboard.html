@@ -13,57 +13,97 @@
         .mobile-container { max-width: 480px; height: 100vh; margin: 0 auto; background: #fff; position: relative; overflow: hidden; }
         #map { height: 100%; width: 100%; z-index: 1; }
         
+        /* SIDEBAR STYLING */
         #sidebar {
-            position: absolute; top: 0; left: -100%; width: 300px; height: 100%;
-            background: white; z-index: 5000; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 10px 0 40px rgba(0,0,0,0.1);
+            position: absolute; top: 0; left: -100%; width: 85%; height: 100%;
+            background: #111827; z-index: 5000; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
         }
         #sidebar.open { left: 0; }
-        #overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); z-index: 4999; display: none; backdrop-filter: blur(2px);
+        .nav-link { 
+            display: flex; items-center: center; gap: 1rem; padding: 1rem; 
+            border-radius: 1rem; transition: all 0.3s; color: #9ca3af; font-weight: 600;
         }
+        .nav-link.active { background: #2563eb; color: white; }
+        .nav-link:hover:not(.active) { background: #1f2937; color: white; }
 
-        .dot-marker { border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        /* LEGEND STYLING */
+        .map-legend {
+            position: absolute; bottom: 120px; right: 20px; background: white;
+            padding: 12px; border-radius: 16px; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            font-size: 10px; font-weight: 800; display: flex; flex-direction: column; gap: 8px;
+            border: 1px solid #f3f4f6;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 3px; }
+
+        .dot-marker { border-radius: 50%; border: 2.5px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .bg-antri { background-color: #3b82f6; } .bg-proses { background-color: #eab308; } 
         .bg-selesai { background-color: #22c55e; } .bg-cancel { background-color: #ef4444; }
-        .bg-konf { background-color: #9ca3af; } .bg-pelanggan { background-color: #8b5cf6; }
+        .bg-pelanggan { background-color: #8b5cf6; }
 
         .bottom-sheet {
             position: absolute; bottom: 0; left: 0; right: 0; 
             background: white; border-top-left-radius: 2.5rem; border-top-right-radius: 2.5rem;
             z-index: 2000; transform: translateY(105%); transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-            padding: 2rem; padding-bottom: 4rem; box-shadow: 0 -20px 50px rgba(0,0,0,0.15);
+            padding: 2rem; padding-bottom: 3rem; box-shadow: 0 -20px 50px rgba(0,0,0,0.1);
         }
         .bottom-sheet.active { transform: translateY(0); }
-        .handle { width: 50px; height: 5px; background: #e5e7eb; border-radius: 10px; margin: -10px auto 20px; }
+        .handle { width: 40px; height: 4px; background: #e5e7eb; border-radius: 10px; margin: -10px auto 20px; }
     </style>
 </head>
 <body>
 
     <div class="mobile-container shadow-2xl">
-        <div id="overlay" onclick="toggleSidebar()"></div>
+        <div id="overlay" onclick="toggleSidebar()" class="absolute inset-0 bg-black/50 z-[4999] hidden backdrop-blur-sm"></div>
         
-        <div id="sidebar" class="p-8 flex flex-col">
-            <div class="mb-10">
-                <h2 class="text-3xl font-black text-gray-900 tracking-tighter leading-none">NANDA<br>TEKNIK</h2>
-                <div class="h-1 w-12 bg-blue-600 mt-4"></div>
+        <div id="sidebar" class="p-6 flex flex-col">
+            <div class="mb-10 px-2">
+                <p class="text-blue-500 text-[10px] font-black tracking-[0.3em] uppercase">Administrator</p>
+                <h2 class="text-2xl font-black text-white tracking-tighter">NANDA TEKNIK</h2>
             </div>
-            <nav class="space-y-4 flex-1">
-                <a href="#" onclick="toggleSidebar()" class="flex items-center gap-4 p-4 bg-blue-50 text-blue-700 rounded-2xl font-black text-sm">Dashboard Maps</a>
-                <a href="booking.html" class="flex items-center gap-4 p-4 text-gray-400 font-bold text-sm hover:bg-gray-50 rounded-2xl transition-all">Input Booking</a>
+            
+            <nav class="space-y-2 flex-1 overflow-y-auto">
+                <a href="#" class="nav-link active">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A2 2 0 013 15.382V6.618a2 2 0 011.106-1.789L9 2l5 2.5L20 2v8.5a2 2 0 01-1.106 1.789L15 15l-6 5z"/></svg>
+                    Monitoring Maps
+                </a>
+                <a href="booking.html" class="nav-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Input Booking
+                </a>
+                <hr class="border-gray-800 my-4">
+                <a href="nota.html" class="nav-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Buat Nota Tagihan
+                </a>
+                <a href="penawaran.html" class="nav-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                    Surat Penawaran
+                </a>
+                <a href="broadcast.html" class="nav-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Kirim Email Massal
+                </a>
             </nav>
-            <button class="flex items-center gap-4 p-4 text-red-500 font-black text-xs uppercase tracking-widest">LOGOUT</button>
+
+            <button class="mt-auto p-4 bg-red-500/10 text-red-500 rounded-2xl font-black text-xs tracking-widest uppercase">Logout System</button>
         </div>
 
         <div class="absolute top-6 left-6 right-6 z-[1001] flex items-center gap-3">
-            <button onclick="toggleSidebar()" class="bg-white p-4 rounded-2xl shadow-xl text-gray-900 active:scale-90 transition-all border border-gray-100">
+            <button onclick="toggleSidebar()" class="bg-white p-4 rounded-2xl shadow-xl text-gray-900 border border-gray-100">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
             <div class="bg-white/90 backdrop-blur-md p-1.5 rounded-2xl shadow-xl flex flex-1 border border-white">
                 <button id="btnJob" onclick="switchMode('pekerjaan')" class="flex-1 py-3 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all bg-gray-900 text-white">Pekerjaan</button>
-                <button id="btnCust" onclick="switchMode('pelanggan')" class="flex-1 py-3 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all text-gray-400">Pelanggan</button>
+                <button id="btnCust" onclick="switchMode('pelanggan')" class="flex-1 py-3 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all text-gray-400">Database Pelanggan</button>
             </div>
+        </div>
+
+        <div class="map-legend">
+            <div class="legend-item"><div class="legend-color bg-antri"></div> ANTRIAN</div>
+            <div class="legend-item"><div class="legend-color bg-proses"></div> PROSES</div>
+            <div class="legend-item"><div class="legend-color bg-pelanggan"></div> RUMAH PELANGGAN</div>
         </div>
 
         <div id="map"></div>
@@ -72,59 +112,47 @@
             <div class="handle"></div>
             
             <div id="contentPekerjaan" class="hidden">
-                <div class="flex justify-between items-start mb-2">
+                <div class="flex justify-between items-start mb-4">
                     <div>
-                        <span id="jobStatus" class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">STATUS</span>
+                        <span id="jobStatus" class="px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">STATUS</span>
                         <h2 id="jobName" class="text-2xl font-black text-gray-800 mt-2 tracking-tight">Nama Pelanggan</h2>
                         <p id="jobDate" class="text-[10px] text-gray-400 font-bold mt-1"></p>
                     </div>
-                    <p id="jobId" class="font-black text-blue-600 text-lg">#000</p>
+                    <p id="jobId" class="font-black text-blue-600 text-lg">#ID</p>
                 </div>
-                <div class="space-y-3 mb-6">
-                    <div id="jobType" class="text-gray-500 font-bold text-xs uppercase tracking-widest">Layanan</div>
-                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                        <p class="text-[9px] font-black text-gray-400 uppercase mb-1">Keterangan:</p>
-                        <p id="jobDesc" class="text-sm text-gray-700 font-medium italic"></p>
-                    </div>
+                <div class="space-y-4 mb-6">
+                    <div id="jobType" class="text-blue-600 font-black text-[10px] uppercase tracking-widest">LAYANAN</div>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-sm text-gray-700 italic" id="jobDesc"></div>
                 </div>
-                <div class="grid grid-cols-3 gap-2 mb-3">
-                    <a id="waJob" target="_blank" class="bg-green-500 text-white py-4 rounded-2xl flex items-center justify-center shadow-lg shadow-green-100">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.187-2.59-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.667.072-1.097-.066-.264-.085-1.492-.475-2.528-1.445-1.008-.943-1.748-2.494-1.748-2.494-.047-.061-.382-.505-.382-1.028 0-.523.271-.78.369-.885.097-.105.215-.132.285-.132.07 0 .141 0 .202.003l.5-.01c.153-.004.225-.015.324.227l.436 1.054c.052.127.088.252.003.422-.085.17-.128.276-.254.425-.127.149-.267.33-.381.444-.127.127-.26.265-.112.52.148.255.658 1.085 1.415 1.761.972.866 1.792 1.135 2.047 1.262.255.128.404.106.554-.064.148-.17.637-.744.807-1.001.17-.255.339-.212.573-.127.234.085 1.487.702 1.742.829.255.127.425.191.488.318.064.127.064.737-.08 1.142z"/></svg>
-                    </a>
-                    <a id="navJob" target="_blank" class="col-span-2 bg-blue-600 text-white py-4 rounded-2xl font-black text-[11px] uppercase flex items-center justify-center gap-2 shadow-lg shadow-blue-200">NAVIGASI MAPS</a>
+                <div class="flex gap-2">
+                    <a id="waJob" target="_blank" class="w-16 bg-green-500 text-white rounded-2xl flex items-center justify-center shadow-lg"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.187-2.59-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.667.072-1.097-.066-.264-.085-1.492-.475-2.528-1.445-1.008-.943-1.748-2.494-1.748-2.494-.047-.061-.382-.505-.382-1.028 0-.523.271-.78.369-.885.097-.105.215-.132.285-.132.07 0 .141 0 .202.003l.5-.01c.153-.004.225-.015.324.227l.436 1.054c.052.127.088.252.003.422-.085.17-.128.276-.254.425-.127.149-.267.33-.381.444-.127.127-.26.265-.112.52.148.255.658 1.085 1.415 1.761.972.866 1.792 1.135 2.047 1.262.255.128.404.106.554-.064.148-.17.637-.744.807-1.001.17-.255.339-.212.573-.127.234.085 1.487.702 1.742.829.255.127.425.191.488.318.064.127.064.737-.08 1.142z"/></svg></a>
+                    <a id="navJob" target="_blank" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase text-center shadow-lg">NAVIGASI</a>
+                    <button id="btnUpdate" class="flex-1 bg-gray-900 text-white py-4 rounded-2xl font-black text-xs uppercase shadow-lg">UPDATE</button>
                 </div>
-                <button id="btnUpdate" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest">UPDATE STATUS</button>
             </div>
 
             <div id="contentPelanggan" class="hidden">
-                <div class="flex items-center gap-5 mb-6">
-                    <div id="custInit" class="w-16 h-16 bg-purple-600 rounded-3xl flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-purple-200">?</div>
+                <div class="flex items-center gap-4 mb-6">
+                    <div id="custInit" class="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl font-black">?</div>
                     <div>
-                        <h2 id="custName" class="text-2xl font-black text-gray-800 tracking-tight leading-none">Nama Pelanggan</h2>
-                        <p id="custEmail" class="text-xs text-gray-400 mt-1 font-medium italic"></p>
+                        <h2 id="custName" class="text-xl font-black text-gray-800">Nama Pelanggan</h2>
+                        <p id="custEmail" class="text-xs text-gray-400"></p>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-gray-50 p-4 rounded-2xl">
-                        <p class="text-[9px] font-black text-gray-400 uppercase mb-1">WhatsApp</p>
-                        <p id="custWA" class="text-sm font-bold text-gray-800"></p>
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-2xl">
-                        <p class="text-[9px] font-black text-gray-400 uppercase mb-1">Tgl Lahir</p>
-                        <p id="custUltah" class="text-sm font-bold text-gray-800"></p>
-                    </div>
+                <div class="grid grid-cols-2 gap-3 mb-6 text-sm">
+                    <div class="bg-gray-50 p-3 rounded-xl"><p class="text-[8px] font-black text-gray-400 uppercase">WhatsApp</p><p id="custWA" class="font-bold"></p></div>
+                    <div class="bg-gray-50 p-3 rounded-xl"><p class="text-[8px] font-black text-gray-400 uppercase">Tgl Lahir</p><p id="custUltah" class="font-bold"></p></div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <a id="navCust" target="_blank" class="bg-purple-600 text-white py-4 rounded-2xl font-black text-[11px] uppercase flex items-center justify-center shadow-lg">NAVIGASI RUMAH</a>
-                    <button id="btnEditCust" class="bg-gray-900 text-white rounded-2xl font-black text-[11px] uppercase">EDIT PROFIL</button>
+                <div class="flex gap-2">
+                    <a id="navCust" target="_blank" class="flex-1 bg-purple-600 text-white py-4 rounded-2xl font-black text-xs text-center">NAVIGASI RUMAH</a>
+                    <button id="btnEditCust" class="flex-1 bg-gray-900 text-white py-4 rounded-2xl font-black text-xs">DETAIL PROFIL</button>
                 </div>
             </div>
         </div>
     </div>
 
-  <script>
+    <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec";
-        
         let map, markerGroup, allData = [];
         let currentMode = 'pekerjaan';
 
@@ -132,9 +160,9 @@
             map = L.map('map', { zoomControl: false }).setView([-8.2191, 114.3691], 12);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
             markerGroup = L.layerGroup().addTo(map);
+            
             map.on('click', () => {
                 document.getElementById('bottomSheet').classList.remove('active');
-                if(document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
             });
         }
 
@@ -143,88 +171,86 @@
                 const response = await fetch(SCRIPT_URL);
                 allData = await response.json();
                 renderMarkers();
-            } catch (err) { console.error("Gagal load data:", err); }
+            } catch (err) { console.error("Error:", err); }
         }
 
         function switchMode(mode) {
             currentMode = mode;
             document.getElementById('btnJob').className = mode === 'pekerjaan' ? "flex-1 py-3 px-2 rounded-xl text-[9px] font-black uppercase transition-all bg-gray-900 text-white" : "flex-1 py-3 px-2 rounded-xl text-[9px] font-black uppercase transition-all text-gray-400";
             document.getElementById('btnCust').className = mode === 'pelanggan' ? "flex-1 py-3 px-2 rounded-xl text-[9px] font-black uppercase transition-all bg-gray-900 text-white" : "flex-1 py-3 px-2 rounded-xl text-[9px] font-black uppercase transition-all text-gray-400";
-            document.getElementById('bottomSheet').classList.remove('active');
             renderMarkers();
         }
 
         function renderMarkers() {
             markerGroup.clearLayers();
-            // Filter: mode pekerjaan (tampilkan yang belum selesai), mode pelanggan (unique by email)
-            let displayData = currentMode === 'pekerjaan' 
-                ? allData.filter(d => d.status !== 'Selesai') 
-                : [...new Map(allData.map(item => [item.email, item])).values()];
-
-            displayData.forEach(item => {
-                const lat = (currentMode === 'pekerjaan') ? item.lat : item.lat_rumah;
-                const lng = (currentMode === 'pekerjaan') ? item.lang : item.lang_rumah;
-                if(!lat || !lng) return;
-
-                const color = currentMode === 'pekerjaan' ? getStatusColor(item.status) : 'bg-pelanggan';
-                const icon = L.divIcon({ className: `dot-marker ${color}`, iconSize: [18, 18] });
-
-                L.marker([lat, lng], {icon: icon}).addTo(markerGroup).on('click', () => {
-                    if(currentMode === 'pekerjaan') showJobDetail(item, lat, lng);
-                    else showCustDetail(item, lat, lng);
+            
+            if(currentMode === 'pekerjaan') {
+                // Tampilkan hanya yang BELUM SELESAI
+                allData.filter(d => d.status !== 'Selesai' && d.lat && d.lang).forEach(item => {
+                    createMarker(item.lat, item.lang, getStatusColor(item.status), item);
                 });
+            } else {
+                // Tampilkan SEMUA data pelanggan (Unique by Email)
+                const uniqueCust = [...new Map(allData.map(item => [item.email, item])).values()];
+                uniqueCust.filter(c => c.lat_rumah && c.lang_rumah).forEach(item => {
+                    createMarker(item.lat_rumah, item.lang_rumah, 'bg-pelanggan', item);
+                });
+            }
+        }
+
+        function createMarker(lat, lng, color, item) {
+            const icon = L.divIcon({ className: `dot-marker ${color}`, iconSize: [16, 16] });
+            L.marker([lat, lng], {icon: icon}).addTo(markerGroup).on('click', () => {
+                currentMode === 'pekerjaan' ? showJobDetail(item, lat, lng) : showCustDetail(item, lat, lng);
             });
         }
 
         function showJobDetail(item, lat, lng) {
-            document.getElementById('contentPekerjaan').classList.remove('hidden');
+            const content = document.getElementById('contentPekerjaan');
+            const sheet = document.getElementById('bottomSheet');
             document.getElementById('contentPelanggan').classList.add('hidden');
-            document.getElementById('jobName').innerText = item.nama_pelanggan || "Tanpa Nama";
-            document.getElementById('jobId').innerText = "#" + (item.id || "0");
+            content.classList.remove('hidden');
+            
+            document.getElementById('jobName').innerText = item.nama_pelanggan || "No Name";
+            document.getElementById('jobId').innerText = "#" + item.id;
             document.getElementById('jobType').innerText = item.pekerjaan || "Servis";
-            document.getElementById('jobDate').innerText = "Tgl Booking: " + (item.tanggal || "-");
-            document.getElementById('jobDesc').innerText = item.Keterangan || "-";
+            document.getElementById('jobDesc').innerText = item.Keterangan || "Tidak ada catatan.";
             
             const st = document.getElementById('jobStatus');
-            st.innerText = item.status || "PENDING";
-            st.className = `px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${getStatusColor(item.status).replace('bg-', 'bg-opacity-20 text-')}`;
+            st.innerText = item.status || "WAITING";
+            st.className = `px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${getStatusColor(item.status).replace('bg-', 'bg-opacity-20 text-')}`;
             
-            // Perbaikan Link Navigasi & WA
-            document.getElementById('navJob').href = `https://www.google.com/maps?q=${lat},${lng}`;
+            document.getElementById('navJob').href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
             document.getElementById('waJob').href = `https://wa.me/${formatWA(item.whatsapp)}`;
-            document.getElementById('btnUpdate').onclick = () => window.location.href = `booking.html?id=${item.id}`;
+            document.getElementById('btnUpdate').onclick = () => window.location.href = `update-status.html?id=${item.id}`;
             
-            document.getElementById('bottomSheet').classList.add('active');
+            sheet.classList.add('active');
             map.flyTo([lat, lng], 15);
         }
 
         function showCustDetail(item, lat, lng) {
+            const content = document.getElementById('contentPelanggan');
+            const sheet = document.getElementById('bottomSheet');
             document.getElementById('contentPekerjaan').classList.add('hidden');
-            document.getElementById('contentPelanggan').classList.remove('hidden');
-            document.getElementById('custName').innerText = item.nama_pelanggan || "User";
-            document.getElementById('custInit').innerText = (item.nama_pelanggan || "U").charAt(0).toUpperCase();
-            document.getElementById('custEmail').innerText = item.email || "-";
-            document.getElementById('custWA').innerText = item.whatsapp || "-";
+            content.classList.remove('hidden');
+
+            document.getElementById('custName').innerText = item.nama_pelanggan;
+            document.getElementById('custEmail').innerText = item.email;
+            document.getElementById('custWA').innerText = item.whatsapp;
             document.getElementById('custUltah').innerText = item.tanggal_lahir || "-";
+            document.getElementById('custInit').innerText = item.nama_pelanggan.charAt(0);
+
+            document.getElementById('navCust').href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
             
-            // Link Navigasi Rumah
-            document.getElementById('navCust').href = `https://www.google.com/maps?q=${item.lat_rumah},${item.lang_rumah}`;
-            
-            // FITUR EDIT PELANGGAN
-            document.getElementById('btnEditCust').onclick = () => {
-                window.location.href = `edit-pelanggan.html?email=${encodeURIComponent(item.email)}`;
-            };
-            
-            document.getElementById('bottomSheet').classList.add('active');
+            sheet.classList.add('active');
             map.flyTo([lat, lng], 15);
         }
 
         function getStatusColor(s) {
             if(s === 'Tunggu Antrian') return 'bg-antri';
             if(s === 'Proses') return 'bg-proses';
-            if(s === 'Selesai') return 'bg-selesai';
             if(s === 'Cancel') return 'bg-cancel';
-            return 'bg-konf';
+            return 'bg-antri';
         }
 
         function formatWA(num) {
@@ -234,10 +260,8 @@
         }
 
         function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const ov = document.getElementById('overlay');
-            sb.classList.toggle('open');
-            ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('hidden');
         }
 
         window.onload = () => { initMap(); loadData(); };
