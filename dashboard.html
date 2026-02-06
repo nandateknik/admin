@@ -25,17 +25,17 @@
             background: rgba(0,0,0,0.4); z-index: 4999; display: none; backdrop-filter: blur(2px);
         }
 
-        /* MARKER NOMOR */
+        /* MARKER NOMOR URUT */
         .dot-marker { 
             border-radius: 50%; border: 2px solid white; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 10px; font-weight: 900;
+            color: white; font-size: 11px; font-weight: 900;
         }
         .bg-antri { background-color: #3b82f6; } 
         .bg-proses { background-color: #eab308; } 
 
-        /* COUNTER FLOATING */
+        /* COUNTER PANEL KANAN BAWAH */
         .counter-panel {
             position: absolute; bottom: 30px; right: 20px;
             background: white; padding: 12px 16px; border-radius: 20px;
@@ -43,6 +43,7 @@
             border: 1px solid #f3f4f6; min-width: 150px;
         }
 
+        /* BOTTOM SHEET */
         .bottom-sheet {
             position: absolute; bottom: 0; left: 0; right: 0; 
             background: white; border-top-left-radius: 2.5rem; border-top-right-radius: 2.5rem;
@@ -50,7 +51,7 @@
             padding: 2rem; padding-bottom: 4rem; box-shadow: 0 -20px 50px rgba(0,0,0,0.15);
         }
         .bottom-sheet.active { transform: translateY(0); }
-        .handle { width: 50px; height: 5px; background: #e5e7eb; border-radius: 10px; margin: -10px auto 20px; }
+        .handle { width: 50px; height: 5px; background: #e5e7eb; border-radius: 10px; margin: -10px auto 25px; }
     </style>
 </head>
 <body>
@@ -66,4 +67,151 @@
             <nav class="space-y-4 flex-1">
                 <a href="#" onclick="toggleSidebar()" class="flex items-center gap-4 p-4 bg-blue-50 text-blue-700 rounded-2xl font-black text-sm">Dashboard Maps</a>
                 <a href="input-booking.html" class="flex items-center gap-4 p-4 text-gray-400 font-bold text-sm hover:bg-gray-50 rounded-2xl transition-all">Input Booking</a>
-                <a href="nota.html
+                <a href="booking.html" class="flex items-center gap-4 p-4 text-gray-400 font-bold text-sm hover:bg-gray-50 rounded-2xl transition-all">Update Status</a>
+                <a href="nota.html" class="flex items-center gap-4 p-4 text-gray-400 font-bold text-sm hover:bg-gray-50 rounded-2xl transition-all">Nota Tagihan</a>
+            </nav>
+            <button class="mt-auto p-4 text-red-500 font-black text-xs uppercase tracking-widest text-left">Logout System</button>
+        </div>
+
+        <div class="absolute top-6 left-6 right-6 z-[1001] flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="bg-white p-4 rounded-2xl shadow-xl text-gray-900 border border-gray-100">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <div class="bg-white px-6 py-4 rounded-2xl shadow-xl flex-1 border border-white">
+                <p class="text-[9px] font-black text-blue-600 uppercase tracking-widest">Pekerjaan Aktif</p>
+                <p id="mainCounter" class="text-xl font-black text-gray-900 mt-0.5">0 Order</p>
+            </div>
+        </div>
+
+        <div class="counter-panel">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold text-gray-400 uppercase">Antrian</span>
+                <span id="countAntri" class="text-sm font-black text-blue-600">0</span>
+            </div>
+            <div class="flex items-center justify-between mb-2 border-b pb-2">
+                <span class="text-[10px] font-bold text-gray-400 uppercase">Proses</span>
+                <span id="countProses" class="text-sm font-black text-yellow-500">0</span>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+                <span class="text-[10px] font-bold text-gray-400 uppercase">Total Pelanggan</span>
+                <span id="countCust" class="text-sm font-black text-gray-900">0</span>
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div id="bottomSheet" class="bottom-sheet">
+            <div class="handle"></div>
+            
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex-1">
+                    <span id="jobStatus" class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">STATUS</span>
+                    <h2 id="jobName" class="text-2xl font-black text-gray-800 mt-2 italic tracking-tight">Nama Pelanggan</h2>
+                    <p id="jobId" class="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-widest">Order ID: #---</p>
+                </div>
+                <div id="jobUrutan" class="bg-gray-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg border-2 border-white">1</div>
+            </div>
+
+            <div class="space-y-4 mb-8">
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Pekerjaan</p>
+                    <p id="jobType" class="text-sm font-bold text-gray-800 uppercase">Layanan Teknik</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Keterangan / Masalah</p>
+                    <p id="jobDesc" class="text-sm text-gray-600 italic leading-relaxed">"Tidak ada catatan."</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3">
+                <a id="waJob" href="#" class="bg-green-500 text-white p-4 rounded-2xl flex items-center justify-center shadow-lg active:scale-95 transition-all"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.187-2.59-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.667.072-1.097-.066-.264-.085-1.492-.475-2.528-1.445-1.008-.943-1.748-2.494-1.748-2.494-.047-.061-.382-.505-.382-1.028 0-.523.271-.78.369-.885.097-.105.215-.132.285-.132.07 0 .141 0 .202.003l.5-.01c.153-.004.225-.015.324.227l.436 1.054c.052.127.088.252.003.422-.085.17-.128.276-.254.425-.127.149-.267.33-.381.444-.127.127-.26.265-.112.52.148.255.658 1.085 1.415 1.761.972.866 1.792 1.135 2.047 1.262.255.128.404.106.554-.064.148-.17.637-.744.807-1.001.17-.255.339-.212.573-.127.234.085 1.487.702 1.742.829.255.127.425.191.488.318.064.127.064.737-.08 1.142z"/></svg></a>
+                <a id="navJob" href="#" target="_blank" class="bg-blue-600 text-white py-4 rounded-2xl font-black text-xs text-center shadow-lg active:scale-95 transition-all">NAVIGASI</a>
+                <button id="btnUpdate" class="bg-gray-900 text-white py-4 rounded-2xl font-black text-xs shadow-lg active:scale-95 transition-all uppercase tracking-wider">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec";
+        let map, markerGroup, allData = [];
+
+        function initMap() {
+            map = L.map('map', { zoomControl: false }).setView([-8.2191, 114.3691], 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+            markerGroup = L.layerGroup().addTo(map);
+            map.on('click', () => document.getElementById('bottomSheet').classList.remove('active'));
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                allData = await response.json();
+                renderMarkers();
+            } catch (err) { console.error("Error loading data:", err); }
+        }
+
+        function renderMarkers() {
+            markerGroup.clearLayers();
+            // Filter hanya pekerjaan belum selesai
+            const pendingJobs = allData.filter(d => d.status !== 'Selesai' && d.lat && d.lang);
+            const totalCust = [...new Map(allData.map(item => [item.email, item])).values()].length;
+
+            // Update UI Counter
+            document.getElementById('mainCounter').innerText = `${pendingJobs.length} Order`;
+            document.getElementById('countAntri').innerText = pendingJobs.filter(d => d.status === 'Tunggu Antrian').length;
+            document.getElementById('countProses').innerText = pendingJobs.filter(d => d.status === 'Proses').length;
+            document.getElementById('countCust').innerText = totalCust;
+
+            pendingJobs.forEach((item, index) => {
+                const orderNum = index + 1;
+                const statusColor = item.status === 'Proses' ? 'bg-proses' : 'bg-antri';
+                
+                const icon = L.divIcon({ 
+                    className: `dot-marker ${statusColor}`, 
+                    html: `<span>${orderNum}</span>`,
+                    iconSize: [28, 28] 
+                });
+
+                L.marker([item.lat, item.lang], {icon: icon}).addTo(markerGroup).on('click', () => {
+                    showJobDetail(item, orderNum);
+                });
+            });
+        }
+
+        function showJobDetail(item, orderNum) {
+            const sheet = document.getElementById('bottomSheet');
+            document.getElementById('jobName').innerText = item.nama_pelanggan || "No Name";
+            document.getElementById('jobId').innerText = `Order ID: #${item.id || '---'}`;
+            document.getElementById('jobUrutan').innerText = orderNum;
+            document.getElementById('jobType').innerText = item.pekerjaan || "Layanan Teknik";
+            document.getElementById('jobDesc').innerText = item.Keterangan || "Tidak ada catatan.";
+            
+            const st = document.getElementById('jobStatus');
+            st.innerText = item.status || "WAITING";
+            st.className = `px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${item.status === 'Proses' ? 'bg-yellow-100 text-yellow-600' : 'bg-blue-100 text-blue-600'}`;
+            
+            document.getElementById('navJob').href = `https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lang}`;
+            document.getElementById('waJob').href = `https://wa.me/${formatWA(item.whatsapp)}`;
+            document.getElementById('btnUpdate').onclick = () => window.location.href = `booking.html?id=${item.id}`;
+            
+            sheet.classList.add('active');
+            map.flyTo([item.lat, item.lang], 15);
+        }
+
+        function formatWA(num) {
+            if(!num) return "";
+            let c = num.toString().replace(/\D/g, '');
+            return c.startsWith('0') ? '62' + c.slice(1) : c;
+        }
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('open');
+            ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
+        }
+
+        window.onload = () => { initMap(); loadData(); };
+    </script>
+</body>
+</html>
