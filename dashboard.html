@@ -23,7 +23,7 @@
         }
         .order-number { transform: rotate(45deg); color: white; font-weight: 800; font-size: 11px; }
         .marker-proses { background: #f59e0b; }
-        .marker-selesai { background: #10b981; } /* Hijau untuk selesai */
+        .marker-selesai { background: #10b981; }
 
         /* Floating Panels */
         .info-panel {
@@ -40,18 +40,19 @@
         /* Sidebar & Sheet */
         #sidebar {
             position: absolute; top: 0; left: -110%; width: 280px; height: 100%;
-            background: white; z-index: 5000; transition: all 0.4s;
+            background: white; z-index: 5000; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column; box-shadow: 20px 0 50px rgba(0,0,0,0.1);
         }
         #sidebar.open { left: 0; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 12px; color: #64748b; font-weight: 700; font-size: 0.85rem; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #64748b; font-weight: 700; font-size: 0.85rem; transition: 0.2s; }
+        .nav-link:hover { background: #f1f5f9; color: #2563eb; }
         .nav-link.active { background: #2563eb; color: white; }
 
         .bottom-sheet {
             position: absolute; bottom: 0; left: 0; right: 0; 
             background: white; border-top-left-radius: 32px; border-top-right-radius: 32px;
             z-index: 2000; transform: translateY(105%); transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-            padding: 24px; box-shadow: 0 -15px 40px rgba(0,0,0,0.08);
+            padding: 24px; box-shadow: 0 -15px 40px rgba(0,0,0,0.08); max-height: 80vh; overflow-y: auto;
         }
         .bottom-sheet.active { transform: translateY(0); }
         .handle { width: 40px; height: 4px; background: #e2e8f0; border-radius: 10px; margin: -10px auto 20px; }
@@ -64,14 +65,35 @@
         <div id="overlay" onclick="toggleSidebar()"></div>
         
         <div id="sidebar">
-            <div class="p-8">
-                <div class="flex items-center gap-3 mb-10">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-8">
                     <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg">N</div>
-                    <h1 class="font-extrabold text-slate-800 tracking-tight">NANDA TEKNIK</h1>
+                    <h1 class="font-extrabold text-slate-800 tracking-tight italic text-lg">NANDA <span class="text-blue-600">TEKNIK</span></h1>
                 </div>
                 <nav class="space-y-1">
-                    <a href="#" class="nav-link active">Dashboard Map</a>
-                    <a href="input-booking.html" class="nav-link">Input Booking</a>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mb-2 tracking-widest">Main Menu</p>
+                    <a href="index.html" class="nav-link active">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                        Dashboard Map
+                    </a>
+                    <a href="pelanggan.html" class="nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Database Pelanggan
+                    </a>
+                    
+                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Transaksi</p>
+                    <a href="input-booking.html" class="nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                        Input Booking
+                    </a>
+                    <a href="nota.html" class="nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Buat Nota / Invoice
+                    </a>
+                    <a href="penawaran.html" class="nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+                        Surat Penawaran
+                    </a>
                 </nav>
             </div>
         </div>
@@ -81,12 +103,13 @@
                 <button onclick="toggleSidebar()" class="text-slate-600 bg-slate-50 p-2 rounded-lg">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
-                <div class="flex-1">
-                    <input type="date" id="dateFilter" onchange="renderMarkers()" class="w-full bg-slate-50 border-none rounded-lg p-1 text-sm font-bold text-slate-700 focus:ring-0">
+                <div class="flex-1 flex gap-2">
+                    <input type="date" id="dateFilter" onchange="renderMarkers()" class="flex-1 bg-slate-50 border-none rounded-lg p-1 text-xs font-bold text-slate-700 focus:ring-0">
+                    <button onclick="resetFilter()" class="bg-red-50 text-red-600 px-3 rounded-lg text-[10px] font-black uppercase border border-red-100">Reset</button>
                 </div>
-                <div class="text-right">
-                    <span id="jobCounter" class="text-xl font-black text-slate-800">0</span>
-                    <p class="text-[8px] font-bold text-slate-400 uppercase">Ditemukan</p>
+                <div class="text-right min-w-[40px]">
+                    <span id="jobCounter" class="text-xl font-black text-slate-800 leading-none">0</span>
+                    <p class="text-[7px] font-bold text-slate-400 uppercase">Jobs</p>
                 </div>
             </div>
         </div>
@@ -98,21 +121,21 @@
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
-                        <span class="text-[10px] font-bold text-slate-600 uppercase">Antrian</span>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-tight">Antrian</span>
                     </div>
                     <span id="countAntrian" class="text-[10px] font-black text-blue-600">0</span>
                 </div>
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
-                        <span class="text-[10px] font-bold text-slate-600 uppercase">Proses</span>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-tight">Proses</span>
                     </div>
                     <span id="countProses" class="text-[10px] font-black text-amber-600">0</span>
                 </div>
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
-                        <span class="text-[10px] font-bold text-slate-600 uppercase">Selesai</span>
+                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-tight">Selesai</span>
                     </div>
                     <span id="countSelesai" class="text-[10px] font-black text-emerald-600">0</span>
                 </div>
@@ -121,16 +144,15 @@
 
         <div id="bottomSheet" class="bottom-sheet">
             <div class="handle"></div>
-            <div id="sheetContent">
-                </div>
+            <div id="sheetContent"></div>
         </div>
     </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec";
         let map, markerGroup, allData = [];
+        let isResetMode = false; // Flag untuk mode reset
 
-        // Set default input date ke hari ini
         document.getElementById('dateFilter').valueAsDate = new Date();
 
         function initMap() {
@@ -148,26 +170,37 @@
             } catch (err) { console.error(err); }
         }
 
+        // FUNGSI RESET FILTER
+        function resetFilter() {
+            isResetMode = true;
+            document.getElementById('dateFilter').value = ""; // Kosongkan tanggal
+            renderMarkers();
+        }
+
         function renderMarkers() {
             markerGroup.clearLayers();
             const selectedDate = document.getElementById('dateFilter').value;
             
-            // Filter berdasarkan tanggal (apapun statusnya)
-            // Asumsi format data 'tanggal' dari sheet adalah YYYY-MM-DD
-            const filtered = allData.filter(d => {
-                if (!d.lat || !d.lang || !d.tanggal) return false;
-                const dDate = new Date(d.tanggal).toISOString().split('T')[0];
-                return dDate === selectedDate;
-            });
+            let filtered = [];
 
-            // Update Counter Legend
+            if (isResetMode) {
+                // Tampilkan semua data yang statusnya BUKAN Selesai
+                filtered = allData.filter(d => d.status !== 'Selesai' && d.lat && d.lang);
+            } else {
+                // Filter normal berdasarkan tanggal
+                filtered = allData.filter(d => {
+                    if (!d.lat || !d.lang || !d.tanggal) return false;
+                    const dDate = new Date(d.tanggal).toISOString().split('T')[0];
+                    return dDate === selectedDate;
+                });
+            }
+
+            // Update Counter
             document.getElementById('jobCounter').innerText = filtered.length;
-            document.getElementById('countAntrian').innerText = filtered.filter(d => d.status === 'Antrian').length;
+            document.getElementById('countAntrian').innerText = filtered.filter(d => d.status === 'Tunggu Antrian' || d.status === 'Antrian').length;
             document.getElementById('countProses').innerText = filtered.filter(d => d.status === 'Proses').length;
             document.getElementById('countSelesai').innerText = filtered.filter(d => d.status === 'Selesai').length;
 
-            // Mengakali 1 User 2 Pekerjaan (Lokasi Sama):
-            // Kita gunakan object untuk mengelompokkan data berdasarkan koordinat
             const locations = {};
             filtered.forEach(item => {
                 const key = `${item.lat},${item.lang}`;
@@ -179,7 +212,6 @@
                 const jobsAtLoc = locations[key];
                 const firstJob = jobsAtLoc[0];
                 
-                // Tentukan warna marker berdasarkan status job pertama (atau prioritaskan 'Proses')
                 let statusClass = '';
                 if (jobsAtLoc.some(j => j.status === 'Proses')) statusClass = 'marker-proses';
                 else if (jobsAtLoc.every(j => j.status === 'Selesai')) statusClass = 'marker-selesai';
@@ -194,6 +226,9 @@
                     showJobDetail(jobsAtLoc);
                 });
             });
+
+            // Matikan flag reset setelah render selesai jika ada tanggal yang dipilih manual lagi
+            if(selectedDate !== "") isResetMode = false;
         }
 
         function showJobDetail(jobs) {
@@ -206,21 +241,20 @@
                         <span class="bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-black italic">JOB ${idx + 1}</span>
                         <span class="px-2 py-1 rounded text-[10px] font-black uppercase ${item.status === 'Proses' ? 'bg-amber-100 text-amber-600' : (item.status === 'Selesai' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600')}">${item.status}</span>
                     </div>
-                    <h2 class="text-xl font-extrabold text-slate-800">${item.nama_pelanggan}</h2>
-                    <p class="text-blue-600 text-[10px] font-bold uppercase mb-3">${item.pekerjaan}</p>
+                    <h2 class="text-xl font-extrabold text-slate-800">${item.nama_pelanggan || 'Pelanggan'}</h2>
+                    <p class="text-blue-600 text-[10px] font-bold uppercase mb-3">${item.pekerjaan || 'Layanan'}</p>
                     <div class="bg-slate-50 p-3 rounded-xl mb-3">
                         <p class="text-[10px] text-slate-400 font-bold uppercase">Catatan:</p>
-                        <p class="text-xs text-slate-600 italic">${item.Keterangan || '-'}</p>
+                        <p class="text-xs text-slate-600 italic">"${item.keterangan || item.Keterangan || '-'}"</p>
                     </div>
                     <div class="flex gap-2">
-                        <a href="https://wa.me/${formatWA(item.whatsapp)}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg text-xs font-bold">WhatsApp</a>
-                        <a href="booking.html?id=${item.id}" class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg text-xs font-bold">Update</a>
+                        <a href="https://wa.me/${formatWA(item.whatsapp)}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">WhatsApp</a>
+                        <a href="update-booking.html?id=${item.id}" class="flex-1 bg-blue-600 text-white text-center py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">Update</a>
                     </div>
                 </div>
             `).join('');
 
-            // Tombol Navigasi Umum (untuk lokasi tersebut)
-            html += `<a href="https://www.google.com/maps?q=${jobs[0].lat},${jobs[0].lang}" target="_blank" class="block w-full bg-slate-900 text-white text-center py-3 rounded-xl text-xs font-bold mt-6">NAVIGASI RUTE</a>`;
+            html += `<a href="https://www.google.com/maps?q=${jobs[0].lat},${jobs[0].lang}" target="_blank" class="block w-full bg-slate-900 text-white text-center py-3 rounded-xl text-[10px] font-bold mt-6 uppercase tracking-widest">Buka di Google Maps</a>`;
 
             content.innerHTML = html;
             sheet.classList.add('active');
