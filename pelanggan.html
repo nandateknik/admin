@@ -26,7 +26,7 @@
         }
         .overlay.active { display: block; }
 
-        /* Marker & UI */
+        /* Marker UI */
         .cust-marker {
             width: 32px; height: 32px; background: #10b981; border: 2px solid white;
             border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
@@ -34,11 +34,13 @@
             box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
         }
         .cust-icon { transform: rotate(45deg); color: white; font-size: 14px; }
+        
         .info-panel {
             position: absolute; top: 20px; left: 20px; right: 20px;
             background: white; border-radius: 20px; padding: 12px;
             z-index: 1001; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; gap: 10px; align-items: center;
         }
+
         .bottom-sheet {
             position: absolute; bottom: 0; left: 0; right: 0; 
             background: white; border-top-left-radius: 32px; border-top-right-radius: 32px;
@@ -59,10 +61,10 @@
             </div>
             <nav class="space-y-2">
                 <a href="index.html" class="flex items-center gap-4 text-slate-600 font-bold p-3 rounded-xl hover:bg-slate-50 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> Dashboard
+                    🏠 Dashboard
                 </a>
                 <a href="pelanggan.html" class="flex items-center gap-4 text-emerald-600 bg-emerald-50 font-bold p-3 rounded-xl">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg> Database
+                    👥 Database Pelanggan
                 </a>
             </nav>
         </div>
@@ -80,8 +82,16 @@
 
         <div id="bottomSheet" class="bottom-sheet">
             <div class="handle"></div>
-            <h2 id="detNama" class="text-2xl font-black text-slate-800 italic leading-tight">Nama Pelanggan</h2>
-            <p id="detWA" class="text-emerald-600 font-bold text-[10px] mt-1 uppercase tracking-widest">WHATSAPP</p>
+            
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 id="detNama" class="text-2xl font-black text-slate-800 italic leading-tight">Nama Pelanggan</h2>
+                    <p id="detWA" class="text-emerald-600 font-bold text-[10px] mt-1 uppercase tracking-widest">WHATSAPP</p>
+                </div>
+                <a id="btnEdit" href="#" class="bg-blue-50 text-blue-600 p-3 rounded-2xl active:scale-90 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                </a>
+            </div>
             
             <div class="mt-6 space-y-3">
                 <div class="bg-slate-50 p-4 rounded-2xl">
@@ -98,8 +108,7 @@
     </div>
 
     <script>
-        // PERBAIKAN: Menggunakan parameter ?type=pelanggan sesuai kode Apps Script Anda
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec?type=pelanggan";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec";
         let map, markerGroup, allData = [];
 
         function toggleSidebar() {
@@ -111,41 +120,49 @@
             map = L.map('map', { zoomControl: false }).setView([-8.2191, 114.3691], 12);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
             markerGroup = L.layerGroup().addTo(map);
-            
-            // Tutup sheet jika map diklik
             map.on('click', () => document.getElementById('bottomSheet').classList.remove('active'));
         }
 
         async function loadData() {
             try {
-                const response = await fetch(SCRIPT_URL);
+                // Gunakan type=pelanggan untuk database
+                const response = await fetch(SCRIPT_URL + "?type=pelanggan");
                 allData = await response.json();
                 renderMarkers(allData);
             } catch (err) { 
-                console.error("Gagal ambil data:", err);
-                alert("Gagal memuat data. Pastikan Apps Script sudah di-deploy sebagai 'Anyone'.");
+                console.error(err);
+                alert("Gagal memuat data.");
             }
         }
 
         function renderMarkers(data) {
             markerGroup.clearLayers();
             data.forEach(item => {
-                // Pastikan kolom di Google Sheet bernama 'lat' dan 'lang' (sesuai kode Apps Script Anda)
-                if(item.lat && item.lang) {
+                const lat = item.lat || item.lat_rumah;
+                const lng = item.lang || item.lang_rumah;
+                const nama = item.nama || item.nama_pelanggan || "Tanpa Nama";
+
+                if(lat && lng) {
                     const icon = L.divIcon({
                         className: 'custom-div-icon',
                         html: `<div class="cust-marker"><span class="cust-icon">👤</span></div>`,
                         iconSize: [32, 32], iconAnchor: [16, 32]
                     });
 
-                    L.marker([item.lat, item.lang], {icon: icon}).addTo(markerGroup).on('click', () => {
-                        document.getElementById('detNama').innerText = item.nama || "Tanpa Nama";
+                    L.marker([lat, lng], {icon: icon}).addTo(markerGroup).on('click', () => {
+                        document.getElementById('detNama').innerText = nama;
                         document.getElementById('detWA').innerText = "WA: " + (item.whatsapp || "-");
                         document.getElementById('detEmail').innerText = item.email || "-";
+                        
+                        // Link WhatsApp & Navigasi
                         document.getElementById('linkWA').href = "https://wa.me/" + formatWA(item.whatsapp);
-                        document.getElementById('linkNav').href = `https://www.google.com/maps?q=${item.lat},${item.lang}`;
+                        document.getElementById('linkNav').href = `https://www.google.com/maps?q=${lat},${lng}`;
+                        
+                        // UPDATE LINK EDIT (Melempar Email)
+                        document.getElementById('btnEdit').href = `edit-pelanggan.html?email=${encodeURIComponent(item.email)}`;
+                        
                         document.getElementById('bottomSheet').classList.add('active');
-                        map.flyTo([item.lat, item.lang], 15);
+                        map.flyTo([lat, lng], 15);
                     });
                 }
             });
@@ -159,7 +176,7 @@
 
         function filterData() {
             const val = document.getElementById('searchBox').value.toLowerCase();
-            const filtered = allData.filter(i => (i.nama || "").toLowerCase().includes(val));
+            const filtered = allData.filter(i => (i.nama || i.nama_pelanggan || "").toLowerCase().includes(val));
             renderMarkers(filtered);
         }
 
