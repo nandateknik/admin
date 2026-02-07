@@ -18,6 +18,10 @@
             background: white; z-index: 100; top: 100%; left: 0; right: 0; 
             margin-top: 5px; overflow-y: auto; max-height: 200px;
         }
+        /* Status Badge Colors */
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-accepted { background: #dcfce7; color: #16a34a; }
+        .status-rejected { background: #fee2e2; color: #dc2626; }
     </style>
 </head>
 <body>
@@ -50,10 +54,9 @@
             <input type="hidden" id="finalEmail">
         </div>
 
-        <div id="itemContainer" class="space-y-3">
-            </div>
+        <div id="itemContainer" class="space-y-3"></div>
 
-        <button onclick="tambahItem()" class="w-full py-4 text-[10px] font-800 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl hover:bg-slate-50">+ TAMBAH BARIS PEKERJAAN</button>
+        <button onclick="tambahItem()" class="w-full py-4 text-[10px] font-800 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl hover:bg-slate-50 uppercase">+ Tambah Baris Pekerjaan</button>
 
         <div class="bg-slate-800 p-6 rounded-[2.5rem] text-white shadow-xl">
             <div class="flex justify-between items-end">
@@ -68,7 +71,7 @@
 
     <main id="contentRiwayat" class="p-6 hidden bg-slate-50 flex-1 space-y-4">
         <div class="space-y-2">
-            <input type="text" id="searchRiwayat" oninput="filterRiwayat()" placeholder="Cari ID Penawaran / Nama..." class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:border-slate-400">
+            <input type="text" id="searchRiwayat" oninput="filterRiwayat()" placeholder="Cari ID / Nama / Email..." class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:border-slate-400 shadow-sm">
         </div>
         <div id="listRiwayat" class="space-y-4"></div>
     </main>
@@ -76,12 +79,20 @@
 
 <div id="modalNota" class="fixed inset-0 bg-slate-900/90 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white w-full rounded-[2.5rem] overflow-hidden max-h-[95vh] flex flex-col max-w-sm shadow-2xl">
+        
+        <div class="p-4 bg-slate-50 flex justify-between items-center border-b">
+            <span class="text-[10px] font-900 text-slate-400 uppercase tracking-widest">Opsi Penawaran</span>
+            <button id="btnActionStatus" onclick="updateStatusDialog()" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-[10px] font-900 hover:bg-slate-700 transition-all uppercase">
+                Ganti Status
+            </button>
+        </div>
+
         <div id="notaPrintArea" class="p-8 nota-kertas flex-1 overflow-y-auto relative border-8 border-white">
             <div class="text-center mb-6 border-b-2 border-black pb-4">
                 <h2 class="font-900 text-xl uppercase tracking-tighter">NANDA TEKNIK BANYUWANGI</h2>
                 <p class="text-[8px] leading-tight">Sukowidi Indah Residence, Blok D05, Klatak, Banyuwangi</p>
-                <p class="text-[8px] leading-tight">WA: 0823-3120-1148 | Email: 082331201148</p>
-                <p class="text-[8px] italic font-bold">SURAT PENAWARAN HARGA (QUOTATION)</p>
+                <p class="text-[8px] leading-tight">WA: 0823-3120-1148 | Banyuwangi</p>
+                <p class="text-[8px] italic font-bold mt-1">SURAT PENAWARAN HARGA (QUOTATION)</p>
             </div>
             
             <div class="text-[10px] flex justify-between mb-6">
@@ -91,7 +102,7 @@
                 </div>
                 <div class="text-right">
                     <p id="vTgl" class="font-bold"></p>
-                    <p class="font-900 text-slate-400 uppercase">OFFICIAL QUOTE</p>
+                    <p id="vStatusText" class="font-900 uppercase tracking-widest"></p>
                 </div>
             </div>
 
@@ -100,7 +111,7 @@
                     <tr class="border-b-2 border-black">
                         <th class="text-left py-1">DESKRIPSI PEKERJAAN</th>
                         <th class="text-center py-1">QTY</th>
-                        <th class="text-right py-1">HARGA</th>
+                        <th class="text-right py-1">TOTAL</th>
                     </tr>
                 </thead>
                 <tbody id="vItems"></tbody>
@@ -114,7 +125,7 @@
             <div class="text-[8px] pt-4 border-t border-dashed border-slate-300">
                 <p class="font-bold uppercase mb-1">Syarat & Ketentuan:</p>
                 <p>1. Penawaran berlaku selama 14 hari sejak diterbitkan.</p>
-                <p>2. Harga sudah termasuk jasa teknisi dan penggantian part sesuai deskripsi.</p>
+                <p>2. Harga sudah termasuk jasa teknisi dan penggantian part.</p>
                 <p>3. Konfirmasi pengerjaan dapat dilakukan melalui WhatsApp.</p>
                 <div class="mt-6 text-right">
                     <p class="font-bold underline italic">Hormat Kami,</p>
@@ -136,6 +147,7 @@
     let pelangganData = [];
     let riwayatData = [];
     let currentMode = 'pelanggan';
+    let selectedQuote = null;
 
     function switchTab(tab) {
         document.getElementById('contentBuat').classList.toggle('hidden', tab !== 'buat');
@@ -145,22 +157,19 @@
         if(tab === 'riwayat') loadRiwayat();
     }
 
-    // Autocomplete Logic
+    // Autocomplete
     const searchInput = document.getElementById('custSearch');
     const autoList = document.getElementById('autocomplete-list');
 
     searchInput.addEventListener('input', function() {
         const val = this.value;
-        if(currentMode !== 'pelanggan') {
-            document.getElementById('finalEmail').value = val;
-            return;
-        }
+        if(currentMode !== 'pelanggan') { document.getElementById('finalEmail').value = val; return; }
         autoList.innerHTML = "";
         if (!val) { autoList.classList.add('hidden'); return; }
         const filtered = pelangganData.filter(p => (p.nama + p.email).toLowerCase().includes(val.toLowerCase()));
         filtered.slice(0, 5).forEach(p => {
             const div = document.createElement('div');
-            div.className = "p-4 hover:bg-slate-50 cursor-pointer border-b border-slate-50 transition-all";
+            div.className = "p-4 hover:bg-slate-50 cursor-pointer border-b border-slate-50";
             div.innerHTML = `<div class="font-bold text-slate-700 text-sm">${p.nama}</div><div class="text-[10px] text-slate-400">${p.email}</div>`;
             div.onclick = () => {
                 searchInput.value = p.nama;
@@ -187,14 +196,8 @@
             <button onclick="this.parentElement.remove(); hitungTotal();" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 font-bold">✕</button>
             <input type="text" placeholder="Deskripsi Pekerjaan" class="w-full text-sm font-bold outline-none item-nama border-b border-slate-50 pb-2">
             <div class="flex items-center gap-3">
-                <div class="flex-1">
-                    <span class="text-[9px] text-slate-400 font-bold block mb-1 uppercase">Qty</span>
-                    <input type="number" oninput="hitungTotal()" value="1" min="1" class="w-full bg-slate-50 p-2 rounded-lg text-sm font-bold item-qty">
-                </div>
-                <div class="flex-[2]">
-                    <span class="text-[9px] text-slate-400 font-bold block mb-1 text-right uppercase">Harga Estimasi</span>
-                    <input type="number" oninput="hitungTotal()" placeholder="0" class="w-full bg-slate-50 p-2 rounded-lg text-sm font-bold item-harga text-right">
-                </div>
+                <div class="flex-1"><span class="text-[9px] text-slate-400 font-bold block mb-1 uppercase tracking-tighter">Qty</span><input type="number" oninput="hitungTotal()" value="1" min="1" class="w-full bg-slate-50 p-2 rounded-lg text-sm font-bold item-qty"></div>
+                <div class="flex-[2]"><span class="text-[9px] text-slate-400 font-bold block mb-1 text-right uppercase tracking-tighter">Harga Estimasi</span><input type="number" oninput="hitungTotal()" placeholder="0" class="w-full bg-slate-50 p-2 rounded-lg text-sm font-bold item-harga text-right"></div>
             </div>`;
         document.getElementById('itemContainer').appendChild(div);
     }
@@ -227,6 +230,7 @@
             action: 'simpanPenawaran',
             id_nota: "OFF-" + Date.now().toString().slice(-6),
             email: email, items: items, total: hitungTotal(),
+            status: "PENDING",
             tanggal: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
         };
 
@@ -250,36 +254,76 @@
         const key = document.getElementById('searchRiwayat').value.toLowerCase();
         const list = document.getElementById('listRiwayat');
         list.innerHTML = "";
-        riwayatData.filter(n => (n.id_nota + n.email).toLowerCase().includes(key)).forEach(n => {
+        riwayatData.filter(n => (n.id + n.email).toLowerCase().includes(key)).forEach(n => {
+            const sClass = n.status === 'ACCEPTED' ? 'status-accepted' : (n.status === 'REJECTED' ? 'status-rejected' : 'status-pending');
             list.innerHTML += `
                 <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all">
-                    <div>
-                        <p class="text-[9px] font-900 text-slate-400 uppercase tracking-tighter">${n.id_nota} • ${n.tanggal}</p>
+                    <div class="overflow-hidden">
+                        <p class="text-[9px] font-900 text-slate-400 uppercase tracking-tighter">${n.id} • ${n.tanggal}</p>
                         <p class="text-sm font-900 text-slate-700 truncate w-40">${n.email}</p>
+                        <span class="text-[8px] font-bold px-2 py-0.5 rounded-full ${sClass}">${n.status}</span>
                     </div>
-                    <p class="text-sm font-900 text-slate-800">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
+                    <p class="text-sm font-900 text-slate-800 shrink-0">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
                 </div>`;
         });
     }
 
     function bukaDetail(n) {
-        document.getElementById('vId').innerText = n.id_nota;
+        selectedQuote = n;
+        document.getElementById('vId').innerText = n.id;
         document.getElementById('vCust').innerText = n.email;
         document.getElementById('vTgl').innerText = n.tanggal;
         document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
         
+        const statusEl = document.getElementById('vStatusText');
+        statusEl.innerText = n.status;
+        statusEl.className = "font-900 uppercase tracking-widest " + (n.status === 'ACCEPTED' ? 'text-green-600' : (n.status === 'REJECTED' ? 'text-red-600' : 'text-amber-500'));
+
         const body = document.getElementById('vItems');
         body.innerHTML = "";
-        const items = typeof n.items_json === 'string' ? JSON.parse(n.items_json) : n.items_json;
+        const items = typeof n.items_json === 'string' ? JSON.parse(n.items_json) : (n.items_json || []);
         items.forEach(it => {
+            const h = parseInt(it.harga) || 0;
+            const q = parseInt(it.qty) || 1;
             body.innerHTML += `
                 <tr class="border-b border-slate-100">
-                    <td class="py-2 text-[10px] uppercase">${it.nama}</td>
-                    <td class="text-center py-2 text-[10px]">${it.qty}</td>
-                    <td class="text-right py-2 font-bold text-[10px]">${parseInt(it.harga).toLocaleString('id-ID')}</td>
+                    <td class="py-2 text-[10px] uppercase font-bold">${it.nama}</td>
+                    <td class="text-center py-2 text-[10px]">${q}</td>
+                    <td class="text-right py-2 font-bold text-[10px]">${(h * q).toLocaleString('id-ID')}</td>
                 </tr>`;
         });
         document.getElementById('modalNota').classList.replace('hidden', 'flex');
+    }
+
+    async function updateStatusDialog() {
+        if(!selectedQuote) return;
+        const { value: newStatus } = await Swal.fire({
+            title: 'Update Status Penawaran',
+            input: 'select',
+            inputOptions: {
+                'PENDING': 'PENDING (Menunggu)',
+                'ACCEPTED': 'ACCEPTED (Disetujui)',
+                'REJECTED': 'REJECTED (Ditolak)'
+            },
+            inputPlaceholder: 'Pilih status baru',
+            showCancelButton: true
+        });
+
+        if (newStatus) {
+            Swal.fire({title: 'Updating...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
+            const payload = {
+                action: 'updateStatusPenawaran',
+                id: selectedQuote.id,
+                status: newStatus
+            };
+            try {
+                await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)});
+                Swal.fire('Updated', 'Status berhasil diubah', 'success').then(() => {
+                    tutupModal();
+                    loadRiwayat();
+                });
+            } catch(e) { Swal.fire('Error', 'Gagal update', 'error'); }
+        }
     }
 
     function downloadPdf() {
@@ -290,7 +334,7 @@
         }).from(element).save();
     }
 
-    function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); }
+    function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); selectedQuote = null; }
 
     window.onload = async () => {
         tambahItem();
