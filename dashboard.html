@@ -71,17 +71,21 @@
                     <h1 class="font-extrabold text-slate-800 tracking-tight italic text-lg">NANDA <span class="text-blue-600">TEKNIK</span></h1>
                 </div>
                 <nav class="space-y-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mb-2 tracking-widest">Main Menu</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mb-2 tracking-widest">Utama</p>
+                    <a href="dashboard.html" class="nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        Homepage
+                    </a>
                     <a href="index.html" class="nav-link active">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
-                        Dashboard Map
+                        Live Tracking Map
                     </a>
                     <a href="pelanggan.html" class="nav-link">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         Database Pelanggan
                     </a>
                     
-                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Transaksi</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Transaksi & Marketing</p>
                     <a href="input-booking.html" class="nav-link">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
                         Input Booking
@@ -89,6 +93,10 @@
                     <a href="nota.html" class="nav-link">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         Buat Nota / Invoice
+                    </a>
+                    <a href="kirim-email.html" class="nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        Kirim Broadcast Email
                     </a>
                     <a href="penawaran.html" class="nav-link">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
@@ -100,12 +108,12 @@
 
         <div class="info-panel">
             <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="text-slate-600 bg-slate-50 p-2 rounded-lg">
+                <button onclick="toggleSidebar()" class="text-slate-600 bg-slate-50 p-2 rounded-lg active:scale-90 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <div class="flex-1 flex gap-2">
                     <input type="date" id="dateFilter" onchange="renderMarkers()" class="flex-1 bg-slate-50 border-none rounded-lg p-1 text-xs font-bold text-slate-700 focus:ring-0">
-                    <button onclick="resetFilter()" class="bg-red-50 text-red-600 px-3 rounded-lg text-[10px] font-black uppercase border border-red-100">Reset</button>
+                    <button onclick="resetFilter()" class="bg-red-50 text-red-600 px-3 rounded-lg text-[10px] font-black uppercase border border-red-100 active:scale-95 transition">Reset</button>
                 </div>
                 <div class="text-right min-w-[40px]">
                     <span id="jobCounter" class="text-xl font-black text-slate-800 leading-none">0</span>
@@ -151,7 +159,7 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec";
         let map, markerGroup, allData = [];
-        let isResetMode = false; // Flag untuk mode reset
+        let isResetMode = false;
 
         document.getElementById('dateFilter').valueAsDate = new Date();
 
@@ -170,24 +178,21 @@
             } catch (err) { console.error(err); }
         }
 
-        // FUNGSI RESET FILTER
         function resetFilter() {
             isResetMode = true;
-            document.getElementById('dateFilter').value = ""; // Kosongkan tanggal
+            document.getElementById('dateFilter').value = ""; 
             renderMarkers();
         }
 
         function renderMarkers() {
             markerGroup.clearLayers();
             const selectedDate = document.getElementById('dateFilter').value;
-            
             let filtered = [];
 
-            if (isResetMode) {
-                // Tampilkan semua data yang statusnya BUKAN Selesai
+            if (isResetMode && selectedDate === "") {
                 filtered = allData.filter(d => d.status !== 'Selesai' && d.lat && d.lang);
             } else {
-                // Filter normal berdasarkan tanggal
+                isResetMode = false;
                 filtered = allData.filter(d => {
                     if (!d.lat || !d.lang || !d.tanggal) return false;
                     const dDate = new Date(d.tanggal).toISOString().split('T')[0];
@@ -195,7 +200,6 @@
                 });
             }
 
-            // Update Counter
             document.getElementById('jobCounter').innerText = filtered.length;
             document.getElementById('countAntrian').innerText = filtered.filter(d => d.status === 'Tunggu Antrian' || d.status === 'Antrian').length;
             document.getElementById('countProses').innerText = filtered.filter(d => d.status === 'Proses').length;
@@ -226,9 +230,6 @@
                     showJobDetail(jobsAtLoc);
                 });
             });
-
-            // Matikan flag reset setelah render selesai jika ada tanggal yang dipilih manual lagi
-            if(selectedDate !== "") isResetMode = false;
         }
 
         function showJobDetail(jobs) {
