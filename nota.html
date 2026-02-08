@@ -118,10 +118,11 @@
     let databaseNota = [];
     let selectedNota = null;
 
-    // --- Tab & Initialization ---
     async function init() {
-        const resP = await fetch(SCRIPT_URL + "?type=pelanggan");
-        pelangganData = await resP.json();
+        try {
+            const resP = await fetch(SCRIPT_URL + "?type=pelanggan");
+            pelangganData = await resP.json();
+        } catch (e) { console.error("Gagal load pelanggan", e); }
     }
 
     function switchTab(tab) {
@@ -132,7 +133,7 @@
         if(tab === 'riwayat') loadRiwayat();
     }
 
-    // --- Autocomplete Pelanggan ---
+    // --- Autocomplete ---
     const searchInput = document.getElementById('notaCustSearch');
     const autoList = document.getElementById('autocomplete-list');
 
@@ -140,7 +141,10 @@
         const val = this.value;
         autoList.innerHTML = "";
         if (!val) { autoList.classList.add('hidden'); return; }
-        const filtered = pelangganData.filter(p => p.nama.toLowerCase().includes(val.toLowerCase()) || p.email.toLowerCase().includes(val.toLowerCase()));
+        const filtered = pelangganData.filter(p => 
+            (p.nama && p.nama.toLowerCase().includes(val.toLowerCase())) || 
+            (p.email && p.email.toLowerCase().includes(val.toLowerCase()))
+        );
         if(filtered.length > 0) {
             filtered.forEach(p => {
                 const div = document.createElement('div');
@@ -157,7 +161,6 @@
         }
     });
 
-    // --- Logic Items ---
     function tambahItem() {
         const div = document.createElement('div');
         div.className = "bg-white border border-gray-100 p-4 rounded-2xl shadow-sm space-y-3 item-row relative";
@@ -195,8 +198,10 @@
 
         const payload = {
             action: 'simpanNota',
-            id_nota: "INV-" + Date.now().toString().slice(-6),
-            email: email, items: items, total: hitungTotal(),
+            id_nota: "INV-" + Date.now().toString().slice(-6), // Iki bakal masuk kolom ID
+            email: email, 
+            items: items, 
+            total: hitungTotal(),
             status: document.getElementById('notaStatus').value,
             tanggal: new Date().toLocaleString('id-ID')
         };
@@ -217,8 +222,9 @@
         container.innerHTML = "";
         data.forEach(n => {
             const isPaid = n.status === 'PAID';
+            const displayId = n.id || "INV-???"; // Sesuaikan kolom "id"
             container.innerHTML += `<div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-4 rounded-2xl border border-gray-100 flex justify-between items-center shadow-sm">
-                <div><p class="text-[9px] font-bold text-gray-400 uppercase">${n.id_nota} • ${n.tanggal}</p><p class="text-sm font-bold text-slate-800">${n.email}</p></div>
+                <div><p class="text-[9px] font-bold text-gray-400 uppercase">${displayId} • ${n.tanggal}</p><p class="text-sm font-bold text-slate-800">${n.email}</p></div>
                 <div class="text-right"><p class="text-sm font-900">Rp ${parseInt(n.total).toLocaleString()}</p><span class="text-[9px] font-900 ${isPaid?'text-green-500':'text-red-500'}">${n.status}</span></div>
             </div>`;
         });
@@ -226,7 +232,7 @@
 
     function bukaDetail(n) {
         selectedNota = n;
-        document.getElementById('invId').innerText = "NO: " + n.id_nota;
+        document.getElementById('invId').innerText = "NO: " + (n.id || "INV-???");
         document.getElementById('invCust').innerText = "KE: " + n.email;
         document.getElementById('invTgl').innerText = n.tanggal;
         document.getElementById('invStatus').innerText = n.status;
@@ -236,7 +242,13 @@
         wm.innerHTML = `<span style="border: 6px solid ${n.status==='PAID'?'#16a34a':'#dc2626'}; color:${n.status==='PAID'?'#16a34a':'#dc2626'}; padding:10px; border-radius:12px;">${n.status}</span>`;
 
         const b = document.getElementById('invItems'); b.innerHTML = "";
-        const items = JSON.parse(n.items_json || n.items);
+        
+        // Cek items_json mergo kolommu jenenge items_json
+        let items = [];
+        try {
+            items = JSON.parse(n.items_json || n.items || "[]");
+        } catch(e) { console.error("Gagal parse items"); }
+
         items.forEach(it => {
             b.innerHTML += `<tr><td class="py-1 uppercase">${it.nama}</td><td class="text-center">${it.qty}</td><td class="text-right">${(it.qty*it.harga).toLocaleString()}</td></tr>`;
         });
@@ -244,15 +256,21 @@
     }
 
     async function switchNotaStatus() {
+        const notaId = selectedNota.id; // Gunakan n.id
         const newStatus = selectedNota.status === 'PAID' ? 'UNPAID' : 'PAID';
         Swal.fire({title: 'Updating...'});
-        await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({action: 'updateStatusNota', id: selectedNota.id_nota, status: newStatus})});
+        await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({action: 'updateStatusNota', id: notaId, status: newStatus})});
         location.reload();
     }
 
     function unduhPDF() {
         const el = document.getElementById('notaPrintArea');
-        html2pdf().from(el).set({ margin: 10, filename: `Nota-${selectedNota.id_nota}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save();
+        html2pdf().from(el).set({ 
+            margin: 10, 
+            filename: `Nota-${selectedNota.id}.pdf`, 
+            html2canvas: { scale: 2 }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+        }).save();
     }
 
     function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); }
