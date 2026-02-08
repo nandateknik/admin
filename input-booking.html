@@ -30,42 +30,37 @@
             <button onclick="window.history.back()" class="bg-gray-100 p-3 rounded-2xl active:scale-90 transition-all text-gray-800">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </button>
-            <h1 class="text-xl font-black text-gray-800 tracking-tight">Booking Baru</h1>
+            <h1 class="text-xl font-black text-gray-800 tracking-tight">Booking Service</h1>
             <div class="w-10"></div>
         </div>
 
         <main class="px-8 pt-4">
             <form id="bookingForm" class="space-y-5">
                 
-                <div class="flex bg-gray-100 p-1.5 rounded-[2rem] mb-4">
-                    <button type="button" onclick="setType('pelanggan')" id="btnP" class="flex-1 py-3 rounded-[1.8rem] text-[10px] font-black tracking-widest transition-all bg-white shadow-sm text-blue-600">PELANGGAN LAMA</button>
-                    <button type="button" onclick="setType('umum')" id="btnU" class="flex-1 py-3 rounded-[1.8rem] text-[10px] font-black tracking-widest transition-all text-gray-400">UMUM / BARU</button>
-                </div>
-
                 <div class="relative">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Nama Pelanggan</label>
-                    <input type="text" id="nama" required placeholder="Cari nama pelanggan..." autocomplete="off" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Cari Nama Pelanggan</label>
+                    <input type="text" id="nama" required placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
                     <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
                 </div>
 
                 <div class="grid grid-cols-1 gap-5">
                     <div>
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">WhatsApp</label>
-                        <input type="number" id="whatsapp" required placeholder="08..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
+                        <input type="number" id="whatsapp" readonly placeholder="Terisi otomatis..." class="w-full bg-gray-100 border-2 border-transparent px-6 py-4 rounded-[2rem] font-bold text-gray-500 outline-none cursor-not-allowed">
                     </div>
                     <div>
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Email</label>
-                        <input type="email" id="email" required placeholder="email@gmail.com" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Email Notifikasi</label>
+                        <input type="email" id="email" readonly placeholder="Terisi otomatis..." class="w-full bg-gray-100 border-2 border-transparent px-6 py-4 rounded-[2rem] font-bold text-gray-500 outline-none cursor-not-allowed">
                     </div>
                 </div>
 
                 <div>
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Jenis Pekerjaan</label>
-                    <input type="text" id="pekerjaan" required placeholder="Ketik jenis pekerjaan..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
+                    <input type="text" id="pekerjaan" required placeholder="Contoh: Cuci AC, Perbaikan Kulkas..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
                 </div>
 
                 <div id="map-section">
-                    <label id="map-label" class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Lokasi Pengerjaan</label>
+                    <label id="map-label" class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Lokasi Alamat</label>
                     <div id="map-container">
                         <div id="map"></div>
                     </div>
@@ -73,7 +68,7 @@
                         <div class="bg-blue-500 p-2 rounded-full text-white">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
                         </div>
-                        <span class="text-[11px] font-bold text-blue-700">Menggunakan alamat rumah terdaftar (Maps disembunyikan)</span>
+                        <span class="text-[11px] font-bold text-blue-700">Menggunakan koordinat rumah terdaftar</span>
                     </div>
                     <input type="hidden" id="lat"><input type="hidden" id="lang">
                 </div>
@@ -86,10 +81,8 @@
     </div>
 
     <script>
-        // GANTI INI DENGAN URL SCRIPT TERBARU ANDA
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLGftnLYFoDZfxhGJzULFlghMiA3nvXOIzAQGxkRH3oydDD5wgMW-UsodcI8hY-BbiqA/exec"; 
         let pelangganData = [];
-        let currentType = 'pelanggan';
         let map, marker;
 
         function initMap() {
@@ -98,8 +91,7 @@
             marker = L.marker([-8.2191, 114.3691], {draggable: true}).addTo(map);
             marker.on('dragend', () => {
                 const pos = marker.getLatLng();
-                document.getElementById('lat').value = pos.lat.toFixed(6);
-                document.getElementById('lang').value = pos.lng.toFixed(6);
+                updateCoords(pos.lat, pos.lng);
             });
             updateCoords(-8.2191, 114.3691);
         }
@@ -115,25 +107,16 @@
             if(show) {
                 mapCont.style.display = "block";
                 infoCont.classList.add('hidden');
+                setTimeout(() => map.invalidateSize(), 200);
             } else {
                 mapCont.style.display = "none";
                 infoCont.classList.remove('hidden');
             }
         }
 
-        function setType(type) {
-            currentType = type;
-            document.getElementById('btnP').className = type === 'pelanggan' ? "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black tracking-widest transition-all bg-white shadow-sm text-blue-600" : "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black tracking-widest transition-all text-gray-400";
-            document.getElementById('btnU').className = type === 'umum' ? "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black tracking-widest transition-all bg-white shadow-sm text-blue-600" : "flex-1 py-3 rounded-[1.8rem] text-[10px] font-black tracking-widest transition-all text-gray-400";
-            document.getElementById('bookingForm').reset();
-            toggleMapVisibility(true); 
-            updateCoords(-8.2191, 114.3691);
-        }
-
         async function loadDatabase() {
             try {
-                // Gunakan parameter type=pelanggan agar sesuai dengan doGet di GAS
-                const res = await fetch(SCRIPT_URL + "?type=pelanggan");
+                const res = await fetch(SCRIPT_URL + "?action=checkCustomer"); // Gunakan action yang sesuai di GS Anda
                 pelangganData = await res.json();
             } catch (e) { console.error("Gagal load database pelanggan:", e); }
         }
@@ -142,10 +125,9 @@
         const list = document.getElementById('autocomplete-list');
 
         inputNama.addEventListener('input', function() {
-            if(currentType !== 'pelanggan') return;
             const val = this.value;
             list.innerHTML = "";
-            if (!val || val.length < 2) { list.classList.add('hidden'); return; }
+            if (!val || val.length < 1) { list.classList.add('hidden'); return; }
 
             const filtered = pelangganData.filter(p => p.nama && p.nama.toLowerCase().includes(val.toLowerCase()));
 
@@ -158,8 +140,8 @@
                     document.getElementById('email').value = p.email;
                     document.getElementById('whatsapp').value = p.whatsapp;
                     
-                    if(p.lat && p.lang) {
-                        updateCoords(p.lat, p.lang);
+                    if(p.lat && p.lng) {
+                        updateCoords(p.lat, p.lng);
                         toggleMapVisibility(false);
                     } else {
                         toggleMapVisibility(true);
@@ -174,55 +156,46 @@
         document.getElementById('bookingForm').onsubmit = async (e) => {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
-            if (!email.includes('@')) {
-                Swal.fire('Email Tidak Valid', 'Mohon isi email dengan benar agar notifikasi terkirim.', 'warning');
+            if(!document.getElementById('email').value) {
+                Swal.fire('Pilih Pelanggan', 'Silakan pilih pelanggan dari daftar yang muncul.', 'warning');
                 return;
             }
 
             const btn = document.getElementById('submitBtn');
-            const originalText = btn.innerText;
-            
             btn.disabled = true; 
-            btn.innerText = "MENGIRIM NOTIFIKASI...";
-            btn.classList.replace('bg-gray-900', 'bg-gray-500');
+            btn.innerText = "MEMPROSES...";
 
             const payload = {
                 action: 'tambahBooking',
                 nama: inputNama.value,
-                email: email,
+                email: document.getElementById('email').value,
                 whatsapp: document.getElementById('whatsapp').value,
                 pekerjaan: document.getElementById('pekerjaan').value,
                 keterangan: "Input Manual Admin",
-                lat: document.getElementById('lat').value || "-8.2191",
-                lang: document.getElementById('lang').value || "114.3691"
+                lat: document.getElementById('lat').value,
+                lng: document.getElementById('lang').value
             };
 
             try {
-                // Kirim data ke Google Apps Script
                 await fetch(SCRIPT_URL, { 
                     method: 'POST', 
                     mode: 'no-cors', 
                     body: JSON.stringify(payload) 
                 });
 
-                // Beri jeda visual sedikit karena mode no-cors instan
                 setTimeout(() => {
                     Swal.fire({
-                        title: 'Booking Berhasil!',
-                        text: 'Email Konfirmasi & Notif Telegram telah dikirim.',
+                        title: 'Booking Tersimpan!',
+                        text: 'Notifikasi sudah dikirim ke pelanggan dan Telegram.',
                         icon: 'success',
                         confirmButtonColor: '#111827'
-                    }).then(() => {
-                        location.reload();
-                    });
+                    }).then(() => location.reload());
                 }, 1000);
 
             } catch (err) {
                 Swal.fire('Gagal', 'Terjadi kesalahan jaringan.', 'error');
                 btn.disabled = false; 
-                btn.innerText = originalText;
-                btn.classList.replace('bg-gray-500', 'bg-gray-900');
+                btn.innerText = "SIMPAN BOOKING";
             }
         };
 
