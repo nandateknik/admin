@@ -7,24 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Courier+Prime&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
         .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; display: flex; flex-direction: column; }
         .tab-active { border-bottom: 4px solid #2563eb; color: #2563eb; }
-        .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; position: relative; color: #000; }
-        #watermark {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 60px; font-weight: 900; opacity: 0.08; pointer-events: none; z-index: 10; white-space: nowrap;
-        }
-        .wm-paid { color: #16a34a; border: 6px solid #16a34a; padding: 10px; border-radius: 12px; }
-        .wm-unpaid { color: #dc2626; border: 6px solid #dc2626; padding: 10px; border-radius: 12px; }
         .autocomplete-items {
-            position: absolute; border-radius: 1rem; border: 1px solid #e2e8f0;
+            position: absolute; border-radius: 1.5rem; border: 1px solid #e2e8f0;
             background: white; z-index: 100; top: 100%; left: 0; right: 0; 
-            margin-top: 5px; overflow-y: auto; max-height: 200px;
+            margin-top: 5px; overflow-y: auto; max-height: 240px;
         }
-        .autocomplete-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+        .autocomplete-item { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+        .autocomplete-item:hover { background-color: #f8fafc; }
+        
+        /* Layout untuk PDF (Disembunyikan dari layar aplikasi) */
+        #notaPrintArea { display: none; }
     </style>
 </head>
 <body>
@@ -32,10 +29,10 @@
 <div class="mobile-container shadow-2xl">
     <header class="p-6 pb-2 bg-white sticky top-0 z-50">
         <div class="flex items-center justify-between mb-4">
-            <button onclick="window.history.back()" class="p-2 hover:bg-gray-100 rounded-xl transition-all">
+            <button onclick="window.history.back()" class="p-2 hover:bg-gray-100 rounded-xl">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </button>
-            <h1 class="text-xl font-900 tracking-tight">Billing System</h1>
+            <h1 class="text-xl font-900 tracking-tight text-gray-800">Billing System</h1>
             <div class="w-10"></div>
         </div>
         <nav class="flex border-b border-gray-100">
@@ -45,40 +42,40 @@
     </header>
 
     <main id="contentBuat" class="p-6 space-y-6">
-        <div class="flex bg-gray-100 p-1 rounded-2xl shadow-inner">
-            <button onclick="setNotaMode('pelanggan')" id="btnNP" class="flex-1 py-2 rounded-xl text-[10px] font-800 bg-white shadow-sm text-blue-600">PELANGGAN LAMA</button>
-            <button onclick="setNotaMode('umum')" id="btnNU" class="flex-1 py-2 rounded-xl text-[10px] font-800 text-gray-400">UMUM / BARU</button>
-        </div>
-
         <div class="relative">
-            <label class="text-[10px] font-800 text-gray-400 uppercase tracking-widest ml-2 mb-1 block">Penerima</label>
-            <input type="text" id="notaCustSearch" placeholder="Cari nama atau email..." class="w-full bg-gray-50 border-2 border-transparent p-4 rounded-2xl font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
+            <label class="text-[10px] font-800 text-gray-400 uppercase tracking-widest ml-2 mb-1 block">Cari Pelanggan</label>
+            <input type="text" id="notaCustSearch" placeholder="Ketik nama pelanggan..." class="w-full bg-gray-50 border-2 border-transparent p-4 rounded-2xl font-bold outline-none focus:border-blue-500 focus:bg-white transition-all">
             <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
             <input type="hidden" id="finalEmail">
         </div>
 
-        <div id="itemContainer" class="space-y-3">
+        <div id="emailBadge" class="hidden px-4 py-2 bg-blue-50 border border-blue-100 rounded-xl text-[10px] font-bold text-blue-600 flex items-center gap-2">
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+            <span id="displayEmail"></span>
+        </div>
+
+        <div id="itemContainer" class="space-y-3 pt-2">
             <div class="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm space-y-3 item-row">
-                <input type="text" placeholder="Nama Jasa / Barang" class="w-full text-sm font-bold outline-none item-nama border-b pb-2">
+                <input type="text" placeholder="Deskripsi Jasa / Barang" class="w-full text-sm font-bold outline-none item-nama border-b pb-2">
                 <div class="flex items-center gap-3">
                     <div class="flex-1">
-                        <span class="text-[9px] text-gray-400 font-bold block mb-1 uppercase">Qty</span>
+                        <span class="text-[9px] text-gray-400 font-bold block mb-1">QTY</span>
                         <input type="number" oninput="hitungTotal()" value="1" min="1" class="w-full bg-gray-50 p-2 rounded-lg text-sm font-bold item-qty">
                     </div>
                     <div class="flex-[2]">
-                        <span class="text-[9px] text-gray-400 font-bold block mb-1 uppercase">Harga</span>
+                        <span class="text-[9px] text-gray-400 font-bold block mb-1">HARGA SATUAN</span>
                         <input type="number" oninput="hitungTotal()" placeholder="0" class="w-full bg-gray-50 p-2 rounded-lg text-sm font-bold item-harga text-right">
                     </div>
                 </div>
             </div>
         </div>
 
-        <button onclick="tambahItem()" class="w-full py-4 text-[10px] font-800 text-gray-400 border-2 border-dashed border-gray-200 rounded-2xl">+ TAMBAH BARIS</button>
+        <button onclick="tambahItem()" class="w-full py-4 text-[10px] font-800 text-gray-400 border-2 border-dashed border-gray-200 rounded-2xl active:bg-gray-50">+ TAMBAH BARIS</button>
 
         <div class="bg-slate-900 p-6 rounded-[2.5rem] text-white shadow-xl">
             <div class="flex justify-between items-center mb-6">
-                <span class="text-[10px] font-800 text-slate-400 uppercase tracking-widest">Status</span>
-                <select id="notaStatus" class="bg-slate-800 text-[10px] font-900 p-2 rounded-xl border-none outline-none">
+                <span class="text-[10px] font-800 text-slate-400 uppercase tracking-widest">Status Tagihan</span>
+                <select id="notaStatus" class="bg-slate-800 text-[10px] font-900 p-2 px-4 rounded-xl border-none outline-none">
                     <option value="PAID">PAID (LUNAS)</option>
                     <option value="UNPAID">UNPAID (PIUTANG)</option>
                 </select>
@@ -88,84 +85,70 @@
                     <span class="text-[10px] font-800 text-slate-400 block mb-1 uppercase">Total</span>
                     <span id="totalDisplay" class="text-3xl font-900 text-blue-400">Rp 0</span>
                 </div>
-                <button onclick="simpanNota()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-900 text-xs shadow-lg active:scale-95 transition-all">SIMPAN</button>
+                <button onclick="simpanNota()" class="bg-blue-600 hover:bg-blue-50 text-white px-8 py-4 rounded-2xl font-900 text-xs shadow-lg active:scale-95 transition-all">SIMPAN</button>
             </div>
         </div>
     </main>
 
     <main id="contentRiwayat" class="p-6 hidden bg-gray-50 flex-1 space-y-4 overflow-y-auto">
-        <div class="space-y-2">
-            <input type="text" id="searchRiwayat" oninput="filterRiwayat()" placeholder="Cari ID / Nama..." class="w-full p-4 bg-white border border-gray-100 rounded-2xl text-xs font-bold outline-none focus:border-blue-500 shadow-sm">
-        </div>
-        <div id="listRiwayat" class="space-y-4 pb-20"></div>
+        <input type="text" id="searchRiwayat" oninput="filterRiwayat()" placeholder="Cari ID atau Nama..." class="w-full p-4 bg-white border border-gray-100 rounded-2xl text-xs font-bold outline-none shadow-sm">
+        <div id="listRiwayat" class="space-y-4 pb-24"></div>
         
-        <div class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-white/80 backdrop-blur p-4 flex justify-center items-center gap-4" id="paginationUI">
-            <button id="prevBtn" class="p-2 bg-white rounded-lg border disabled:opacity-30"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-            <span id="pageNumber" class="text-xs font-900 text-gray-500">1 / 1</span>
-            <button id="nextBtn" class="p-2 bg-white rounded-lg border disabled:opacity-30"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+        <div class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-white/90 backdrop-blur p-4 border-t flex justify-center items-center gap-6" id="paginationUI">
+            <button id="prevBtn" class="p-2 bg-white rounded-xl border disabled:opacity-20"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <span id="pageNumber" class="text-[10px] font-900 text-gray-500 bg-gray-100 px-4 py-2 rounded-full">1 / 1</span>
+            <button id="nextBtn" class="p-2 bg-white rounded-xl border disabled:opacity-20"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
         </div>
     </main>
 </div>
 
-<div id="modalNota" class="fixed inset-0 bg-black/80 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white w-full rounded-[2.5rem] overflow-hidden max-h-[90vh] flex flex-col max-w-sm shadow-2xl">
-        
-        <div class="p-4 bg-gray-50 flex justify-between items-center border-b">
-            <button onclick="switchNotaStatus()" class="bg-orange-100 text-orange-600 px-4 py-2 rounded-xl text-[10px] font-900 hover:bg-orange-200">
-                🔄 UBAH STATUS
-            </button>
-            <button onclick="tutupModal()" class="text-gray-400 p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+<div id="notaPrintArea" style="width: 794px; min-height: 1123px; padding: 50px; background: white; color: black; position: relative; font-family: 'Courier New', Courier, monospace;">
+    <div id="pdf-watermark" style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 150px; font-weight: 900; opacity: 0.08; border: 15px solid; padding: 30px; border-radius: 30px; pointer-events: none; z-index: 0; text-transform: uppercase;"></div>
+    <div style="position: relative; z-index: 1;">
+        <div style="text-align: center; border-bottom: 3px double black; padding-bottom: 15px; margin-bottom: 25px;">
+            <h1 style="font-size: 32px; font-weight: bold; margin: 0; letter-spacing: 2px;">NANDA TEKNIK BANYUWANGI</h1>
+            <p style="font-size: 14px; margin: 5px 0;">Network, Software & Electrical Engineering</p>
+            <p style="font-size: 13px; margin: 0;">Sukowidi Indah Residence, Blok D-5 Banyuwangi | WhatsApp: 0823-3120-1148</p>
         </div>
-
-        <div id="notaPrintArea" class="p-8 nota-kertas flex-1 overflow-y-auto relative">
-            <div id="watermark"></div>
-            <div class="text-center mb-6 border-b-2 border-black pb-4">
-                <h2 class="font-900 text-lg uppercase">Nanda Teknik Banyuwangi</h2>
-                <p class="text-[8px]">Network, Software & Electrical Engineering</p>
-                <p class="text-[8px]">Sukowidi Indah Residence, Blok D-5 Banyuwangi. 68421</p>
-                <p class="text-[8px]">Email : nandateknik02@gmail.com | Website : www.nandateknik.com | Wa : 082331201148</p>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 15px; line-height: 1.6;">
+            <div style="flex: 1;">
+                <p><strong>INVOICE :</strong> <span id="pdf-id"></span></p>
+                <p><strong>KEPADA  :</strong> <span id="pdf-nama"></span></p>
             </div>
-            
-            <div class="text-[10px] flex justify-between mb-6">
-                <div><p>NO: <span id="invId" class="font-bold"></span></p><p>KE: <span id="invCust" class="font-bold uppercase"></span></p></div>
-                <div class="text-right"><p id="invTgl" class="font-bold"></p><p id="invStatus" class="font-900 uppercase"></p></div>
-            </div>
-
-            <table class="w-full text-[10px] mb-8">
-                <thead>
-                    <tr class="border-b border-black">
-                        <th class="text-left py-1">DESKRIPSI</th>
-                        <th class="text-center py-1">QTY</th>
-                        <th class="text-right py-1">TOTAL</th>
-                    </tr>
-                </thead>
-                <tbody id="invItems"></tbody>
-            </table>
-
-            <div class="border-t-2 border-black pt-2 mb-8">
-                <div class="flex justify-between font-900 text-xs uppercase">
-                    <span>Grand Total</span>
-                    <span id="invTotal"></span>
-                </div>
-            </div>
-
-            <div class="text-[8px] grid grid-cols-2 pt-4 border-t border-dashed">
-                <div>
-                    <p class="font-bold">PEMBAYARAN:</p>
-                    <p>BCA - NANDA KRISBIANTO</p>
-                    <p>1801826011</p>
-                </div>
-                <div class="text-right flex flex-col justify-end">
-                    <p class="font-bold underline italic">Hormat Kami,</p>
-                    <br><p class="font-bold">NANDA KRISBIANTO</p>
-                </div>
+            <div style="flex: 1; text-align: right;">
+                <p><strong>TANGGAL :</strong> <span id="pdf-tgl"></span></p>
+                <p><strong>STATUS  :</strong> <span id="pdf-status" style="font-weight: 900; text-transform: uppercase; padding: 2px 8px; border: 1px solid;"></span></p>
             </div>
         </div>
-        
-        <div class="p-6 bg-slate-50 flex gap-3">
-            <button onclick="unduhPDF()" class="flex-1 py-4 rounded-2xl font-800 text-xs text-white bg-blue-600 shadow-lg flex items-center justify-center gap-2 uppercase tracking-widest">
-                SIMPAN PDF
-            </button>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 14px; border: 1px solid black;">
+            <thead>
+                <tr style="background: #eee; border-bottom: 2px solid black;">
+                    <th style="padding: 12px; text-align: left; border-right: 1px solid black;">DESKRIPSI LAYANAN / BARANG</th>
+                    <th style="padding: 12px; text-align: center; border-right: 1px solid black; width: 60px;">QTY</th>
+                    <th style="padding: 12px; text-align: right; border-right: 1px solid black; width: 120px;">HARGA</th>
+                    <th style="padding: 12px; text-align: right; width: 120px;">SUBTOTAL</th>
+                </tr>
+            </thead>
+            <tbody id="pdf-items"></tbody>
+            <tfoot>
+                <tr style="border-top: 2px solid black; background: #fafafa;">
+                    <td colspan="3" style="padding: 15px; text-align: right; font-weight: bold; font-size: 16px;">TOTAL AKHIR :</td>
+                    <td id="pdf-total" style="padding: 15px; text-align: right; font-weight: 900; font-size: 18px;"></td>
+                </tr>
+            </tfoot>
+        </table>
+        <div style="display: flex; justify-content: space-between; margin-top: 60px; font-size: 13px;">
+            <div style="flex: 1.5; border: 1px dashed black; padding: 15px; border-radius: 5px;">
+                <p style="font-weight: bold; text-decoration: underline; margin-bottom: 8px;">METODE PEMBAYARAN:</p>
+                <p>Bank BCA - Nanda Krisbianto</p>
+                <p>No. Rekening: <strong>180-182-6011</strong></p>
+                <p style="margin-top: 10px; font-style: italic; color: #444;">* Harap simpan nota digital ini sebagai bukti klaim garansi yang sah.</p>
+            </div>
+            <div style="flex: 1; text-align: center;">
+                <p style="margin-bottom: 80px; font-weight: bold;">Hormat Kami,</p>
+                <p style="font-weight: bold; text-decoration: underline;">( NANDA KRISBIANTO )</p>
+                <p>Owner Nanda Teknik</p>
+            </div>
         </div>
     </div>
 </div>
@@ -177,36 +160,44 @@
     let databaseNota = [];
     let filteredNota = [];
     let selectedNota = null;
-    let currentNotaMode = 'pelanggan';
     let currentPage = 1;
-    const itemsPerPage = 6;
+    const itemsPerPage = 8;
 
     function switchTab(tab) {
         document.getElementById('contentBuat').classList.toggle('hidden', tab !== 'buat');
         document.getElementById('contentRiwayat').classList.toggle('hidden', tab !== 'riwayat');
         document.getElementById('tabBuat').classList.toggle('tab-active', tab === 'buat');
         document.getElementById('tabRiwayat').classList.toggle('tab-active', tab === 'riwayat');
-        if(tab === 'riwayat') { loadRiwayat(); }
+        if(tab === 'riwayat') loadRiwayat();
     }
 
-    // --- AUTOCOMPLETE ---
+    // --- AUTO SEARCH LOGIC ---
     const searchInput = document.getElementById('notaCustSearch');
     const autoList = document.getElementById('autocomplete-list');
 
     searchInput.addEventListener('input', function() {
         const val = this.value;
-        if(currentNotaMode !== 'pelanggan') { document.getElementById('finalEmail').value = val; return; }
         autoList.innerHTML = "";
+        document.getElementById('finalEmail').value = "";
+        document.getElementById('emailBadge').classList.add('hidden');
+
         if (!val || val.length < 1) { autoList.classList.add('hidden'); return; }
-        const filtered = pelangganData.filter(p => (p.nama && p.nama.toLowerCase().includes(val.toLowerCase())) || (p.email && p.email.toLowerCase().includes(val.toLowerCase())));
+
+        const filtered = pelangganData.filter(p => 
+            (p.nama && p.nama.toLowerCase().includes(val.toLowerCase())) || 
+            (p.email && p.email.toLowerCase().includes(val.toLowerCase()))
+        );
+
         if(filtered.length > 0) {
             filtered.slice(0, 5).forEach(p => {
                 const div = document.createElement('div');
                 div.className = "autocomplete-item";
-                div.innerHTML = `<div class="font-bold">${p.nama}</div><div class="text-[10px] text-gray-400">${p.email}</div>`;
+                div.innerHTML = `<div class="font-bold text-sm">${p.nama}</div><div class="text-[10px] text-blue-500">${p.email}</div>`;
                 div.onclick = () => {
                     searchInput.value = p.nama;
                     document.getElementById('finalEmail').value = p.email;
+                    document.getElementById('displayEmail').innerText = p.email;
+                    document.getElementById('emailBadge').classList.remove('hidden');
                     autoList.classList.add('hidden');
                 };
                 autoList.appendChild(div);
@@ -215,21 +206,11 @@
         } else { autoList.classList.add('hidden'); }
     });
 
-    function setNotaMode(mode) {
-        currentNotaMode = mode;
-        const isPel = mode === 'pelanggan';
-        document.getElementById('btnNP').className = isPel ? "flex-1 py-2 rounded-xl text-[10px] font-800 bg-white shadow-sm text-blue-600" : "flex-1 py-2 rounded-xl text-[10px] font-800 text-gray-400";
-        document.getElementById('btnNU').className = !isPel ? "flex-1 py-2 rounded-xl text-[10px] font-800 bg-white shadow-sm text-blue-600" : "flex-1 py-2 rounded-xl text-[10px] font-800 text-gray-400";
-        searchInput.value = ""; document.getElementById('finalEmail').value = "";
-    }
-
-    // --- HITUNG & SIMPAN ---
     function tambahItem() {
-        const container = document.getElementById('itemContainer');
         const div = document.createElement('div');
         div.className = "bg-white border border-gray-100 p-4 rounded-2xl shadow-sm space-y-3 item-row relative";
-        div.innerHTML = `<button onclick="this.parentElement.remove(); hitungTotal();" class="absolute top-4 right-4 text-gray-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button><input type="text" placeholder="Deskripsi" class="w-full text-sm font-bold outline-none item-nama border-b pb-2"><div class="flex items-center gap-3"><div class="flex-1"><span class="text-[9px] text-gray-400 font-bold block mb-1">QTY</span><input type="number" oninput="hitungTotal()" value="1" min="1" class="w-full bg-gray-50 p-2 rounded-lg text-sm font-bold item-qty"></div><div class="flex-[2]"><span class="text-[9px] text-gray-400 font-bold block mb-1">HARGA</span><input type="number" oninput="hitungTotal()" class="w-full bg-gray-50 p-2 rounded-lg text-sm font-bold item-harga text-right"></div></div>`;
-        container.appendChild(div);
+        div.innerHTML = `<button onclick="this.parentElement.remove(); hitungTotal();" class="absolute top-4 right-4 text-gray-300 hover:text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button><input type="text" placeholder="Deskripsi Jasa / Barang" class="w-full text-sm font-bold outline-none item-nama border-b pb-2"><div class="flex items-center gap-3"><div class="flex-1"><span class="text-[9px] text-gray-400 font-bold block mb-1">QTY</span><input type="number" oninput="hitungTotal()" value="1" min="1" class="w-full bg-gray-50 p-2 rounded-lg text-sm font-bold item-qty"></div><div class="flex-[2]"><span class="text-[9px] text-gray-400 font-bold block mb-1">HARGA</span><input type="number" oninput="hitungTotal()" placeholder="0" class="w-full bg-gray-50 p-2 rounded-lg text-sm font-bold item-harga text-right"></div></div>`;
+        document.getElementById('itemContainer').appendChild(div);
     }
 
     function hitungTotal() {
@@ -244,47 +225,44 @@
     }
 
     async function simpanNota() {
-        const email = document.getElementById('finalEmail').value || searchInput.value;
+        const email = document.getElementById('finalEmail').value;
         const items = [];
+        if(!email) return Swal.fire('Error', 'Silahkan pilih pelanggan dari hasil pencarian!', 'warning');
+
         document.querySelectorAll('.item-row').forEach(row => {
             const nama = row.querySelector('.item-nama').value;
             const qty = row.querySelector('.item-qty').value;
             const harga = row.querySelector('.item-harga').value;
             if(nama && harga) items.push({ nama, qty, harga });
         });
-        if(!email || items.length === 0) return Swal.fire('Error', 'Data belum lengkap', 'warning');
+
+        if(items.length === 0) return Swal.fire('Error', 'Isi minimal 1 item!', 'warning');
         
-        Swal.fire({title: 'Menyimpan...', didOpen: () => Swal.showLoading()});
+        Swal.fire({title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+        
         const payload = {
             action: 'simpanNota',
             id_nota: "INV-" + Date.now().toString().slice(-6),
             email: email, items: items, total: hitungTotal(),
             status: document.getElementById('notaStatus').value,
-            tanggal: new Date().toLocaleDateString('id-ID') + " " + new Date().toLocaleTimeString('id-ID')
+            tanggal: new Date().toLocaleDateString('id-ID') + " " + new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
         };
+
         try {
             await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)});
             Swal.fire({icon:'success', title:'Tersimpan'}).then(() => location.reload());
-        } catch(e) { Swal.fire('Error', 'Gagal', 'error'); }
+        } catch(e) { Swal.fire('Error', 'Gagal Simpan', 'error'); }
     }
 
-    // --- RIWAYAT & UPDATE ---
     async function loadRiwayat() {
         const list = document.getElementById('listRiwayat');
-        list.innerHTML = `<div class="flex justify-center py-20"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>`;
+        list.innerHTML = `<p class='text-center py-10 text-xs font-bold animate-pulse'>MEMUAT DATA...</p>`;
         try {
             const res = await fetch(SCRIPT_URL + "?type=nota");
             databaseNota = await res.json();
             filteredNota = [...databaseNota];
             displayNota();
-        } catch(e) { list.innerHTML = "Gagal memuat."; }
-    }
-
-    function filterRiwayat() {
-        const keyword = document.getElementById('searchRiwayat').value.toLowerCase();
-        filteredNota = databaseNota.filter(n => (n.id && n.id.toLowerCase().includes(keyword)) || (n.email && n.email.toLowerCase().includes(keyword)) || (n.id_nota && n.id_nota.toLowerCase().includes(keyword)));
-        currentPage = 1;
-        displayNota();
+        } catch(e) { list.innerHTML = "Gagal memuat riwayat."; }
     }
 
     function displayNota() {
@@ -294,14 +272,14 @@
 
         currentData.forEach((n) => {
             const isPaid = n.status.toUpperCase() === 'PAID';
-            list.innerHTML += `<div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all">
+            list.innerHTML += `<div onclick='generatePDF(${JSON.stringify(n)})' class="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all">
                 <div class="flex gap-4 items-center">
-                    <div class="w-10 h-10 rounded-full ${isPaid ? 'bg-green-50' : 'bg-red-50'} flex items-center justify-center">
-                        <svg class="w-5 h-5 ${isPaid ? 'text-green-500' : 'text-red-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <div class="w-10 h-10 rounded-full ${isPaid ? 'bg-green-50 text-green-500' : 'bg-red-50 text-red-500'} flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <div>
-                        <p class="text-[9px] font-900 text-gray-300 uppercase">${n.id || n.id_nota} • ${n.tanggal}</p>
-                        <p class="text-sm font-900 text-slate-800 uppercase truncate w-32">${n.email}</p>
+                        <p class="text-[9px] font-900 text-gray-300 uppercase">${n.id_nota || n.id}</p>
+                        <p class="text-sm font-900 text-slate-800 uppercase truncate w-32">${n.email.split('@')[0]}</p>
                     </div>
                 </div>
                 <div class="text-right">
@@ -310,24 +288,48 @@
                 </div>
             </div>`;
         });
+        
         const tp = Math.ceil(filteredNota.length / itemsPerPage) || 1;
         document.getElementById('pageNumber').innerText = `${currentPage} / ${tp}`;
         document.getElementById('prevBtn').disabled = currentPage === 1;
         document.getElementById('nextBtn').disabled = currentPage === tp;
     }
 
-    function bukaDetail(nota) {
-        selectedNota = nota;
-        const status = nota.status.toUpperCase();
-        document.getElementById('invId').innerText = nota.id || nota.id_nota;
-        document.getElementById('invTgl').innerText = nota.tanggal;
-        document.getElementById('invCust').innerText = nota.email;
-        document.getElementById('invStatus').innerText = status;
-        document.getElementById('invStatus').className = "font-900 uppercase " + (status === 'PAID' ? 'text-green-600' : 'text-red-600');
-        document.getElementById('invTotal').innerText = "Rp " + (parseInt(nota.total) || 0).toLocaleString('id-ID');
-        document.getElementById('watermark').innerHTML = `<span class="${status === 'PAID' ? 'wm-paid' : 'wm-unpaid'}">${status}</span>`;
+    function generatePDF(nota) {
+        Swal.fire({
+            title: 'Opsi Nota',
+            text: `Invoice: ${nota.id_nota || nota.id}`,
+            showCancelButton: true,
+            confirmButtonText: 'Unduh PDF',
+            showDenyButton: true,
+            denyButtonText: 'Ubah Status',
+            denyButtonColor: '#f59e0b'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                renderPDF(nota);
+            } else if (result.isDenied) {
+                updateStatus(nota);
+            }
+        });
+    }
 
-        const body = document.getElementById('invItems'); body.innerHTML = "";
+    function renderPDF(nota) {
+        const status = nota.status.toUpperCase();
+        document.getElementById('pdf-id').innerText = nota.id_nota || nota.id;
+        document.getElementById('pdf-nama').innerText = nota.email;
+        document.getElementById('pdf-tgl').innerText = nota.tanggal;
+        document.getElementById('pdf-status').innerText = status;
+        document.getElementById('pdf-status').style.color = status === 'PAID' ? '#16a34a' : '#dc2626';
+        document.getElementById('pdf-status').style.borderColor = status === 'PAID' ? '#16a34a' : '#dc2626';
+        document.getElementById('pdf-total').innerText = "Rp " + parseInt(nota.total).toLocaleString('id-ID');
+        
+        const wm = document.getElementById('pdf-watermark');
+        wm.innerText = status;
+        wm.style.color = status === 'PAID' ? '#16a34a' : '#dc2626';
+        wm.style.borderColor = status === 'PAID' ? '#16a34a' : '#dc2626';
+
+        const body = document.getElementById('pdf-items');
+        body.innerHTML = "";
         let items = [];
         try {
             const raw = nota.items_json || nota.items;
@@ -337,60 +339,57 @@
         items.forEach(it => {
             const q = parseFloat(it.qty) || 1;
             const h = parseFloat(it.harga) || 0;
-            body.innerHTML += `<tr class="border-b border-gray-100">
-                <td class="py-2 text-xs uppercase"><span class="font-bold">${it.nama}</span><br><span class="text-[8px] text-gray-400">@${h.toLocaleString('id-ID')}</span></td>
-                <td class="text-center py-2 text-xs">${q}</td>
-                <td class="text-right py-2 font-bold text-xs">${(q*h).toLocaleString('id-ID')}</td>
-            </tr>`;
-        });
-        document.getElementById('modalNota').classList.replace('hidden', 'flex');
-    }
-
-    async function switchNotaStatus() {
-        if(!selectedNota) return;
-        const statusLama = selectedNota.status.toUpperCase();
-        const statusBaru = statusLama === 'PAID' ? 'UNPAID' : 'PAID';
-
-        const confirm = await Swal.fire({
-            title: 'Ubah Status?',
-            text: `Ubah status menjadi ${statusBaru}?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Ubah',
-            confirmButtonColor: '#2563eb'
+            body.innerHTML += `
+                <tr style="border-bottom: 1px solid black;">
+                    <td style="padding: 12px; border-right: 1px solid black;">${it.nama.toUpperCase()}</td>
+                    <td style="padding: 12px; text-align: center; border-right: 1px solid black;">${q}</td>
+                    <td style="padding: 12px; text-align: right; border-right: 1px solid black;">${h.toLocaleString('id-ID')}</td>
+                    <td style="padding: 12px; text-align: right;">${(q*h).toLocaleString('id-ID')}</td>
+                </tr>`;
         });
 
-        if(confirm.isConfirmed) {
-            Swal.fire({title: 'Memproses...', didOpen: () => Swal.showLoading()});
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({
-                        action: 'updateStatusNota',
-                        id: selectedNota.id || selectedNota.id_nota,
-                        status: statusBaru
-                    })
-                });
-                selectedNota.status = statusBaru;
-                bukaDetail(selectedNota);
-                loadRiwayat();
-                Swal.fire('Berhasil', 'Status diperbarui', 'success');
-            } catch(e) { Swal.fire('Error', 'Gagal', 'error'); }
-        }
-    }
-
-    function unduhPDF() {
         const element = document.getElementById('notaPrintArea');
-        html2pdf().from(element).set({ margin: 10, filename: `Nota-${selectedNota.id || 'INV'}.pdf`, html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save();
+        element.style.display = 'block'; // Tampilkan sebentar untuk render
+        
+        const opt = {
+            margin: 0,
+            filename: `NOTA-${nota.id_nota || 'NT'}.pdf`,
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().from(element).set(opt).save().then(() => {
+            element.style.display = 'none';
+        });
     }
 
-    function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); selectedNota = null; }
-    
+    async function updateStatus(nota) {
+        const statusBaru = nota.status.toUpperCase() === 'PAID' ? 'UNPAID' : 'PAID';
+        Swal.fire({title: 'Memproses...', didOpen: () => Swal.showLoading()});
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({ action: 'updateStatusNota', id: nota.id_nota || nota.id, status: statusBaru })
+            });
+            Swal.fire('Berhasil', 'Status diperbarui', 'success').then(() => loadRiwayat());
+        } catch(e) { Swal.fire('Error', 'Gagal', 'error'); }
+    }
+
+    window.onload = async () => { 
+        try { 
+            const res = await fetch(SCRIPT_URL + "?type=pelanggan"); 
+            pelangganData = await res.json(); 
+        } catch(e) {} 
+    };
+
+    function filterRiwayat() {
+        const kw = document.getElementById('searchRiwayat').value.toLowerCase();
+        filteredNota = databaseNota.filter(n => (n.id_nota && n.id_nota.toLowerCase().includes(kw)) || (n.email && n.email.toLowerCase().includes(kw)));
+        currentPage = 1; displayNota();
+    }
+
     document.getElementById('prevBtn').onclick = () => { if(currentPage > 1) { currentPage--; displayNota(); } };
     document.getElementById('nextBtn').onclick = () => { if(currentPage < Math.ceil(filteredNota.length / itemsPerPage)) { currentPage++; displayNota(); } };
-
-    window.onload = async () => { try { const res = await fetch(SCRIPT_URL + "?type=pelanggan"); pelangganData = await res.json(); } catch(e) {} };
 </script>
 </body>
 </html>
