@@ -11,14 +11,13 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #334155; }
         .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; display: flex; flex-direction: column; }
-        .tab-active { border-bottom: 4px solid #64748b; color: #1e293b; }
+        .tab-active { border-bottom: 4px solid #1e293b; color: #1e293b; font-weight: 900; }
         .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; position: relative; color: #000; }
         .autocomplete-items {
             position: absolute; border-radius: 1rem; border: 1px solid #e2e8f0;
             background: white; z-index: 100; top: 100%; left: 0; right: 0; 
             margin-top: 5px; overflow-y: auto; max-height: 200px;
         }
-        /* Status Badge Colors */
         .status-pending { background: #fef3c7; color: #d97706; }
         .status-accepted { background: #dcfce7; color: #16a34a; }
         .status-rejected { background: #fee2e2; color: #dc2626; }
@@ -27,9 +26,9 @@
 <body>
 
 <div class="mobile-container shadow-2xl">
-    <header class="p-6 pb-2 bg-white sticky top-0 z-50 border-b">
-        <div class="flex items-center justify-between mb-4">
-            <button onclick="window.history.back()" class="p-2 hover:bg-slate-100 rounded-xl transition-all">
+    <header class="p-8 pb-2 bg-white sticky top-0 z-50 border-b">
+        <div class="flex items-center justify-between mb-6">
+            <button onclick="window.history.back()" class="bg-slate-100 p-3 rounded-2xl active:scale-90 transition-all">
                 <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </button>
             <h1 class="text-xl font-900 tracking-tight text-slate-800 uppercase italic">Penawaran <span class="text-slate-400">Harga</span></h1>
@@ -41,113 +40,102 @@
         </nav>
     </header>
 
-    <main id="contentBuat" class="p-6 space-y-6">
-        <div class="flex bg-slate-100 p-1 rounded-2xl">
-            <button onclick="setMode('pelanggan')" id="btnMP" class="flex-1 py-2 rounded-xl text-[10px] font-800 bg-white shadow-sm text-slate-800">PELANGGAN TERDAFTAR</button>
-            <button onclick="setMode('umum')" id="btnMU" class="flex-1 py-2 rounded-xl text-[10px] font-800 text-slate-400">UMUM / BARU</button>
-        </div>
-
+    <main id="contentBuat" class="p-8 space-y-6 flex-1">
         <div class="relative">
-            <label class="text-[10px] font-800 text-slate-400 uppercase tracking-widest ml-2 mb-1 block">Tujuan Penawaran</label>
-            <input type="text" id="custSearch" placeholder="Cari nama atau email..." class="w-full bg-slate-50 border-2 border-transparent p-4 rounded-2xl font-bold outline-none focus:border-slate-400 focus:bg-white transition-all">
+            <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Cari Pelanggan</label>
+            <input type="text" id="custSearch" placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-slate-50 border-2 border-transparent p-5 rounded-[2rem] font-bold outline-none focus:border-slate-400 focus:bg-white transition-all shadow-sm">
             <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
             <input type="hidden" id="finalEmail">
         </div>
 
-        <div id="itemContainer" class="space-y-3"></div>
+        <div id="itemContainer" class="space-y-4"></div>
 
-        <button onclick="tambahItem()" class="w-full py-4 text-[10px] font-800 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl hover:bg-slate-50 uppercase">+ Tambah Baris Pekerjaan</button>
+        <button onclick="tambahItem()" class="w-full py-5 text-[10px] font-900 text-slate-400 border-2 border-dashed border-slate-200 rounded-[1.5rem] hover:bg-slate-50 uppercase tracking-widest">+ Tambah Pekerjaan</button>
 
-        <div class="bg-slate-800 p-6 rounded-[2.5rem] text-white shadow-xl">
+        <div class="bg-slate-800 p-7 rounded-[2.5rem] text-white shadow-xl">
             <div class="flex justify-between items-end">
                 <div>
                     <span class="text-[10px] font-800 text-slate-400 block mb-1 uppercase tracking-widest">Estimasi Total</span>
                     <span id="totalDisplay" class="text-3xl font-900 text-white leading-none">Rp 0</span>
                 </div>
-                <button onclick="simpanPenawaran()" class="bg-slate-100 text-slate-900 px-8 py-4 rounded-2xl font-900 text-xs shadow-lg active:scale-95 transition-all uppercase">Simpan</button>
+                <button onclick="simpanPenawaran()" class="bg-white text-slate-900 px-8 py-4 rounded-2xl font-900 text-xs shadow-lg active:scale-95 transition-all uppercase">Simpan</button>
             </div>
         </div>
     </main>
 
-    <main id="contentRiwayat" class="p-6 hidden bg-slate-50 flex-1 space-y-4">
-        <div class="space-y-2">
-            <input type="text" id="searchRiwayat" oninput="filterRiwayat()" placeholder="Cari ID / Nama / Email..." class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:border-slate-400 shadow-sm">
-        </div>
-        <div id="listRiwayat" class="space-y-4"></div>
+    <main id="contentRiwayat" class="p-8 hidden bg-slate-50 flex-1 space-y-4 overflow-y-auto">
+        <input type="text" id="searchRiwayat" oninput="filterRiwayat()" placeholder="Cari ID / Nama..." class="w-full p-5 bg-white border border-slate-200 rounded-[2rem] text-xs font-black shadow-sm outline-none">
+        <div id="listRiwayat" class="space-y-4 pb-10"></div>
     </main>
 </div>
 
-<div id="modalNota" class="fixed inset-0 bg-slate-900/90 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
+<div id="modalNota" class="fixed inset-0 bg-slate-900/95 z-[100] hidden items-center justify-center p-4 backdrop-blur-md">
     <div class="bg-white w-full rounded-[2.5rem] overflow-hidden max-h-[95vh] flex flex-col max-w-sm shadow-2xl">
-        
         <div class="p-4 bg-slate-50 flex justify-between items-center border-b">
-            <span class="text-[10px] font-900 text-slate-400 uppercase tracking-widest">Opsi Penawaran</span>
-            <button id="btnActionStatus" onclick="updateStatusDialog()" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-[10px] font-900 hover:bg-slate-700 transition-all uppercase">
-                Ganti Status
-            </button>
+            <button onclick="updateStatusDialog()" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-[10px] font-900 uppercase">Ganti Status</button>
+            <button onclick="tutupModal()" class="text-slate-400 p-2 text-xl font-black">✕</button>
         </div>
 
-        <div id="notaPrintArea" class="p-8 nota-kertas flex-1 overflow-y-auto relative border-8 border-white">
+        <div id="notaPrintArea" class="p-8 nota-kertas flex-1 overflow-y-auto bg-white">
             <div class="text-center mb-6 border-b-2 border-black pb-4">
                 <h2 class="font-900 text-xl uppercase tracking-tighter">NANDA TEKNIK BANYUWANGI</h2>
-                <p class="text-[8px] leading-tight">Sukowidi Indah Residence, Blok D05, Klatak, Banyuwangi</p>
-                <p class="text-[8px] leading-tight">WA: 0823-3120-1148 | Banyuwangi</p>
-                <p class="text-[8px] italic font-bold mt-1">SURAT PENAWARAN HARGA (QUOTATION)</p>
+                <p class="text-[8px] font-bold">Network, Software & Electrical Engineering</p>
+                <p class="text-[8px]">WA: 0823-3120-1148 | Banyuwangi</p>
+                <p class="text-[8px] italic font-black mt-2 underline">SURAT PENAWARAN HARGA (QUOTATION)</p>
             </div>
             
             <div class="text-[10px] flex justify-between mb-6">
-                <div>
-                    <p>NOMOR : <span id="vId" class="font-bold"></span></p>
-                    <p>UNTUK : <span id="vCust" class="font-bold"></span></p>
+                <div class="space-y-1">
+                    <p class="text-gray-400 uppercase font-bold text-[8px]">Tujuan:</p>
+                    <p id="vCust" class="font-black text-sm uppercase"></p>
+                    <p id="vId" class="font-bold text-gray-500"></p>
                 </div>
                 <div class="text-right">
                     <p id="vTgl" class="font-bold"></p>
-                    <p id="vStatusText" class="font-900 uppercase tracking-widest"></p>
+                    <p id="vStatusText" class="font-900 uppercase text-[9px]"></p>
                 </div>
             </div>
 
-            <table class="w-full text-[10px] mb-8">
+            <table class="w-full text-[10px] mb-6 border-collapse">
                 <thead>
                     <tr class="border-b-2 border-black">
-                        <th class="text-left py-1">DESKRIPSI PEKERJAAN</th>
-                        <th class="text-center py-1">QTY</th>
-                        <th class="text-right py-1">TOTAL</th>
+                        <th class="text-left py-2 px-1">DESKRIPSI</th>
+                        <th class="text-center py-2 px-1 w-10">QTY</th>
+                        <th class="text-right py-2 px-1 w-24">SUBTOTAL</th>
                     </tr>
                 </thead>
                 <tbody id="vItems"></tbody>
+                <tfoot>
+                    <tr class="border-t-2 border-black font-900 text-[11px]">
+                        <td colspan="2" class="py-3 px-1 uppercase">Total Estimasi</td>
+                        <td class="py-3 px-1 text-right text-sm" id="vTotal"></td>
+                    </tr>
+                </tfoot>
             </table>
 
-            <div class="border-t-2 border-black pt-2 mb-8 text-right">
-                <span class="text-[9px] font-bold text-slate-400 block uppercase">Total Estimasi Biaya</span>
-                <span id="vTotal" class="font-900 text-sm"></span>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
+                <p class="text-[8px] font-black text-gray-400 uppercase mb-2 tracking-widest">Pembayaran Transfer:</p>
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-[9px] font-bold text-gray-600">BCA - Nanda Krisbianto</span>
+                    <span class="text-[10px] font-black">180-182-6011</span>
+                </div>
             </div>
 
-            <div class="text-[8px] pt-4 border-t border-dashed border-slate-300">
-                <p class="font-bold uppercase mb-1">Syarat & Ketentuan:</p>
-                <p>1. Penawaran berlaku selama 14 hari sejak diterbitkan.</p>
-                <p>2. Harga sudah termasuk jasa teknisi dan penggantian part.</p>
-                <p>3. Konfirmasi pengerjaan dapat dilakukan melalui WhatsApp.</p>
-                <div class="mt-6 text-right">
-                    <p class="font-bold underline italic">Hormat Kami,</p>
-                    <br><p class="font-bold">NANDA TEKNIK</p>
-                </div>
+            <div class="text-right pr-4 mt-8">
+                <p class="text-[9px] font-bold underline italic mb-12">Hormat Kami,</p>
+                <p class="text-[10px] font-black uppercase">NANDA TEKNIK</p>
             </div>
         </div>
         
-        <div class="p-6 bg-slate-100 flex gap-3">
-            <button onclick="tutupModal()" class="flex-1 py-4 rounded-2xl font-800 text-[10px] bg-white border border-slate-200 text-slate-400 uppercase">Tutup</button>
-            <button onclick="downloadPdf()" class="flex-1 py-4 rounded-2xl font-800 text-[10px] text-white bg-slate-800 shadow-lg uppercase">Download PDF</button>
+        <div class="p-6 bg-slate-100">
+            <button onclick="downloadPdf()" class="w-full py-4 rounded-2xl font-900 text-[10px] text-white bg-slate-800 shadow-lg uppercase active:scale-95 transition-all">Unduh PDF</button>
         </div>
     </div>
 </div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQz16cIzrcWxvlL90YpJm3r9z1MZ_YM0mPbP_xD3z5HH5zuLp6VRIhcyuHOKYGN1_rVg/exec";
-    
-    let pelangganData = [];
-    let riwayatData = [];
-    let currentMode = 'pelanggan';
-    let selectedQuote = null;
+    let pelangganData = [], riwayatData = [], selectedQuote = null;
 
     function switchTab(tab) {
         document.getElementById('contentBuat').classList.toggle('hidden', tab !== 'buat');
@@ -157,20 +145,18 @@
         if(tab === 'riwayat') loadRiwayat();
     }
 
-    // Autocomplete
     const searchInput = document.getElementById('custSearch');
     const autoList = document.getElementById('autocomplete-list');
 
     searchInput.addEventListener('input', function() {
         const val = this.value;
-        if(currentMode !== 'pelanggan') { document.getElementById('finalEmail').value = val; return; }
         autoList.innerHTML = "";
         if (!val) { autoList.classList.add('hidden'); return; }
         const filtered = pelangganData.filter(p => (p.nama + p.email).toLowerCase().includes(val.toLowerCase()));
         filtered.slice(0, 5).forEach(p => {
             const div = document.createElement('div');
-            div.className = "p-4 hover:bg-slate-50 cursor-pointer border-b border-slate-50";
-            div.innerHTML = `<div class="font-bold text-slate-700 text-sm">${p.nama}</div><div class="text-[10px] text-slate-400">${p.email}</div>`;
+            div.className = "p-5 hover:bg-slate-50 cursor-pointer border-b border-slate-50";
+            div.innerHTML = `<div class="font-black text-slate-700 text-sm">${p.nama}</div><div class="text-[10px] text-slate-400 font-bold uppercase">${p.email}</div>`;
             div.onclick = () => {
                 searchInput.value = p.nama;
                 document.getElementById('finalEmail').value = p.email;
@@ -181,23 +167,15 @@
         autoList.classList.toggle('hidden', filtered.length === 0);
     });
 
-    function setMode(mode) {
-        currentMode = mode;
-        const isPel = mode === 'pelanggan';
-        document.getElementById('btnMP').className = isPel ? "flex-1 py-2 rounded-xl text-[10px] font-800 bg-white shadow-sm text-slate-800" : "flex-1 py-2 rounded-xl text-[10px] font-800 text-slate-400";
-        document.getElementById('btnMU').className = !isPel ? "flex-1 py-2 rounded-xl text-[10px] font-800 bg-white shadow-sm text-slate-800" : "flex-1 py-2 rounded-xl text-[10px] font-800 text-slate-400";
-        searchInput.value = ""; document.getElementById('finalEmail').value = "";
-    }
-
     function tambahItem() {
         const div = document.createElement('div');
-        div.className = "bg-white border border-slate-100 p-4 rounded-2xl shadow-sm space-y-3 item-row relative";
+        div.className = "bg-white border border-slate-100 p-5 rounded-[1.5rem] shadow-sm space-y-3 item-row relative";
         div.innerHTML = `
-            <button onclick="this.parentElement.remove(); hitungTotal();" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 font-bold">✕</button>
-            <input type="text" placeholder="Deskripsi Pekerjaan" class="w-full text-sm font-bold outline-none item-nama border-b border-slate-50 pb-2">
-            <div class="flex items-center gap-3">
-                <div class="flex-1"><span class="text-[9px] text-slate-400 font-bold block mb-1 uppercase tracking-tighter">Qty</span><input type="number" oninput="hitungTotal()" value="1" min="1" class="w-full bg-slate-50 p-2 rounded-lg text-sm font-bold item-qty"></div>
-                <div class="flex-[2]"><span class="text-[9px] text-slate-400 font-bold block mb-1 text-right uppercase tracking-tighter">Harga Estimasi</span><input type="number" oninput="hitungTotal()" placeholder="0" class="w-full bg-slate-50 p-2 rounded-lg text-sm font-bold item-harga text-right"></div>
+            <button onclick="this.parentElement.remove(); hitungTotal();" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 font-black">✕</button>
+            <input type="text" placeholder="Pekerjaan / Sparepart" class="w-full text-sm font-black outline-none item-nama border-b border-slate-50 pb-2">
+            <div class="flex items-center gap-4">
+                <div class="flex-1"><span class="text-[8px] text-slate-400 font-black block mb-1 uppercase">Qty</span><input type="number" oninput="hitungTotal()" value="1" min="1" class="w-full bg-slate-50 p-3 rounded-xl text-sm font-black item-qty"></div>
+                <div class="flex-[2]"><span class="text-[8px] text-slate-400 font-black block mb-1 text-right uppercase">Harga</span><input type="number" oninput="hitungTotal()" placeholder="0" class="w-full bg-slate-50 p-3 rounded-xl text-sm font-black item-harga text-right"></div>
             </div>`;
         document.getElementById('itemContainer').appendChild(div);
     }
@@ -205,39 +183,30 @@
     function hitungTotal() {
         let total = 0;
         document.querySelectorAll('.item-row').forEach(row => {
-            const q = row.querySelector('.item-qty').value || 0;
-            const h = row.querySelector('.item-harga').value || 0;
-            total += (q * h);
+            total += (row.querySelector('.item-qty').value || 0) * (row.querySelector('.item-harga').value || 0);
         });
         document.getElementById('totalDisplay').innerText = "Rp " + total.toLocaleString('id-ID');
         return total;
     }
 
     async function simpanPenawaran() {
-        const email = document.getElementById('finalEmail').value || searchInput.value;
+        const email = document.getElementById('finalEmail').value;
         const items = [];
         document.querySelectorAll('.item-row').forEach(row => {
-            const nama = row.querySelector('.item-nama').value;
-            const qty = row.querySelector('.item-qty').value;
-            const harga = row.querySelector('.item-harga').value;
-            if(nama && harga) items.push({ nama, qty, harga });
+            const n = row.querySelector('.item-nama').value, q = row.querySelector('.item-qty').value, h = row.querySelector('.item-harga').value;
+            if(n && h) items.push({ nama: n, qty: q, harga: h });
         });
-
-        if(!email || items.length === 0) return Swal.fire('Gagal', 'Lengkapi data pelanggan dan item', 'warning');
-
+        if(!email || items.length === 0) return Swal.fire('Error', 'Lengkapi pelanggan & item.', 'warning');
         Swal.fire({title: 'Menyimpan...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
         const payload = {
-            action: 'simpanPenawaran',
-            id_nota: "OFF-" + Date.now().toString().slice(-6),
-            email: email, items: items, total: hitungTotal(),
-            status: "PENDING",
+            action: 'simpanPenawaran', id_nota: "OFF-" + Date.now().toString().slice(-6),
+            email: email, items: items, total: hitungTotal(), status: "PENDING",
             tanggal: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
         };
-
         try {
             await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)});
-            Swal.fire('Berhasil', 'Penawaran telah disimpan', 'success').then(() => location.reload());
-        } catch(e) { Swal.fire('Error', 'Gagal menyimpan', 'error'); }
+            Swal.fire('Berhasil', 'Penawaran disimpan', 'success').then(() => location.reload());
+        } catch(e) { Swal.fire('Error', 'Gagal kirim', 'error'); }
     }
 
     async function loadRiwayat() {
@@ -247,7 +216,7 @@
             const res = await fetch(SCRIPT_URL + "?type=penawaran");
             riwayatData = await res.json();
             filterRiwayat();
-        } catch(e) { list.innerHTML = "<p class='text-center py-20 text-slate-400'>Gagal sinkron data.</p>"; }
+        } catch(e) { list.innerHTML = "<p class='text-center py-20 text-slate-400'>Error Sinkron.</p>"; }
     }
 
     function filterRiwayat() {
@@ -257,13 +226,13 @@
         riwayatData.filter(n => (n.id + n.email).toLowerCase().includes(key)).forEach(n => {
             const sClass = n.status === 'ACCEPTED' ? 'status-accepted' : (n.status === 'REJECTED' ? 'status-rejected' : 'status-pending');
             list.innerHTML += `
-                <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all">
+                <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-[2rem] border-2 border-slate-50 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all">
                     <div class="overflow-hidden">
                         <p class="text-[9px] font-900 text-slate-400 uppercase tracking-tighter">${n.id} • ${n.tanggal}</p>
-                        <p class="text-sm font-900 text-slate-700 truncate w-40">${n.email}</p>
-                        <span class="text-[8px] font-bold px-2 py-0.5 rounded-full ${sClass}">${n.status}</span>
+                        <p class="text-sm font-black text-slate-700 truncate w-40 uppercase">${n.email}</p>
+                        <span class="text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest ${sClass}">${n.status}</span>
                     </div>
-                    <p class="text-sm font-900 text-slate-800 shrink-0">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
+                    <p class="text-sm font-black text-slate-800">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
                 </div>`;
         });
     }
@@ -274,22 +243,17 @@
         document.getElementById('vCust').innerText = n.email;
         document.getElementById('vTgl').innerText = n.tanggal;
         document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
-        
-        const statusEl = document.getElementById('vStatusText');
-        statusEl.innerText = n.status;
-        statusEl.className = "font-900 uppercase tracking-widest " + (n.status === 'ACCEPTED' ? 'text-green-600' : (n.status === 'REJECTED' ? 'text-red-600' : 'text-amber-500'));
-
-        const body = document.getElementById('vItems');
-        body.innerHTML = "";
+        const st = document.getElementById('vStatusText');
+        st.innerText = n.status;
+        st.className = "font-900 uppercase tracking-widest " + (n.status === 'ACCEPTED' ? 'text-green-600' : (n.status === 'REJECTED' ? 'text-red-600' : 'text-amber-500'));
+        const body = document.getElementById('vItems'); body.innerHTML = "";
         const items = typeof n.items_json === 'string' ? JSON.parse(n.items_json) : (n.items_json || []);
         items.forEach(it => {
-            const h = parseInt(it.harga) || 0;
-            const q = parseInt(it.qty) || 1;
             body.innerHTML += `
-                <tr class="border-b border-slate-100">
-                    <td class="py-2 text-[10px] uppercase font-bold">${it.nama}</td>
-                    <td class="text-center py-2 text-[10px]">${q}</td>
-                    <td class="text-right py-2 font-bold text-[10px]">${(h * q).toLocaleString('id-ID')}</td>
+                <tr class="border-b border-slate-50">
+                    <td class="py-3 text-[10px] uppercase font-bold text-slate-700">${it.nama}</td>
+                    <td class="text-center py-3 text-[10px] font-bold text-slate-500">${it.qty}</td>
+                    <td class="text-right py-3 font-black text-slate-800 text-[10px]">${(it.harga * it.qty).toLocaleString('id-ID')}</td>
                 </tr>`;
         });
         document.getElementById('modalNota').classList.replace('hidden', 'flex');
@@ -297,51 +261,30 @@
 
     async function updateStatusDialog() {
         if(!selectedQuote) return;
-        const { value: newStatus } = await Swal.fire({
-            title: 'Update Status Penawaran',
-            input: 'select',
-            inputOptions: {
-                'PENDING': 'PENDING (Menunggu)',
-                'ACCEPTED': 'ACCEPTED (Disetujui)',
-                'REJECTED': 'REJECTED (Ditolak)'
-            },
-            inputPlaceholder: 'Pilih status baru',
+        const { value: st } = await Swal.fire({
+            title: 'Update Status', input: 'select',
+            inputOptions: { 'PENDING': 'PENDING', 'ACCEPTED': 'ACCEPTED', 'REJECTED': 'REJECTED' },
             showCancelButton: true
         });
-
-        if (newStatus) {
-            Swal.fire({title: 'Updating...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
-            const payload = {
-                action: 'updateStatusPenawaran',
-                id: selectedQuote.id,
-                status: newStatus
-            };
+        if (st) {
+            Swal.fire({title: 'Updating...', didOpen: () => Swal.showLoading()});
             try {
-                await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)});
-                Swal.fire('Updated', 'Status berhasil diubah', 'success').then(() => {
-                    tutupModal();
-                    loadRiwayat();
-                });
-            } catch(e) { Swal.fire('Error', 'Gagal update', 'error'); }
+                await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'updateStatusPenawaran', id: selectedQuote.id, status: st })});
+                Swal.fire('Updated', '', 'success').then(() => { tutupModal(); loadRiwayat(); });
+            } catch(e) { Swal.fire('Error', '', 'error'); }
         }
     }
 
     function downloadPdf() {
-        const element = document.getElementById('notaPrintArea');
-        html2pdf().set({
-            margin: 5, filename: `Penawaran-${document.getElementById('vId').innerText}.pdf`,
-            html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).from(element).save();
+        const el = document.getElementById('notaPrintArea');
+        html2pdf().set({ margin: 10, filename: `PEN-${selectedQuote.id}.pdf`, html2canvas: { scale: 3 }, jsPDF: { format: 'a4' } }).from(el).save();
     }
 
     function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); selectedQuote = null; }
 
     window.onload = async () => {
         tambahItem();
-        try {
-            const res = await fetch(SCRIPT_URL + "?type=pelanggan");
-            pelangganData = await res.json();
-        } catch(e) {}
+        try { const res = await fetch(SCRIPT_URL + "?type=pelanggan"); pelangganData = await res.json(); } catch(e) {}
     };
 </script>
 </body>
