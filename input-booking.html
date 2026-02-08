@@ -13,7 +13,7 @@
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; }
         #map-container { transition: all 0.5s ease; overflow: hidden; }
-        #map { height: 220px; border-radius: 1.5rem; border: 2px solid #f3f4f6; }
+        #map { height: 220px; border-radius: 1.5rem; border: 2px solid #f3f4f6; width: 100%; }
         .autocomplete-items {
             position: absolute; border-radius: 1.5rem; border: 1px solid #e5e7eb;
             background: white; z-index: 99; top: 100%; left: 0; right: 0; 
@@ -21,6 +21,7 @@
         }
         .autocomplete-item { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #f9fafb; transition: all 0.2s; }
         .autocomplete-item:hover { background-color: #eff6ff; }
+        input:read-only { background-color: #f9fafb; color: #9ca3af; cursor: not-allowed; }
     </style>
 </head>
 <body class="bg-gray-200">
@@ -46,30 +47,37 @@
                 <div class="grid grid-cols-1 gap-5">
                     <div>
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">WhatsApp</label>
-                        <input type="number" id="whatsapp" readonly placeholder="Terisi otomatis..." class="w-full bg-gray-100 border-2 border-transparent px-6 py-4 rounded-[2rem] font-bold text-gray-500 outline-none cursor-not-allowed">
+                        <input type="number" id="whatsapp" readonly placeholder="Otomatis..." class="w-full border-2 border-gray-100 px-6 py-4 rounded-[2rem] font-bold outline-none">
                     </div>
                     <div>
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Email Notifikasi</label>
-                        <input type="email" id="email" readonly placeholder="Terisi otomatis..." class="w-full bg-gray-100 border-2 border-transparent px-6 py-4 rounded-[2rem] font-bold text-gray-500 outline-none cursor-not-allowed">
+                        <input type="email" id="email" readonly placeholder="Otomatis..." class="w-full border-2 border-gray-100 px-6 py-4 rounded-[2rem] font-bold outline-none">
                     </div>
                 </div>
 
                 <div>
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Jenis Pekerjaan</label>
-                    <input type="text" id="pekerjaan" required placeholder="Contoh: Cuci AC, Perbaikan Kulkas..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
+                    <input type="text" id="pekerjaan" required placeholder="Contoh: Service AC, Pasang Baru..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
                 </div>
 
                 <div id="map-section">
-                    <label id="map-label" class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Lokasi Alamat</label>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Lokasi Alamat</label>
+                    
                     <div id="map-container">
                         <div id="map"></div>
+                        <p class="text-[10px] text-center text-gray-400 mt-2 italic">Geser pin jika lokasi kurang akurat</p>
                     </div>
+
                     <div id="saved-location-info" class="hidden p-4 bg-blue-50 border-2 border-blue-100 rounded-[1.5rem] flex items-center space-x-3">
                         <div class="bg-blue-500 p-2 rounded-full text-white">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
                         </div>
-                        <span class="text-[11px] font-bold text-blue-700">Menggunakan koordinat rumah terdaftar</span>
+                        <div class="flex flex-col">
+                            <span class="text-[11px] font-bold text-blue-700">Koordinat terdaftar ditemukan</span>
+                            <button type="button" onclick="toggleMapVisibility(true)" class="text-[10px] text-blue-500 underline text-left">Gunakan lokasi lain?</button>
+                        </div>
                     </div>
+                    
                     <input type="hidden" id="lat"><input type="hidden" id="lang">
                 </div>
 
@@ -81,14 +89,18 @@
     </div>
 
     <script>
+        // PASTIKAN URL INI ADALAH URL DEPLOYMENT TERBARU ANDA
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLGftnLYFoDZfxhGJzULFlghMiA3nvXOIzAQGxkRH3oydDD5wgMW-UsodcI8hY-BbiqA/exec"; 
+        
         let pelangganData = [];
         let map, marker;
 
+        // Inisialisasi Peta
         function initMap() {
             map = L.map('map').setView([-8.2191, 114.3691], 13);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
             marker = L.marker([-8.2191, 114.3691], {draggable: true}).addTo(map);
+            
             marker.on('dragend', () => {
                 const pos = marker.getLatLng();
                 updateCoords(pos.lat, pos.lng);
@@ -114,13 +126,19 @@
             }
         }
 
+        // Load Data Pelanggan dari Script
         async function loadDatabase() {
             try {
-                const res = await fetch(SCRIPT_URL + "?action=checkCustomer"); // Gunakan action yang sesuai di GS Anda
-                pelangganData = await res.json();
-            } catch (e) { console.error("Gagal load database pelanggan:", e); }
+                const response = await fetch(SCRIPT_URL + "?action=checkCustomer");
+                const result = await response.json();
+                pelangganData = Array.isArray(result) ? result : (result.data || []);
+                console.log("Database Loaded:", pelangganData.length, "customers");
+            } catch (e) {
+                console.error("Gagal load database:", e);
+            }
         }
 
+        // Logika Autosearch / Autocomplete
         const inputNama = document.getElementById('nama');
         const list = document.getElementById('autocomplete-list');
 
@@ -129,41 +147,58 @@
             list.innerHTML = "";
             if (!val || val.length < 1) { list.classList.add('hidden'); return; }
 
-            const filtered = pelangganData.filter(p => p.nama && p.nama.toLowerCase().includes(val.toLowerCase()));
+            const filtered = pelangganData.filter(p => 
+                p.nama && p.nama.toLowerCase().includes(val.toLowerCase())
+            );
 
-            filtered.slice(0, 5).forEach(p => {
-                const div = document.createElement('div');
-                div.className = "autocomplete-item";
-                div.innerHTML = `<div class="font-black text-gray-800 text-sm">${p.nama}</div><div class="text-[10px] text-gray-400 font-bold uppercase">${p.email}</div>`;
-                div.onclick = () => {
-                    inputNama.value = p.nama;
-                    document.getElementById('email').value = p.email;
-                    document.getElementById('whatsapp').value = p.whatsapp;
-                    
-                    if(p.lat && p.lng) {
-                        updateCoords(p.lat, p.lng);
-                        toggleMapVisibility(false);
-                    } else {
-                        toggleMapVisibility(true);
-                    }
-                    list.classList.add('hidden');
-                };
-                list.appendChild(div);
-            });
-            list.classList.remove('hidden');
+            if (filtered.length > 0) {
+                filtered.slice(0, 5).forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = "autocomplete-item";
+                    div.innerHTML = `
+                        <div class="font-black text-gray-800 text-sm">${p.nama}</div>
+                        <div class="text-[10px] text-gray-400 font-bold uppercase">${p.email || 'Tanpa Email'}</div>
+                    `;
+                    div.onclick = () => {
+                        inputNama.value = p.nama;
+                        document.getElementById('email').value = p.email || "";
+                        document.getElementById('whatsapp').value = p.whatsapp || "";
+                        
+                        // Deteksi lat/lng atau lat/lang
+                        const pLat = p.lat;
+                        const pLng = p.lng || p.lang;
+
+                        if (pLat && pLng) {
+                            const newPos = [parseFloat(pLat), parseFloat(pLng)];
+                            marker.setLatLng(newPos);
+                            map.setView(newPos, 16);
+                            updateCoords(pLat, pLng);
+                            toggleMapVisibility(false);
+                        } else {
+                            toggleMapVisibility(true);
+                        }
+                        list.classList.add('hidden');
+                    };
+                    list.appendChild(div);
+                });
+                list.classList.remove('hidden');
+            } else {
+                list.classList.add('hidden');
+            }
         });
 
+        // Submit Form
         document.getElementById('bookingForm').onsubmit = async (e) => {
             e.preventDefault();
             
-            if(!document.getElementById('email').value) {
-                Swal.fire('Pilih Pelanggan', 'Silakan pilih pelanggan dari daftar yang muncul.', 'warning');
+            if (!document.getElementById('email').value) {
+                Swal.fire('Pilih Pelanggan', 'Silakan pilih nama pelanggan dari daftar yang muncul.', 'warning');
                 return;
             }
 
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true; 
-            btn.innerText = "MEMPROSES...";
+            btn.disabled = true;
+            btn.innerText = "MENYIMPAN...";
 
             const payload = {
                 action: 'tambahBooking',
@@ -177,29 +212,39 @@
             };
 
             try {
-                await fetch(SCRIPT_URL, { 
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    body: JSON.stringify(payload) 
+                // Menggunakan POST dengan no-cors untuk bypass kebijakan CORS browser
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(payload)
                 });
 
+                // Beri jeda 1 detik karena no-cors tidak mengembalikan response
                 setTimeout(() => {
                     Swal.fire({
-                        title: 'Booking Tersimpan!',
-                        text: 'Notifikasi sudah dikirim ke pelanggan dan Telegram.',
+                        title: 'Berhasil!',
+                        text: 'Booking telah disimpan & notifikasi terkirim.',
                         icon: 'success',
                         confirmButtonColor: '#111827'
                     }).then(() => location.reload());
                 }, 1000);
 
             } catch (err) {
-                Swal.fire('Gagal', 'Terjadi kesalahan jaringan.', 'error');
-                btn.disabled = false; 
+                Swal.fire('Error', 'Gagal terhubung ke server.', 'error');
+                btn.disabled = false;
                 btn.innerText = "SIMPAN BOOKING";
             }
         };
 
-        window.onload = () => { initMap(); loadDatabase(); };
+        // Klik di luar list untuk menutup autocomplete
+        document.addEventListener('click', (e) => {
+            if (e.target !== inputNama) list.classList.add('hidden');
+        });
+
+        window.onload = () => {
+            initMap();
+            loadDatabase();
+        };
     </script>
 </body>
 </html>
