@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Pelanggan - Nanda Teknik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        #map { height: 180px; border-radius: 1.5rem; border: 2px solid #f3f4f6; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between mb-8 bg-white p-6 rounded-[2rem] shadow-sm">
+            <div>
+                <h1 class="text-2xl font-black text-gray-800 uppercase italic">Database <span class="text-blue-500">Pelanggan</span></h1>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nanda Teknik Management System</p>
+            </div>
+            <button onclick="window.location.href='index.html'" class="bg-gray-900 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">Kembali</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="form-title" class="text-sm font-black text-gray-800 uppercase tracking-widest">Tambah Pelanggan</h2>
+                        <button onclick="resetForm()" id="btn-reset" class="hidden text-[10px] font-black text-red-500 uppercase">Batal Edit</button>
+                    </div>
+
+                    <form id="pelangganForm" class="space-y-4">
+                        <input type="hidden" id="original_email"> <div>
+                            <label class="text-[9px] font-black text-gray-400 uppercase ml-3 mb-1 block">Nama Lengkap</label>
+                            <input type="text" id="nama" required placeholder="Contoh: Budi Santoso" class="w-full bg-gray-50 border-2 border-gray-50 focus:border-blue-500 px-5 py-3.5 rounded-2xl font-bold text-gray-700 outline-none transition-all text-sm">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[9px] font-black text-gray-400 uppercase ml-3 mb-1 block">WhatsApp</label>
+                                <input type="number" id="whatsapp" required placeholder="0812..." class="w-full bg-gray-50 border-2 border-gray-50 focus:border-blue-500 px-5 py-3.5 rounded-2xl font-bold text-gray-700 outline-none transition-all text-sm">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-gray-400 uppercase ml-3 mb-1 block">Email</label>
+                                <input type="email" id="email" required placeholder="user@mail.com" class="w-full bg-gray-50 border-2 border-gray-50 focus:border-blue-500 px-5 py-3.5 rounded-2xl font-bold text-gray-700 outline-none transition-all text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-[9px] font-black text-gray-400 uppercase ml-3 mb-1 block">Pin Lokasi (Map)</label>
+                            <div id="map" class="mb-2"></div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="lat" readonly placeholder="Latitude" class="bg-gray-100 px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 outline-none">
+                                <input type="text" id="lang" readonly placeholder="Longitude" class="bg-gray-100 px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 outline-none">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="w-full bg-blue-500 text-white py-5 rounded-[2rem] font-black shadow-lg shadow-blue-100 active:scale-95 transition-all mt-4 uppercase tracking-widest text-xs">Simpan Data Pelanggan</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 space-y-6">
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col h-[800px]">
+                    <div class="mb-6">
+                        <h2 class="text-sm font-black text-gray-800 uppercase tracking-widest mb-4">Daftar Pelanggan</h2>
+                        <input type="text" id="searchPelanggan" oninput="renderPelanggan()" placeholder="Cari nama atau email..." class="w-full bg-gray-50 border-2 border-gray-50 focus:border-blue-500 px-6 py-4 rounded-2xl font-bold text-gray-700 outline-none transition-all text-sm">
+                    </div>
+
+                    <div id="listPelanggan" class="space-y-3 overflow-y-auto pr-2 custom-scroll flex-1">
+                        </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJNUwkMUrNtp5JcsVq7P-Vh2MT1AOhJTeRlMVhYIGSUU2IYhSvQBRh_bBTWrdoiZr7VA/exec";
+        
+        let dbPelanggan = [];
+        let map, marker;
+        let isEditMode = false;
+
+        window.onload = () => {
+            initMap();
+            fetchPelanggan();
+        };
+
+        function initMap() {
+            map = L.map('map').setView([-8.2191, 114.3691], 13);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+            marker = L.marker([-8.2191, 114.3691], {draggable: true}).addTo(map);
+            
+            const updateCoords = (lat, lng) => {
+                document.getElementById('lat').value = lat.toFixed(6);
+                document.getElementById('lang').value = lng.toFixed(6);
+            };
+
+            marker.on('dragend', (e) => updateCoords(e.target.getLatLng().lat, e.target.getLatLng().lng));
+            map.on('click', (e) => {
+                marker.setLatLng(e.latlng);
+                updateCoords(e.latlng.lat, e.latlng.lng);
+            });
+            updateCoords(-8.2191, 114.3691);
+        }
+
+        async function fetchPelanggan() {
+            const container = document.getElementById('listPelanggan');
+            container.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold animate-pulse text-[10px] uppercase">Loading Database...</p>`;
+            try {
+                const res = await fetch(SCRIPT_URL + "?type=pelanggan");
+                dbPelanggan = await res.json();
+                renderPelanggan();
+            } catch (e) {
+                container.innerHTML = `<p class="text-center py-10 text-red-400 font-bold uppercase text-[10px]">Gagal Sinkronisasi.</p>`;
+            }
+        }
+
+        function renderPelanggan() {
+            const container = document.getElementById('listPelanggan');
+            const searchVal = document.getElementById('searchPelanggan').value.toLowerCase();
+            const filtered = dbPelanggan.filter(p => 
+                p.nama.toLowerCase().includes(searchVal) || 
+                p.email.toLowerCase().includes(searchVal)
+            );
+
+            container.innerHTML = "";
+            filtered.forEach((p, index) => {
+                container.innerHTML += `
+                    <div onclick="editPelanggan(${index})" class="group bg-gray-50 p-5 rounded-3xl border-2 border-transparent hover:border-blue-200 hover:bg-white transition-all cursor-pointer relative">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-black text-gray-800 text-sm uppercase">${p.nama}</h3>
+                                <p class="text-[10px] font-bold text-gray-400 mt-0.5 tracking-tight uppercase">WA: ${p.whatsapp} • ${p.email}</p>
+                            </div>
+                            <div class="bg-white p-2 rounded-xl group-hover:bg-blue-500 group-hover:text-white transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function editPelanggan(index) {
+            const p = dbPelanggan[index];
+            isEditMode = true;
+            
+            document.getElementById('form-title').innerText = "Update Pelanggan";
+            document.getElementById('btn-reset').classList.remove('hidden');
+            document.getElementById('submitBtn').innerText = "Update Data Pelanggan";
+            document.getElementById('submitBtn').classList.replace('bg-blue-500', 'bg-orange-500');
+
+            document.getElementById('original_email').value = p.email; // ID kanggo referensi di GAS
+            document.getElementById('nama').value = p.nama;
+            document.getElementById('email').value = p.email;
+            document.getElementById('whatsapp').value = p.whatsapp;
+            document.getElementById('lat').value = p.lat;
+            document.getElementById('lang').value = p.lang || p.lng;
+
+            const latLng = [parseFloat(p.lat), parseFloat(p.lang || p.lng)];
+            marker.setLatLng(latLng);
+            map.setView(latLng, 16);
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            isEditMode = false;
+            document.getElementById('pelangganForm').reset();
+            document.getElementById('form-title').innerText = "Tambah Pelanggan";
+            document.getElementById('btn-reset').classList.add('hidden');
+            document.getElementById('submitBtn').innerText = "Simpan Data Pelanggan";
+            document.getElementById('submitBtn').classList.replace('bg-orange-500', 'bg-blue-500');
+            marker.setLatLng([-8.2191, 114.3691]);
+            map.setView([-8.2191, 114.3691], 13);
+        }
+
+        document.getElementById('pelangganForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerText = "PROSES...";
+
+            const payload = {
+                action: isEditMode ? 'updatePelanggan' : 'tambahPelanggan',
+                nama: document.getElementById('nama').value,
+                email: document.getElementById('email').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                lat: document.getElementById('lat').value,
+                lang: document.getElementById('lang').value,
+                original_email: document.getElementById('original_email').value, // Digunakne nek update
+                tanggal: new Date().toLocaleDateString('id-ID'),
+                is_active: "TRUE"
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                Swal.fire({
+                    title: 'BERHASIL!',
+                    text: isEditMode ? 'Data pelanggan diupdate.' : 'Pelanggan anyar ditambahne.',
+                    icon: 'success',
+                    confirmButtonColor: '#111827'
+                }).then(() => {
+                    resetForm();
+                    fetchPelanggan();
+                });
+            } catch (err) {
+                Swal.fire('ERROR', 'Gagal simpan data.', 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
