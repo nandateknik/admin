@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Input Booking - Nanda Teknik</title>
+    <title>Booking System - Nanda Teknik</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -20,8 +20,10 @@
         }
         .autocomplete-item { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #f9fafb; }
         .autocomplete-item:hover { background-color: #eff6ff; }
-        input:read-only { background-color: #f9fafb; color: #9ca3af; }
         .tab-active { border-bottom: 4px solid #111827; color: #111827; font-weight: 900; }
+        
+        /* Custom Styling for Select */
+        select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1.5rem center; background-size: 1em; }
     </style>
 </head>
 <body class="bg-gray-200">
@@ -42,29 +44,41 @@
         </div>
 
         <main id="content-buat" class="p-8 pt-6 space-y-6">
-            <form id="bookingForm" class="space-y-5">
+            <form id="bookingForm" class="space-y-5 pb-10">
                 <div class="relative">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Cari Nama Pelanggan</label>
-                    <input type="text" id="nama" required placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
+                    <input type="text" id="nama" required placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none transition-all">
                     <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
+                    <input type="hidden" id="email">
+                    <input type="hidden" id="whatsapp">
                 </div>
 
-                <div class="grid grid-cols-1 gap-5">
-                    <div class="hidden">
-                        <input type="email" id="email" readonly>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Info Kontak</label>
-                        <div id="contact-info" class="p-5 bg-gray-50 rounded-[1.5rem] border-2 border-gray-100 text-[12px] font-bold text-gray-500 italic">
-                            Silahkan pilih pelanggan terlebih dahulu.
-                        </div>
-                        <input type="hidden" id="whatsapp">
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Info Kontak</label>
+                    <div id="contact-info" class="p-5 bg-gray-50 rounded-[1.5rem] border-2 border-dashed border-gray-200 text-[11px] font-bold text-gray-400 italic">
+                        Pilih pelanggan untuk melihat info kontak.
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Jenis Pekerjaan</label>
-                    <input type="text" id="pekerjaan" required placeholder="Contoh: Service AC" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Jenis Pekerjaan (Judul)</label>
+                    <input type="text" id="pekerjaan" required placeholder="Contoh: Service AC Split 2PK" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Status Awal</label>
+                    <select id="status" required class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
+                        <option value="Belum Dikonfirmasi">Belum Dikonfirmasi</option>
+                        <option value="Tunggu Antrian" selected>Tunggu Antrian</option>
+                        <option value="Proses">Proses</option>
+                        <option value="Cancel">Cancel</option>
+                        <option value="Selesai">Selesai</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Detail & Keterangan</label>
+                    <textarea id="keterangan" rows="3" placeholder="Masukkan detail keluhan atau instruksi tambahan..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[1.5rem] font-bold text-gray-700 outline-none"></textarea>
                 </div>
 
                 <div id="map-section">
@@ -74,38 +88,37 @@
                         <div class="bg-blue-500 p-2 rounded-full text-white"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg></div>
                         <div class="flex-1">
                             <span class="text-[11px] font-bold text-blue-700 block">Koordinat terdaftar ditemukan.</span>
-                            <button type="button" onclick="toggleMapVisibility(true)" class="text-[10px] text-blue-500 underline">Gunakan lokasi lain?</button>
+                            <button type="button" onclick="toggleMapVisibility(true)" class="text-[10px] text-blue-500 underline font-bold">Gunakan lokasi lain?</button>
                         </div>
                     </div>
                     <input type="hidden" id="lat"><input type="hidden" id="lang">
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full bg-gray-900 text-white py-6 rounded-[2.5rem] font-black shadow-xl active:scale-95 transition-all mt-4">SIMPAN BOOKING</button>
+                <button type="submit" id="submitBtn" class="w-full bg-gray-900 text-white py-6 rounded-[2.5rem] font-black shadow-xl active:scale-95 transition-all mt-4 uppercase tracking-widest">SIMPAN BOOKING</button>
             </form>
         </main>
 
         <main id="content-riwayat" class="hidden p-8 pt-6 space-y-6 flex-1 bg-gray-50 min-h-screen">
             <div class="space-y-4">
-                <input type="text" id="searchRiwayat" oninput="renderRiwayat(1)" placeholder="Cari nama, email, atau tanggal..." class="w-full p-5 rounded-[1.5rem] border-2 border-transparent focus:border-blue-500 shadow-sm outline-none font-bold text-sm">
+                <input type="text" id="searchRiwayat" oninput="renderRiwayat(1)" placeholder="Cari ID, Nama, atau Layanan..." class="w-full p-5 rounded-[1.5rem] border-2 border-transparent focus:border-blue-500 shadow-sm outline-none font-bold text-sm">
                 
-                <div id="listRiwayat" class="space-y-4">
-                    </div>
+                <div id="listRiwayat" class="space-y-4"></div>
 
-                <div id="pagination" class="flex justify-center items-center space-x-4 pt-6">
-                    </div>
+                <div id="pagination" class="flex justify-center items-center space-x-2 pt-6 pb-10"></div>
             </div>
         </main>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvFYBWbiVB-_tAywEx9ajkSXOzwRmbnMqPznbRwsu2xDjXRv2_m6-IMVT_F7KdnpA3fA/exec"; // SESUAIKAN URL GAS ANDA
+        // GANTI KARO URL SCRIPT-MU SING ANYAR
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvFYBWbiVB-_tAywEx9ajkSXOzwRmbnMqPznbRwsu2xDjXRv2_m6-IMVT_F7KdnpA3fA/exec"; 
+        
         let pelangganData = [];
         let bookingData = [];
         let map, marker;
         let currentPage = 1;
         const itemsPerPage = 5;
 
-        // INIT SEMUA
         window.onload = () => {
             initMap();
             loadDatabase();
@@ -133,10 +146,20 @@
             map = L.map('map').setView([-8.2191, 114.3691], 13);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
             marker = L.marker([-8.2191, 114.3691], {draggable: true}).addTo(map);
+            
+            const updateCoords = (lat, lng) => {
+                document.getElementById('lat').value = lat.toFixed(6);
+                document.getElementById('lang').value = lng.toFixed(6);
+            };
+
             marker.on('dragend', () => {
                 const pos = marker.getLatLng();
-                document.getElementById('lat').value = pos.lat;
-                document.getElementById('lang').value = pos.lng;
+                updateCoords(pos.lat, pos.lng);
+            });
+
+            map.on('click', (e) => {
+                marker.setLatLng(e.latlng);
+                updateCoords(e.latlng.lat, e.latlng.lng);
             });
         }
 
@@ -149,17 +172,14 @@
 
         async function loadRiwayat() {
             const container = document.getElementById('listRiwayat');
-            container.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold animate-pulse uppercase tracking-widest text-xs">Menarik Data...</p>`;
+            container.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold animate-pulse text-[10px] uppercase tracking-widest">Sinkronisasi Data...</p>`;
             try {
-                // Gunakan endpoint yang sama tapi handle logicnya di GAS (ambil data booking)
-                // Jika doGet di GAS belum support, pastikan GAS mengembalikan data dari Sheet "Booking"
-                const res = await fetch(SCRIPT_URL + "?type=nota"); // Kita asumsikan 'nota' atau buat type baru 'booking' di GAS
-                const allData = await res.json();
-                // Filter data yang berupa booking (tergantung struktur sheet anda)
-                bookingData = allData; 
+                // type=booking_riwayat kudu sesuai karo neng GAS
+                const res = await fetch(SCRIPT_URL + "?type=booking_riwayat"); 
+                bookingData = await res.json();
                 renderRiwayat(1);
             } catch (e) { 
-                container.innerHTML = `<p class="text-center py-10 text-red-400 font-bold uppercase text-xs">Gagal Memuat Riwayat.</p>`;
+                container.innerHTML = `<p class="text-center py-10 text-red-400 font-bold uppercase text-[10px]">Gagal Memuat Data.</p>`;
             }
         }
 
@@ -168,38 +188,43 @@
             const container = document.getElementById('listRiwayat');
             const searchVal = document.getElementById('searchRiwayat').value.toLowerCase();
             
-            // Filter
             const filtered = bookingData.filter(b => 
                 (b.id && b.id.toLowerCase().includes(searchVal)) ||
-                (b.email && b.email.toLowerCase().includes(searchVal)) ||
-                (b.tanggal && b.tanggal.toLowerCase().includes(searchVal)) ||
-                (b.pekerjaan && b.pekerjaan.toLowerCase().includes(searchVal))
+                (b.pekerjaan && b.pekerjaan.toLowerCase().includes(searchVal)) ||
+                (b.email && b.email.toLowerCase().includes(searchVal))
             );
 
-            // Pagination Logic
             const start = (page - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const paginatedItems = filtered.slice(start, end);
+            const paginatedItems = filtered.slice(start, start + itemsPerPage);
             const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
             container.innerHTML = "";
             if(paginatedItems.length === 0) {
-                container.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold uppercase text-xs">Data tidak ditemukan.</p>`;
+                container.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold uppercase text-[10px]">Riwayat Kosong.</p>`;
                 document.getElementById('pagination').innerHTML = "";
                 return;
             }
 
             paginatedItems.forEach(item => {
-                const statusColor = item.status === "Selesai" ? "bg-green-500" : (item.status === "Proses" ? "bg-yellow-500" : "bg-blue-500");
+                let colorClass = "bg-blue-500";
+                if(item.status === "Selesai") colorClass = "bg-green-500";
+                if(item.status === "Proses") colorClass = "bg-yellow-500";
+                if(item.status === "Cancel") colorClass = "bg-red-500";
+                if(item.status === "Belum Dikonfirmasi") colorClass = "bg-gray-400";
+
                 container.innerHTML += `
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col space-y-3">
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 space-y-3">
                         <div class="flex justify-between items-start">
-                            <div>
-                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">${item.id} • ${item.tanggal}</span>
-                                <h3 class="font-black text-gray-800 text-sm uppercase">${item.pekerjaan || 'Tanpa Keterangan'}</h3>
-                                <p class="text-[10px] font-bold text-gray-400">${item.email}</p>
+                            <div class="flex-1">
+                                <span class="text-[9px] font-black text-blue-500 uppercase tracking-tighter">#${item.id} • ${item.tanggal}</span>
+                                <h3 class="font-black text-gray-800 text-sm uppercase leading-tight mt-1">${item.pekerjaan}</h3>
+                                <p class="text-[10px] font-bold text-gray-400 mt-1 italic">"${item.keterangan || 'Tanpa catatan'}"</p>
                             </div>
-                            <span class="${statusColor} text-white text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${item.status || 'Antri'}</span>
+                            <span class="${colorClass} text-white text-[8px] font-black px-3 py-1 rounded-full uppercase ml-2 whitespace-nowrap">${item.status}</span>
+                        </div>
+                        <div class="pt-2 border-t border-gray-50 flex items-center justify-between">
+                             <span class="text-[9px] font-bold text-gray-400">${item.email}</span>
+                             <a href="https://www.google.com/maps?q=${item.lat},${item.lang}" target="_blank" class="text-[9px] font-black text-blue-500 uppercase">📍 Lokasi</a>
                         </div>
                     </div>
                 `;
@@ -212,7 +237,6 @@
             const container = document.getElementById('pagination');
             container.innerHTML = "";
             if(total <= 1) return;
-
             for(let i = 1; i <= total; i++) {
                 const btn = document.createElement('button');
                 btn.innerText = i;
@@ -222,7 +246,7 @@
             }
         }
 
-        // AUTOCOMPLETE LOGIC
+        // AUTOCOMPLETE PELANGGAN
         const inputNama = document.getElementById('nama');
         const list = document.getElementById('autocomplete-list');
 
@@ -236,7 +260,7 @@
                 filtered.slice(0, 5).forEach(p => {
                     const div = document.createElement('div');
                     div.className = "autocomplete-item";
-                    div.innerHTML = `<div class="font-black text-gray-800 text-sm">${p.nama}</div><div class="text-[10px] text-gray-400 font-bold uppercase">${p.email}</div>`;
+                    div.innerHTML = `<div class="font-black text-gray-800 text-sm">${p.nama}</div><div class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">${p.email}</div>`;
                     div.onclick = () => {
                         inputNama.value = p.nama;
                         document.getElementById('email').value = p.email || "";
@@ -271,10 +295,11 @@
             }
         }
 
+        // SUBMIT FORM
         document.getElementById('bookingForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerText = "MENYIMPAN...";
+            btn.disabled = true; btn.innerText = "SEDANG MENYIMPAN...";
 
             const payload = {
                 action: 'tambahBooking',
@@ -282,18 +307,31 @@
                 email: document.getElementById('email').value,
                 whatsapp: document.getElementById('whatsapp').value,
                 pekerjaan: document.getElementById('pekerjaan').value,
-                keterangan: "Input Manual Admin",
+                status: document.getElementById('status').value,
+                keterangan: document.getElementById('keterangan').value,
                 lat: document.getElementById('lat').value || "-8.2191",
                 lang: document.getElementById('lang').value || "114.3691"
             };
 
             try {
-                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                Swal.fire({ title: 'Berhasil!', icon: 'success' }).then(() => {
+                // Gunakan POST karo mode: 'no-cors' yen butuh cepet, 
+                // nanging ideal-e GAS kudu support CORS.
+                await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify(payload) 
+                });
+                
+                Swal.fire({ 
+                    title: 'BERHASIL!', 
+                    text: 'Data booking wis mlebu sistem.',
+                    icon: 'success',
+                    confirmButtonColor: '#111827',
+                    confirmButtonText: 'MANTAP'
+                }).then(() => {
                     location.reload();
                 });
             } catch (err) {
-                Swal.fire('Gagal', 'Cek koneksi internet', 'error');
+                Swal.fire('ERROR', 'Gagal nyimpen data. Cek koneksi internet.', 'error');
                 btn.disabled = false; btn.innerText = "SIMPAN BOOKING";
             }
         };
