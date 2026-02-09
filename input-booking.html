@@ -21,8 +21,6 @@
         .autocomplete-item { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #f9fafb; }
         .autocomplete-item:hover { background-color: #eff6ff; }
         .tab-active { border-bottom: 4px solid #111827; color: #111827; font-weight: 900; }
-        
-        /* Custom Styling for Select */
         select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1.5rem center; background-size: 1em; }
     </style>
 </head>
@@ -47,7 +45,7 @@
             <form id="bookingForm" class="space-y-5 pb-10">
                 <div class="relative">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Cari Nama Pelanggan</label>
-                    <input type="text" id="nama" required placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none transition-all">
+                    <input type="text" id="nama" required placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
                     <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
                     <input type="hidden" id="email">
                     <input type="hidden" id="whatsapp">
@@ -55,18 +53,18 @@
 
                 <div>
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Info Kontak</label>
-                    <div id="contact-info" class="p-5 bg-gray-50 rounded-[1.5rem] border-2 border-dashed border-gray-200 text-[11px] font-bold text-gray-400 italic">
+                    <div id="contact-info" class="p-5 bg-gray-50 rounded-[1.5rem] border-2 border-dashed border-gray-200 text-[11px] font-bold text-gray-400 italic text-center">
                         Pilih pelanggan untuk melihat info kontak.
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Jenis Pekerjaan (Judul)</label>
-                    <input type="text" id="pekerjaan" required placeholder="Contoh: Service AC Split 2PK" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Jenis Pekerjaan</label>
+                    <input type="text" id="pekerjaan" required placeholder="Contoh: Service AC" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Status Awal</label>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Status</label>
                     <select id="status" required class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none">
                         <option value="Belum Dikonfirmasi">Belum Dikonfirmasi</option>
                         <option value="Tunggu Antrian" selected>Tunggu Antrian</option>
@@ -77,12 +75,12 @@
                 </div>
 
                 <div>
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Detail & Keterangan</label>
-                    <textarea id="keterangan" rows="3" placeholder="Masukkan detail keluhan atau instruksi tambahan..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[1.5rem] font-bold text-gray-700 outline-none"></textarea>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Keterangan Lengkap</label>
+                    <textarea id="keterangan" rows="3" placeholder="Detail keluhan atau instruksi..." class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[1.5rem] font-bold text-gray-700 outline-none"></textarea>
                 </div>
 
                 <div id="map-section">
-                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Lokasi Pengerjaan</label>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Lokasi Map</label>
                     <div id="map-container" class="mb-2"><div id="map"></div></div>
                     <div id="saved-location-info" class="hidden p-4 bg-blue-50 border-2 border-blue-100 rounded-[1.5rem] flex items-center space-x-3">
                         <div class="bg-blue-500 p-2 rounded-full text-white"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg></div>
@@ -104,13 +102,12 @@
                 
                 <div id="listRiwayat" class="space-y-4"></div>
 
-                <div id="pagination" class="flex justify-center items-center space-x-2 pt-6 pb-10"></div>
+                <div id="pagination" class="flex justify-center items-center space-x-2 pt-6 pb-20"></div>
             </div>
         </main>
     </div>
 
     <script>
-        // GANTI KARO URL SCRIPT-MU SING ANYAR
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvFYBWbiVB-_tAywEx9ajkSXOzwRmbnMqPznbRwsu2xDjXRv2_m6-IMVT_F7KdnpA3fA/exec"; 
         
         let pelangganData = [];
@@ -167,19 +164,18 @@
             try {
                 const res = await fetch(SCRIPT_URL + "?type=pelanggan");
                 pelangganData = await res.json();
-            } catch (e) { console.error("Gagal load database pelanggan."); }
+            } catch (e) { console.error("Gagal load data pelanggan."); }
         }
 
         async function loadRiwayat() {
             const container = document.getElementById('listRiwayat');
-            container.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold animate-pulse text-[10px] uppercase tracking-widest">Sinkronisasi Data...</p>`;
+            container.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold animate-pulse text-[10px] uppercase">Mengambil data...</p>`;
             try {
-                // type=booking_riwayat kudu sesuai karo neng GAS
                 const res = await fetch(SCRIPT_URL + "?type=booking_riwayat"); 
                 bookingData = await res.json();
                 renderRiwayat(1);
             } catch (e) { 
-                container.innerHTML = `<p class="text-center py-10 text-red-400 font-bold uppercase text-[10px]">Gagal Memuat Data.</p>`;
+                container.innerHTML = `<p class="text-center py-10 text-red-400 font-bold uppercase text-[10px]">Gagal sinkronisasi.</p>`;
             }
         }
 
@@ -191,7 +187,7 @@
             const filtered = bookingData.filter(b => 
                 (b.id && b.id.toLowerCase().includes(searchVal)) ||
                 (b.pekerjaan && b.pekerjaan.toLowerCase().includes(searchVal)) ||
-                (b.email && b.email.toLowerCase().includes(searchVal))
+                (b.nama && b.nama.toLowerCase().includes(searchVal))
             );
 
             const start = (page - 1) * itemsPerPage;
@@ -200,12 +196,13 @@
 
             container.innerHTML = "";
             if(paginatedItems.length === 0) {
-                container.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold uppercase text-[10px]">Riwayat Kosong.</p>`;
+                container.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold uppercase text-[10px]">Data tidak ditemukan.</p>`;
                 document.getElementById('pagination').innerHTML = "";
                 return;
             }
 
-            paginatedItems.forEach(item => {
+            paginatedItems.forEach((item, index) => {
+                const globalIndex = start + index;
                 let colorClass = "bg-blue-500";
                 if(item.status === "Selesai") colorClass = "bg-green-500";
                 if(item.status === "Proses") colorClass = "bg-yellow-500";
@@ -213,18 +210,14 @@
                 if(item.status === "Belum Dikonfirmasi") colorClass = "bg-gray-400";
 
                 container.innerHTML += `
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 space-y-3">
+                    <div onclick="showDetail(${globalIndex})" class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 space-y-3 active:scale-95 transition-all cursor-pointer">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
-                                <span class="text-[9px] font-black text-blue-500 uppercase tracking-tighter">#${item.id} • ${item.tanggal}</span>
+                                <span class="text-[9px] font-black text-blue-500 uppercase">#${item.id} • ${item.tanggal}</span>
                                 <h3 class="font-black text-gray-800 text-sm uppercase leading-tight mt-1">${item.pekerjaan}</h3>
-                                <p class="text-[10px] font-bold text-gray-400 mt-1 italic">"${item.keterangan || 'Tanpa catatan'}"</p>
+                                <p class="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">${item.nama || 'User'}</p>
                             </div>
                             <span class="${colorClass} text-white text-[8px] font-black px-3 py-1 rounded-full uppercase ml-2 whitespace-nowrap">${item.status}</span>
-                        </div>
-                        <div class="pt-2 border-t border-gray-50 flex items-center justify-between">
-                             <span class="text-[9px] font-bold text-gray-400">${item.email}</span>
-                             <a href="https://www.google.com/maps?q=${item.lat},${item.lang}" target="_blank" class="text-[9px] font-black text-blue-500 uppercase">📍 Lokasi</a>
                         </div>
                     </div>
                 `;
@@ -237,16 +230,52 @@
             const container = document.getElementById('pagination');
             container.innerHTML = "";
             if(total <= 1) return;
+            
             for(let i = 1; i <= total; i++) {
                 const btn = document.createElement('button');
                 btn.innerText = i;
                 btn.className = `w-10 h-10 rounded-full font-black text-xs transition-all ${i === currentPage ? 'bg-gray-900 text-white scale-110 shadow-lg' : 'bg-white text-gray-400 border border-gray-100'}`;
-                btn.onclick = () => renderRiwayat(i);
+                btn.onclick = () => {
+                    renderRiwayat(i);
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                };
                 container.appendChild(btn);
             }
         }
 
-        // AUTOCOMPLETE PELANGGAN
+        function showDetail(index) {
+            const item = bookingData[index];
+            Swal.fire({
+                title: `<span class="text-sm font-black uppercase tracking-widest">Detail Booking</span>`,
+                html: `
+                    <div class="text-left space-y-4 p-2">
+                        <div class="border-b border-gray-100 pb-2">
+                            <label class="text-[9px] font-black text-gray-400 uppercase">Pelanggan</label>
+                            <p class="font-bold text-gray-800">${item.nama || '-'}</p>
+                            <p class="text-xs text-gray-500">${item.email}</p>
+                        </div>
+                        <div class="border-b border-gray-100 pb-2">
+                            <label class="text-[9px] font-black text-gray-400 uppercase">Pekerjaan</label>
+                            <p class="font-bold text-gray-800">${item.pekerjaan}</p>
+                        </div>
+                        <div class="border-b border-gray-100 pb-2">
+                            <label class="text-[9px] font-black text-gray-400 uppercase">Status & Tanggal</label>
+                            <p class="font-bold text-gray-800">${item.status} <span class="text-gray-400 font-normal">(${item.tanggal})</span></p>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-gray-400 uppercase">Keterangan</label>
+                            <p class="text-xs font-bold text-gray-600 leading-relaxed italic">"${item.keterangan || 'Tidak ada catatan khusus.'}"</p>
+                        </div>
+                        <a href="https://www.google.com/maps?q=${item.lat},${item.lang}" target="_blank" class="block w-full bg-blue-500 text-white text-center py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest mt-4">Buka Lokasi Map</a>
+                    </div>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true,
+                customClass: { popup: 'rounded-[2rem]' }
+            });
+        }
+
+        // AUTOCOMPLETE & MAP LOGIC
         const inputNama = document.getElementById('nama');
         const list = document.getElementById('autocomplete-list');
 
@@ -295,11 +324,10 @@
             }
         }
 
-        // SUBMIT FORM
         document.getElementById('bookingForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerText = "SEDANG MENYIMPAN...";
+            btn.disabled = true; btn.innerText = "MENYIMPAN...";
 
             const payload = {
                 action: 'tambahBooking',
@@ -314,24 +342,10 @@
             };
 
             try {
-                // Gunakan POST karo mode: 'no-cors' yen butuh cepet, 
-                // nanging ideal-e GAS kudu support CORS.
-                await fetch(SCRIPT_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify(payload) 
-                });
-                
-                Swal.fire({ 
-                    title: 'BERHASIL!', 
-                    text: 'Data booking wis mlebu sistem.',
-                    icon: 'success',
-                    confirmButtonColor: '#111827',
-                    confirmButtonText: 'MANTAP'
-                }).then(() => {
-                    location.reload();
-                });
+                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                Swal.fire({ title: 'BERHASIL!', icon: 'success', confirmButtonColor: '#111827' }).then(() => location.reload());
             } catch (err) {
-                Swal.fire('ERROR', 'Gagal nyimpen data. Cek koneksi internet.', 'error');
+                Swal.fire('ERROR', 'Gagal nyimpen data.', 'error');
                 btn.disabled = false; btn.innerText = "SIMPAN BOOKING";
             }
         };
