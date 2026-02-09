@@ -2,181 +2,124 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Command Center - Nanda Teknik</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin - Nanda Teknik</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; overflow: hidden; }
-        .mobile-container { max-width: 480px; height: 100vh; margin: 0 auto; background: #fff; position: relative; overflow: hidden; display: flex; flex-direction: column; }
-        #map { flex: 1; width: 100%; z-index: 1; }
-        
-        .stat-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
-        
-        .pulse-blue {
-            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
-            animation: pulse 2s infinite;
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #f8fafc;
         }
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 10px 10px rgba(59, 130, 246, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        .login-card {
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
         }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen p-4">
 
-    <div class="mobile-container">
-        <div class="p-5 pb-2 bg-white border-b shadow-sm">
-            <div class="flex justify-between items-center mb-4">
+    <div class="w-full max-w-[400px]">
+        <div class="text-center mb-8">
+            <div class="inline-flex w-16 h-16 bg-blue-600 rounded-2xl items-center justify-center text-white text-3xl font-black shadow-lg shadow-blue-200 mb-4">N</div>
+            <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">NANDA <span class="text-blue-600">TEKNIK</span></h1>
+            <p class="text-slate-400 text-sm font-semibold mt-1 uppercase tracking-widest">Admin Dashboard</p>
+        </div>
+
+        <div class="bg-white p-8 rounded-[2rem] login-card border border-slate-100">
+            <form id="loginForm" class="space-y-5">
                 <div>
-                    <h1 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Live Monitoring</h1>
-                    <div class="text-xl font-black text-slate-800 italic">NANDA<span class="text-blue-600">TEKNIK</span></div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Username</label>
+                    <input type="text" id="username" required
+                        class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-semibold text-slate-700" 
+                        placeholder="Masukkan username...">
                 </div>
-                <div class="flex gap-2 text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border">
-                    <span id="liveClock">00:00</span>
-                </div>
-            </div>
 
-            <div class="grid grid-cols-3 gap-3 mb-2">
-                <div class="stat-card p-3 rounded-2xl text-center border-l-4 border-l-orange-500">
-                    <div id="countAntrian" class="text-xl font-black text-slate-800">0</div>
-                    <div class="text-[9px] font-bold text-slate-400 uppercase">Antrian</div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Password</label>
+                    <input type="password" id="password" required
+                        class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-semibold text-slate-700" 
+                        placeholder="••••••••">
                 </div>
-                <div class="stat-card p-3 rounded-2xl text-center border-l-4 border-l-blue-500">
-                    <div id="countProses" class="text-xl font-black text-slate-800">0</div>
-                    <div class="text-[9px] font-bold text-slate-400 uppercase">Proses</div>
-                </div>
-                <div class="stat-card p-3 rounded-2xl text-center border-l-4 border-l-emerald-500">
-                    <div id="countSelesai" class="text-xl font-black text-slate-800">0</div>
-                    <div class="text-[9px] font-bold text-slate-400 uppercase">Selesai Hari Ini</div>
-                </div>
-            </div>
+
+                <button type="submit" id="btnLogin"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-3">
+                    <span>Masuk Sekarang</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                </button>
+            </form>
         </div>
 
-        <div id="map"></div>
-
-        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-[2000] flex gap-3 w-full px-8">
-            <a href="pelanggan.html" class="flex-1 bg-slate-900 text-white py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 font-black text-xs uppercase tracking-wider active:scale-95 transition">
-                <span>Database Pelanggan</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-            </a>
-            <button onclick="fetchRealtimeData()" class="w-14 h-14 bg-white border-2 border-slate-100 rounded-2xl shadow-xl flex items-center justify-center active:rotate-180 transition-all duration-500 text-xl">
-                🔄
-            </button>
-        </div>
+        <p class="text-center mt-8 text-slate-400 text-xs font-medium">
+            &copy; 2026 Nanda Teknik Management System
+        </p>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec";
-        let map, markerGroup;
+        // GANTI DENGAN URL WEB APP SCRIPT ANDA
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzIPJ--9rRMqBypy5nJCw3tBbsrTeD8YB6NcSDpwGOD2Mc7z_maduyb-tmmHTrVkbuilg/exec";
 
-        function initMap() {
-            map = L.map('map', { zoomControl: false }).setView([-8.2191, 114.3691], 12);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
-            markerGroup = L.layerGroup().addTo(map);
-        }
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btnLogin');
+            const usernameInput = document.getElementById('username').value;
+            const passwordInput = document.getElementById('password').value;
 
-        // Fungsi Cek Apakah Tanggal adalah Hari Ini
-        function isToday(dateString) {
-            if (!dateString) return false;
-            const today = new Date();
-            const targetDate = new Date(dateString);
-            return today.getDate() === targetDate.getDate() &&
-                   today.getMonth() === targetDate.getMonth() &&
-                   today.getFullYear() === targetDate.getFullYear();
-        }
+            // Loading State
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Validasi...`;
 
-        async function fetchRealtimeData() {
             try {
-                const response = await fetch(SCRIPT_URL);
-                const data = await response.json();
-                
-                let antrian = 0, proses = 0, selesaiCount = 0;
-                markerGroup.clearLayers();
-                const usedCoords = {};
+                // Fetch data dari tab 'teknisi'
+                const response = await fetch(SCRIPT_URL + "?action=getTeknisi");
+                const listTeknisi = await response.json();
 
-                data.forEach(order => {
-                    const status = order.status;
-                    const tanggalOrder = order.tanggal; // Kolom tanggal dari GS
+                // Cari user yang cocok
+                const user = listTeknisi.find(u => 
+                    u.username === usernameInput && 
+                    String(u.password) === passwordInput
+                );
 
-                    // LOGIKA FILTER:
-                    // 1. Jika Selesai, hanya tampilkan yang hari ini
-                    // 2. Jika Antrian/Proses, tampilkan semua (biar gak ada yg ketinggalan)
-                    
-                    let shouldShow = false;
-                    if (status === "Tunggu Antrian") { antrian++; shouldShow = true; }
-                    else if (status === "Proses") { proses++; shouldShow = true; }
-                    else if (status === "Selesai") {
-                        if (isToday(tanggalOrder)) {
-                            selesaiCount++;
-                            shouldShow = true;
-                        }
+                if (user) {
+                    // Cek status is_active
+                    const isActive = String(user.is_active).toLowerCase();
+                    if (isActive === 'true' || isActive === '1') {
+                        
+                        // Berhasil Login
+                        localStorage.setItem('isLoggedIn', 'true');
+                        localStorage.setItem('adminName', user.nama);
+                        localStorage.setItem('adminId', user.id);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Login Berhasil',
+                            text: `Selamat datang, ${user.nama}!`,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.href = 'dashboard.html'; // Pindah ke dashboard
+                        });
+
+                    } else {
+                        throw new Error("Akun Anda dinonaktifkan!");
                     }
-
-                    if (shouldShow) {
-                        let lat = parseFloat(order.lat || order.lat_rumah);
-                        let lng = parseFloat(order.lang || order.lang_rumah);
-
-                        if (lat && lng) {
-                            // Anti Tumpuk (Jittering)
-                            const coordKey = `${lat.toFixed(6)},${lng.toFixed(6)}`;
-                            if (usedCoords[coordKey]) {
-                                lat += (Math.random() - 0.5) * 0.0002;
-                                lng += (Math.random() - 0.5) * 0.0002;
-                            }
-                            usedCoords[coordKey] = true;
-
-                            let markerColor = "#f97316"; // Orange
-                            let shadowClass = "";
-
-                            if (status === "Proses") {
-                                markerColor = "#3b82f6"; // Blue
-                                shadowClass = "pulse-blue";
-                            }
-                            if (status === "Selesai") markerColor = "#10b981"; // Green
-
-                            const icon = L.divIcon({
-                                className: 'custom-marker',
-                                html: `<div style="background:${markerColor}; width:22px; height:22px; border-radius:50%; border:3px solid white; box-shadow:0 4px 12px rgba(0,0,0,0.15);" class="${shadowClass}"></div>`
-                            });
-
-                            L.marker([lat, lng], {icon: icon})
-                             .addTo(markerGroup)
-                             .bindPopup(`
-                                <div style="min-width:140px;">
-                                    <div style="font-size:9px; font-weight:800; color:#94a3b8; margin-bottom:2px;">#${order.id || 'N/A'}</div>
-                                    <div style="font-size:13px; font-weight:800; color:#1e293b;">${order.nama_pelanggan || 'User'}</div>
-                                    <div style="font-size:11px; color:#64748b; margin-top:2px;">🛠 ${order.pekerjaan || 'Servis AC'}</div>
-                                    <div style="margin-top:8px; display:inline-block; padding:2px 8px; background:${markerColor}; color:white; border-radius:6px; font-size:9px; font-weight:800;">${status.toUpperCase()}</div>
-                                </div>
-                             `);
-                        }
-                    }
-                });
-
-                document.getElementById('countAntrian').innerText = antrian;
-                document.getElementById('countProses').innerText = proses;
-                document.getElementById('countSelesai').innerText = selesaiCount;
+                } else {
+                    throw new Error("Username atau Password salah!");
+                }
 
             } catch (err) {
-                console.error("Error:", err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Masuk',
+                    text: err.message,
+                    confirmButtonColor: '#2563eb'
+                });
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>Masuk Sekarang</span> <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>`;
             }
-        }
-
-        // Jam Digital Realtime
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('liveClock').innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        }, 1000);
-
-        window.onload = () => {
-            initMap();
-            fetchRealtimeData();
-            setInterval(fetchRealtimeData, 60000); // Update tiap 1 menit
-        };
+        });
     </script>
 </body>
 </html>
