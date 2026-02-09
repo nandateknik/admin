@@ -41,27 +41,69 @@
 </div>
 
 <script>
-    document.getElementById('loginForm').onsubmit = function(e) {
-        e.preventDefault();
-        const user = document.getElementById('username').value;
-        const pass = document.getElementById('password').value;
+    // URL Web App Google Script Anda
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec";
 
-        // --- SETTING USERNAME & PASSWORD NENG KENE ---
-        if(user === "admin" && pass === "nanda123") {
-            // Simpan status login neng Local Storage
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userSession', user);
-            
+    document.getElementById('loginForm').onsubmit = async function(e) {
+        e.preventDefault();
+        
+        // Tampilkan loading supaya user tahu sedang proses
+        Swal.fire({
+            title: 'Memverifikasi...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        const usernameInput = document.getElementById('username').value;
+        const passwordInput = document.getElementById('password').value;
+
+        try {
+            // Memanggil action getTeknisi yang sudah kita buat di Code.gs
+            const response = await fetch(SCRIPT_URL + "?action=getTeknisi");
+            const listTeknisi = await response.json();
+
+            // Validasi apakah data yang kembali adalah Array
+            if (!Array.isArray(listTeknisi)) {
+                throw new Error("Gagal mengambil database teknisi.");
+            }
+
+            // Mencari user di dalam array teknisi
+            const user = listTeknisi.find(u => 
+                String(u.username).toLowerCase() === usernameInput.toLowerCase() && 
+                String(u.password) === passwordInput
+            );
+
+            if (user) {
+                // Cek apakah akun aktif (Kolom is_active di Sheet)
+                const isActive = String(user.is_active).toUpperCase();
+                if (isActive === 'TRUE' || isActive === '1') {
+                    
+                    // Simpan session
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('adminName', user.nama);
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Login Berhasil',
+                        text: `Sugeng rawuh, ${user.nama}!`,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = 'dashboard.html'; // Arahkan ke dashboard
+                    });
+                } else {
+                    throw new Error("Akun Anda dinonaktifkan!");
+                }
+            } else {
+                throw new Error("Username atau Password salah!");
+            }
+
+        } catch (err) {
             Swal.fire({
-                icon: 'success',
-                title: 'Login Berhasil',
-                showConfirmButton: false,
-                timer: 1500
-            }).then(() => {
-                window.location.href = 'index.html';
+                icon: 'error',
+                title: 'Login Gagal',
+                text: err.message
             });
-        } else {
-            Swal.fire('Error', 'Username utawa Password salah!', 'error');
         }
     };
 </script>
