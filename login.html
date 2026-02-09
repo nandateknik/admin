@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - Nanda Teknik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container shadow-2xl">
+    <div class="text-center mb-10">
+        <div class="bg-blue-500 w-20 h-20 rounded-[2.5rem] mx-auto mb-6 flex items-center justify-center shadow-lg shadow-blue-200">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+        </div>
+        <h1 class="text-2xl font-black text-gray-800 uppercase italic">Nanda <span class="text-blue-500">Teknik</span></h1>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Management System</p>
+    </div>
+
+    <form id="loginForm" class="space-y-4">
+        <div>
+            <label class="text-[10px] font-black text-gray-400 uppercase ml-2 mb-2 block">Username</label>
+            <input type="text" id="username" required class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-2xl font-bold text-gray-700 outline-none transition-all">
+        </div>
+        <div>
+            <label class="text-[10px] font-black text-gray-400 uppercase ml-2 mb-2 block">Password</label>
+            <input type="password" id="password" required class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-2xl font-bold text-gray-700 outline-none transition-all">
+        </div>
+        <button type="submit" class="w-full bg-gray-900 text-white py-5 rounded-[2rem] font-black shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest text-xs">Masuk Sekarang</button>
+    </form>
+    
+    <p class="text-center text-[10px] text-gray-400 font-bold mt-10 uppercase tracking-widest">Authorized Personnel Only</p>
+</div>
+
+<script>
+    document.getElementById('loginForm').onsubmit = function(e) {
+        e.preventDefault();
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+
+        // --- SETTING USERNAME & PASSWORD NENG KENE ---
+        if(user === "admin" && pass === "nanda123") {
+            // Simpan status login neng Local Storage
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userSession', user);
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Login Berhasil',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                window.location.href = 'index.html';
+            });
+        } else {
+            Swal.fire('Error', 'Username utawa Password salah!', 'error');
+        }
+    };
+</script>
+</body>
+</html>
