@@ -7,14 +7,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Courier+Prime&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Courier+Prime&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; color: #1e293b; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; color: #1e293b; overflow-x: hidden; }
         .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
-        .tab-active { color: #111827; font-weight: 900; border-bottom: 4px solid #111827; }
-        .autocomplete-items { position: absolute; border-radius: 1.5rem; border: 1px solid #e5e7eb; background: white; z-index: 100; top: 100%; left: 0; right: 0; margin-top: 5px; shadow: 2xl; }
+        
+        /* Sidebar Style */
+        #sidebar {
+            position: absolute; top: 0; left: -110%; width: 280px; height: 100%;
+            background: white; z-index: 5000; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; box-shadow: 20px 0 50px rgba(0,0,0,0.1);
+        }
+        #sidebar.open { left: 0; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #64748b; font-weight: 700; font-size: 0.85rem; transition: 0.2s; cursor: pointer; }
+        .nav-link:hover { background: #f1f5f9; color: #2563eb; }
+        .nav-link.active { background: #2563eb; color: white; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.2); z-index: 4999; display: none; backdrop-filter: blur(2px); }
+
+        .tab-active { color: #2563eb; font-weight: 900; border-bottom: 4px solid #2563eb; }
+        .autocomplete-items { position: absolute; border-radius: 1.5rem; border: 1px solid #e5e7eb; background: white; z-index: 100; top: 100%; left: 0; right: 0; margin-top: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .autocomplete-item { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #f9fafb; }
-        .autocomplete-item:hover { background-color: #eff6ff; }
         
         /* Style Nota */
         .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; color: #000; position: relative; }
@@ -24,15 +36,56 @@
 <body>
 
 <div class="mobile-container shadow-2xl flex flex-col">
-    
+    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+    <div id="sidebar">
+        <div class="p-6 flex flex-col h-full">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg">N</div>
+                <h1 class="font-extrabold text-slate-800 tracking-tight italic text-lg">NANDA <span class="text-blue-600">TEKNIK</span></h1>
+            </div>
+            <nav class="space-y-1 flex-1 overflow-y-auto">
+                <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mb-2 tracking-widest">Utama</p>
+                <a href="dashboard.html" class="nav-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Monitoring Maps
+                </a>
+                <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Transaksi & Marketing</p>
+                <a href="input-booking.html" class="nav-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Input Booking Baru
+                </a>
+                <a href="penawaran.html" class="nav-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Penawaran Harga
+                </a>
+                <a href="nota.html" class="nav-link active">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    Buat Nota Lunas
+                </a>
+                <a href="kirim-email.html" class="nav-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Kirim Email Notif
+                </a>
+                <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Manajemen Data</p>
+                <a href="input-pelanggan.html" class="nav-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                    Tambah Pelanggan
+                </a>
+                <a href="pelanggan.html" class="nav-link">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    Database Pelanggan
+                </a>
+            </nav>
+        </div>
+    </div>
+
     <header class="p-8 pb-4">
         <div class="flex items-center justify-between mb-6">
-            <button onclick="window.history.back()" class="bg-gray-100 p-3 rounded-2xl active:scale-90 transition-all">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
+            <button onclick="toggleSidebar()" class="bg-gray-100 p-3 rounded-2xl active:scale-90 transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
-            <h1 class="text-xl font-black text-gray-800">Billing System</h1>
+            <h1 class="text-xl font-black text-gray-800 italic">BILLING <span class="text-blue-600 font-black">SYSTEM</span></h1>
             <div class="text-[10px] bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-800 tracking-tighter uppercase">v2.5</div>
         </div>
 
@@ -42,7 +95,7 @@
         </nav>
     </header>
 
-    <main id="contentBuat" class="px-8 pt-2 space-y-6 flex-1 pb-10">
+    <main id="contentBuat" class="px-8 pt-2 space-y-6 flex-1 pb-10 overflow-y-auto">
         <div class="relative">
             <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 mb-2 block">Cari Nama Pelanggan</label>
             <input type="text" id="notaCustSearch" placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-[2rem] font-bold text-gray-700 outline-none transition-all">
@@ -88,12 +141,12 @@
 
     <main id="contentRiwayat" class="px-8 hidden bg-gray-50 flex-1 space-y-4 overflow-y-auto pb-10">
         <input type="text" id="searchRiwayat" oninput="filterRiwayat()" placeholder="Cari Nota atau Nama..." class="w-full p-4 bg-white border-2 border-gray-100 rounded-[2rem] text-xs font-black outline-none focus:border-blue-500 shadow-sm mt-4">
-        <div id="listRiwayat" class="space-y-4"></div>
+        <div id="listRiwayat" class="space-y-4 mt-2"></div>
     </main>
 </div>
 
 <div id="modalNota" class="fixed inset-0 bg-black/80 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-2xl rounded-[1.5rem] overflow-hidden flex flex-col shadow-2xl">
+    <div class="bg-white w-full max-w-2xl rounded-[1.5rem] overflow-hidden flex flex-col shadow-2xl max-h-[90vh]">
         <div class="p-4 bg-gray-50 flex justify-between items-center border-b">
             <div class="flex gap-2">
                 <button onclick="switchNotaStatus()" class="bg-orange-500 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase shadow-sm">Ubah Status</button>
@@ -102,60 +155,60 @@
             <button onclick="tutupModal()" class="text-gray-400 p-2 text-xl font-black">✕</button>
         </div>
         
-        <div id="notaPrintArea" class="p-10 nota-kertas bg-white text-black" style="min-height: 800px; position: relative;">
-            <div id="watermark"></div>
-            
-            <div class="text-center mb-8">
-                <h2 class="font-900 text-2xl uppercase tracking-widest mb-1">NANDA TEKNIK BANYUWANGI</h2>
-                <p class="text-[10px] font-bold mb-1">Network, Software & Electrical Engineering</p>
-                <p class="text-[9px] text-gray-600 italic">Sukowidi Indah Residence, Blok D-5 Banyuwangi | WhatsApp: 0823-3120-1148</p>
-                <div class="border-b-2 border-black mt-4 w-full"></div>
-            </div>
-
-            <div class="grid grid-cols-2 text-[11px] mb-6">
-                <div class="space-y-1">
-                    <p><span class="inline-block w-16 font-bold uppercase">Invoice</span>: <span id="invId"></span></p>
-                    <p><span class="inline-block w-16 font-bold uppercase">Kepada</span>: <span id="invCust" class="font-black"></span></p>
+        <div class="flex-1 overflow-y-auto p-4 bg-gray-200">
+            <div id="notaPrintArea" class="p-10 nota-kertas mx-auto bg-white shadow-lg" style="width: 210mm; min-height: 297mm;">
+                <div id="watermark"></div>
+                
+                <div class="text-center mb-8">
+                    <h2 class="font-black text-2xl uppercase tracking-widest mb-1">NANDA TEKNIK BANYUWANGI</h2>
+                    <p class="text-[10px] font-bold mb-1">Network, Software & Electrical Engineering</p>
+                    <p class="text-[9px] text-gray-600 italic">Sukowidi Indah Residence, Blok D-5 Banyuwangi | WhatsApp: 0823-3120-1148</p>
+                    <div class="border-b-2 border-black mt-4 w-full"></div>
                 </div>
-                <div class="text-right space-y-1">
-                    <p><span class="font-bold uppercase">Tanggal</span> : <span id="invTgl"></span></p>
-                    <p><span class="font-bold uppercase tracking-tighter">Status</span> : <span id="invStatusLabel" class="border-2 border-green-500 text-green-600 px-2 py-0.5 rounded font-black text-[9px]">PAID</span></p>
-                </div>
-            </div>
 
-            <table class="w-full text-[11px] mb-4 border-2 border-black">
-                <thead>
-                    <tr class="border-b-2 border-black bg-gray-50 uppercase font-black">
-                        <th class="py-2 px-3 border-r-2 border-black text-left">Deskripsi Layanan / Barang</th>
-                        <th class="py-2 px-2 border-r-2 border-black text-center w-16">Qty</th>
-                        <th class="py-2 px-3 border-r-2 border-black text-center w-24">Harga</th>
-                        <th class="py-2 px-3 text-center w-28">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody id="invItems">
-                    </tbody>
-                <tfoot>
-                    <tr class="border-t-2 border-black">
-                        <td colspan="3" class="py-3 px-3 text-right font-black uppercase tracking-widest bg-gray-50 border-r-2 border-black">Total Akhir :</td>
-                        <td class="py-3 px-3 text-right font-black text-sm" id="invTotal"></td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <div class="flex justify-between items-start mt-12">
-                <div class="border-2 border-dashed border-gray-400 p-4 rounded-lg w-72">
-                    <p class="text-[9px] font-black uppercase mb-2">Metode Pembayaran:</p>
-                    <div class="text-[10px] space-y-1">
-                        <p class="text-gray-600">Bank BCA - Nanda Krisbianto</p>
-                        <p class="font-black text-[12px]">No. Rekening: <span class="underline">180-182-6011</span></p>
-                        <p class="text-[8px] italic text-gray-500 mt-2">* Harap simpan nota digital ini sebagai bukti klaim garansi yang sah.</p>
+                <div class="grid grid-cols-2 text-[11px] mb-6">
+                    <div class="space-y-1">
+                        <p><span class="inline-block w-16 font-bold uppercase">Invoice</span>: <span id="invId"></span></p>
+                        <p><span class="inline-block w-16 font-bold uppercase">Kepada</span>: <span id="invCust" class="font-black"></span></p>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <p><span class="font-bold uppercase">Tanggal</span> : <span id="invTgl"></span></p>
+                        <p><span class="font-bold uppercase tracking-tighter">Status</span> : <span id="invStatusLabel" class="border-2 border-green-500 text-green-600 px-2 py-0.5 rounded font-black text-[9px]">PAID</span></p>
                     </div>
                 </div>
 
-                <div class="text-center w-48 pt-2">
-                    <p class="text-[10px] font-bold mb-16">Hormat Kami,</p>
-                    <p class="text-[11px] font-black uppercase underline">( NANDA KRISBIANTO )</p>
-                    <p class="text-[9px] font-bold text-gray-500 uppercase">Owner Nanda Teknik</p>
+                <table class="w-full text-[11px] mb-4 border-2 border-black">
+                    <thead>
+                        <tr class="border-b-2 border-black bg-gray-50 uppercase font-black">
+                            <th class="py-2 px-3 border-r-2 border-black text-left">Layanan / Barang</th>
+                            <th class="py-2 px-2 border-r-2 border-black text-center w-16">Qty</th>
+                            <th class="py-2 px-3 border-r-2 border-black text-center w-24">Harga</th>
+                            <th class="py-2 px-3 text-center w-28">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invItems"></tbody>
+                    <tfoot>
+                        <tr class="border-t-2 border-black">
+                            <td colspan="3" class="py-3 px-3 text-right font-black uppercase tracking-widest bg-gray-50 border-r-2 border-black">Total Akhir :</td>
+                            <td class="py-3 px-3 text-right font-black text-sm" id="invTotal"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="flex justify-between items-start mt-12">
+                    <div class="border-2 border-dashed border-gray-400 p-4 rounded-lg w-72">
+                        <p class="text-[9px] font-black uppercase mb-2">Metode Pembayaran:</p>
+                        <div class="text-[10px] space-y-1">
+                            <p class="text-gray-600">Bank BCA - Nanda Krisbianto</p>
+                            <p class="font-black text-[12px]">No. Rekening: <span class="underline">180-182-6011</span></p>
+                            <p class="text-[8px] italic text-gray-500 mt-2">* Harap simpan nota digital ini sebagai bukti klaim garansi yang sah.</p>
+                        </div>
+                    </div>
+                    <div class="text-center w-48 pt-2">
+                        <p class="text-[10px] font-bold mb-16">Hormat Kami,</p>
+                        <p class="text-[11px] font-black uppercase underline">( NANDA KRISBIANTO )</p>
+                        <p class="text-[9px] font-bold text-gray-500 uppercase">Owner Nanda Teknik</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -168,6 +221,13 @@
     let databaseNota = [];
     let selectedNota = null;
 
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('overlay');
+        sb.classList.toggle('open');
+        ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
+    }
+
     async function init() {
         try {
             const resP = await fetch(SCRIPT_URL + "?type=pelanggan");
@@ -178,10 +238,8 @@
     function switchTab(tab) {
         document.getElementById('contentBuat').classList.toggle('hidden', tab !== 'buat');
         document.getElementById('contentRiwayat').classList.toggle('hidden', tab !== 'riwayat');
-        document.getElementById('tabBuat').classList.add(tab === 'buat' ? 'tab-active' : 'text-gray-300');
-        document.getElementById('tabBuat').classList.remove(tab === 'buat' ? 'text-gray-300' : 'tab-active');
-        document.getElementById('tabRiwayat').classList.add(tab === 'riwayat' ? 'tab-active' : 'text-gray-300');
-        document.getElementById('tabRiwayat').classList.remove(tab === 'riwayat' ? 'text-gray-300' : 'tab-active');
+        document.getElementById('tabBuat').classList.toggle('tab-active', tab === 'buat');
+        document.getElementById('tabRiwayat').classList.toggle('tab-active', tab === 'riwayat');
         if(tab === 'riwayat') loadRiwayat();
     }
 
@@ -248,6 +306,8 @@
             if(nama && harga) items.push({ nama, qty, harga });
         });
 
+        if(items.length === 0) return Swal.fire('Error', 'Isi minimal satu pekerjaan!', 'error');
+
         const payload = {
             action: 'simpanNota',
             id_nota: "INV-" + Date.now().toString().slice(-6),
@@ -255,10 +315,10 @@
             items: items, 
             total: hitungTotal(),
             status: document.getElementById('notaStatus').value,
-            tanggal: new Date().toLocaleString('id-ID')
+            tanggal: new Date().toLocaleDateString('id-ID')
         };
 
-        Swal.fire({title: 'Sedang menyimpan...', didOpen: () => Swal.showLoading()});
+        Swal.fire({title: 'Menyimpan...', didOpen: () => Swal.showLoading()});
         await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)});
         Swal.fire('Sukses', 'Nota Berhasil Disimpan', 'success').then(() => location.reload());
     }
@@ -274,64 +334,54 @@
         container.innerHTML = "";
         data.forEach(n => {
             const isPaid = n.status === 'PAID';
-            const displayId = n.id || "INV-???";
-            container.innerHTML += `<div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-[2rem] border-2 border-gray-50 flex justify-between items-center shadow-sm active:scale-95 transition-all">
-                <div><p class="text-[9px] font-black text-gray-400 uppercase">${displayId} • ${n.tanggal}</p><p class="text-sm font-black text-gray-800">${n.email}</p></div>
+            container.innerHTML += `<div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-[2rem] border-2 border-gray-100 flex justify-between items-center shadow-sm active:scale-95 transition-all">
+                <div><p class="text-[9px] font-black text-gray-400 uppercase">${n.id || n.id_nota} • ${n.tanggal}</p><p class="text-sm font-black text-gray-800">${n.email}</p></div>
                 <div class="text-right"><p class="text-sm font-black text-gray-900">Rp ${parseInt(n.total).toLocaleString()}</p><span class="text-[9px] font-black uppercase ${isPaid?'text-green-500':'text-red-500'}">${n.status}</span></div>
             </div>`;
         });
     }
 
-function bukaDetail(n) {
-    selectedNota = n;
-    // Set data teks
-    document.getElementById('invId').innerText = "ID: " + (n.id || n.id_nota || "INV-???");
-    document.getElementById('invCust').innerText = n.email; // Utawa n.nama nek ana kolom nama
-    document.getElementById('invTgl').innerText = n.tanggal;
-    document.getElementById('invStatus').innerText = n.status;
-    document.getElementById('invTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
-    
-    // Watermark Status
-    const wm = document.getElementById('watermark');
-    const color = n.status === 'PAID' ? '#16a34a' : '#dc2626';
-    wm.innerHTML = `<span style="border: 5px solid ${color}; color:${color}; padding:8px 15px; border-radius:12px; font-size:35px; font-weight:900; letter-spacing:2px;">${n.status}</span>`;
+    function bukaDetail(n) {
+        selectedNota = n;
+        document.getElementById('invId').innerText = n.id || n.id_nota || "INV-???";
+        document.getElementById('invCust').innerText = n.email;
+        document.getElementById('invTgl').innerText = n.tanggal;
+        
+        // Update Label Status & Watermark
+        const label = document.getElementById('invStatusLabel');
+        label.innerText = n.status;
+        label.className = n.status === 'PAID' ? 'border-2 border-green-500 text-green-600 px-2 py-0.5 rounded font-black text-[9px]' : 'border-2 border-red-500 text-red-600 px-2 py-0.5 rounded font-black text-[9px]';
+        
+        document.getElementById('invTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
+        
+        const wm = document.getElementById('watermark');
+        const color = n.status === 'PAID' ? '#16a34a' : '#dc2626';
+        wm.innerHTML = `<span style="border: 5px solid ${color}; color:${color}; padding:8px 25px; border-radius:12px; font-size:45px; font-weight:900; letter-spacing:4px; opacity:0.3;">${n.status}</span>`;
 
-    // Isi Tabel Items
-    const b = document.getElementById('invItems'); 
-    b.innerHTML = "";
-    let items = [];
-    try { 
-        items = JSON.parse(n.items_json || n.items || "[]"); 
-    } catch(e) { console.error("Gagal parse items", e); }
+        const b = document.getElementById('invItems'); 
+        b.innerHTML = "";
+        let items = [];
+        try { items = typeof n.items === 'string' ? JSON.parse(n.items) : n.items; } catch(e) { console.error(e); }
 
-    items.forEach(it => {
-        b.innerHTML += `
-            <tr class="border-b border-gray-50">
-                <td class="py-3 uppercase font-bold text-gray-700 text-[9px]">${it.nama}</td>
-                <td class="text-center font-bold text-gray-700">${it.qty}</td>
-                <td class="text-right font-bold text-gray-900">${(it.qty * it.harga).toLocaleString('id-ID')}</td>
-            </tr>`;
-    });
+        items.forEach(it => {
+            b.innerHTML += `<tr><td class="py-2 px-3 border-r-2 border-black border-b font-bold uppercase">${it.nama}</td><td class="text-center border-r-2 border-black border-b">${it.qty}</td><td class="text-right px-3 border-r-2 border-black border-b">${parseInt(it.harga).toLocaleString()}</td><td class="text-right px-3 border-b">${(it.qty * it.harga).toLocaleString()}</td></tr>`;
+        });
 
-    document.getElementById('modalNota').classList.replace('hidden', 'flex');
-}
+        document.getElementById('modalNota').classList.replace('hidden', 'flex');
+    }
 
     async function switchNotaStatus() {
-        const notaId = selectedNota.id;
+        const id = selectedNota.id || selectedNota.id_nota;
         const newStatus = selectedNota.status === 'PAID' ? 'UNPAID' : 'PAID';
-        Swal.fire({title: 'Memproses...'});
-        await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({action: 'updateStatusNota', id: notaId, status: newStatus})});
+        Swal.fire({title: 'Memproses...', didOpen: () => Swal.showLoading()});
+        await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({action: 'updateStatusNota', id: id, status: newStatus})});
         location.reload();
     }
 
     function unduhPDF() {
         const el = document.getElementById('notaPrintArea');
-        html2pdf().from(el).set({ 
-            margin: 5, 
-            filename: `Nota-${selectedNota.id}.pdf`, 
-            html2canvas: { scale: 3 }, 
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-        }).save();
+        const opt = { margin: 0, filename: `Nota-${selectedNota.id || 'Nanda'}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        html2pdf().from(el).set(opt).save();
     }
 
     function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); }
