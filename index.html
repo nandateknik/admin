@@ -3,123 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Admin - Nanda Teknik</title>
+    <title>Nanda Teknik - Mobile System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #f8fafc;
-        }
-        .login-card {
-            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
-        }
+        .hidden { display: none; }
+        body { background-color: #f8fafc; font-family: sans-serif; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body>
 
-    <div class="w-full max-w-[400px]">
-        <div class="text-center mb-8">
-            <div class="inline-flex w-16 h-16 bg-blue-600 rounded-2xl items-center justify-center text-white text-3xl font-black shadow-lg shadow-blue-200 mb-4">N</div>
-            <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">NANDA <span class="text-blue-600">TEKNIK</span></h1>
-            <p class="text-slate-400 text-sm font-semibold mt-1 uppercase tracking-widest">Admin Dashboard</p>
-        </div>
-
-        <div class="bg-white p-8 rounded-[2rem] login-card border border-slate-100">
-            <form id="loginForm" class="space-y-5">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Username</label>
-                    <input type="text" id="username" required
-                        class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-semibold text-slate-700" 
-                        placeholder="Masukkan username...">
+    <div id="loginPage" class="flex items-center justify-center min-h-screen p-6">
+        <div class="w-full max-w-sm bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+            <div class="text-center mb-8">
+                <div class="bg-blue-600 w-16 h-16 rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-4">
+                    <i class="fas fa-tools text-white text-2xl"></i>
                 </div>
+                <h1 class="text-2xl font-bold text-gray-800 tracking-tight">NANDA TEKNIK</h1>
+                <p class="text-gray-400 text-sm">Banyuwangi Core System</p>
+            </div>
 
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Password</label>
-                    <input type="password" id="password" required
-                        class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-semibold text-slate-700" 
-                        placeholder="••••••••">
-                </div>
-
-                <button type="submit" id="btnLogin"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-3">
-                    <span>Masuk Sekarang</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            <div class="space-y-4">
+                <input type="text" id="user" placeholder="Username" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="password" id="pass" placeholder="Password" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                <button onclick="handleLogin()" id="btnLogin" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-blue-200 shadow-lg active:scale-95 transition-transform">
+                    MASUK
                 </button>
-            </form>
+                <p id="loginMsg" class="text-center text-red-500 text-sm font-medium h-4"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboardPage" class="hidden">
+        <div class="bg-white p-6 shadow-sm flex justify-between items-center">
+            <div>
+                <p class="text-xs text-gray-400">Selamat datang,</p>
+                <h2 id="userNameDisplay" class="font-bold text-lg text-gray-800">Admin</h2>
+            </div>
+            <button onclick="handleLogout()" class="text-gray-400 hover:text-red-500">
+                <i class="fas fa-sign-out-alt text-xl"></i>
+            </button>
         </div>
 
-        <p class="text-center mt-8 text-slate-400 text-xs font-medium">
-            &copy; 2026 Nanda Teknik Management System
-        </p>
+        <div class="p-4 grid grid-cols-2 gap-4">
+            <div class="bg-blue-600 p-4 rounded-3xl text-white shadow-lg shadow-blue-100">
+                <p class="text-xs opacity-80">Saldo Kas</p>
+                <h3 id="txtSaldo" class="text-lg font-bold">Rp 0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
+                <p class="text-xs text-gray-400">Booking Aktif</p>
+                <h3 id="txtBookingCount" class="text-lg font-bold text-gray-800">0</h3>
+            </div>
+        </div>
+
+        <div class="p-4 grid grid-cols-3 gap-4 text-center">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-50">
+                <i class="fas fa-calendar-check text-blue-500 mb-2"></i>
+                <p class="text-[10px] font-medium text-gray-600 leading-tight">Booking</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-50">
+                <i class="fas fa-file-invoice-dollar text-green-500 mb-2"></i>
+                <p class="text-[10px] font-medium text-gray-600 leading-tight">Nota</p>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-50">
+                <i class="fas fa-wallet text-red-400 mb-2"></i>
+                <p class="text-[10px] font-medium text-gray-600 leading-tight">Pengeluaran</p>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <h4 class="font-bold text-gray-800 mb-3 ml-1">Pekerjaan Terkini</h4>
+            <div id="workloadList" class="space-y-3">
+                <p class="text-center text-gray-400 py-10 text-sm">Memuat data...</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // GANTI DENGAN URL WEB APP SCRIPT ANDA
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzIPJ--9rRMqBypy5nJCw3tBbsrTeD8YB6NcSDpwGOD2Mc7z_maduyb-tmmHTrVkbuilg/exec";
+        // GANTI DENGAN URL WEB APP GOOGLE SCRIPT ANDA
+        const API_URL = "https://script.google.com/macros/s/AKfycbzr4gEWPFsIpFCWycarI1JrSrVfU65IXTprI-s3AXNa4FWu80vCH0H6N3y3jlkESrHgEQ/exec";
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
+        // Cek Session saat halaman dibuka
+        window.onload = () => {
+            const user = localStorage.getItem('nanda_user');
+            if (user) {
+                showDashboard(JSON.parse(user));
+            }
+        };
+
+        async function handleLogin() {
+            const user = document.getElementById('user').value;
+            const pass = document.getElementById('pass').value;
             const btn = document.getElementById('btnLogin');
-            const usernameInput = document.getElementById('username').value;
-            const passwordInput = document.getElementById('password').value;
+            const msg = document.getElementById('loginMsg');
 
-            // Loading State
+            if(!user || !pass) return msg.innerText = "Isi semua field!";
+            
             btn.disabled = true;
-            btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Validasi...`;
+            btn.innerText = "Loading...";
 
             try {
-                // Fetch data dari tab 'teknisi'
-                const response = await fetch(SCRIPT_URL + "?action=getTeknisi");
-                const listTeknisi = await response.json();
-
-                // Cari user yang cocok
-                const user = listTeknisi.find(u => 
-                    u.username === usernameInput && 
-                    String(u.password) === passwordInput
-                );
-
-                if (user) {
-                    // Cek status is_active
-                    const isActive = String(user.is_active).toLowerCase();
-                    if (isActive === 'true' || isActive === '1') {
-                        
-                        // Berhasil Login
-                        localStorage.setItem('isLoggedIn', 'true');
-                        localStorage.setItem('adminName', user.nama);
-                        localStorage.setItem('adminId', user.id);
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Login Berhasil',
-                            text: `Selamat datang, ${user.nama}!`,
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            window.location.href = 'dashboard.html'; // Pindah ke dashboard
-                        });
-
-                    } else {
-                        throw new Error("Akun Anda dinonaktifkan!");
-                    }
-                } else {
-                    throw new Error("Username atau Password salah!");
-                }
-
-            } catch (err) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal Masuk',
-                    text: err.message,
-                    confirmButtonColor: '#2563eb'
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Untuk bypass CORS sederhana jika perlu, tapi data JSON tidak akan terbaca. 
+                    // Sebaiknya Apps Script mengembalikan ContentService.createTextOutput().setMimeType(JSON)
                 });
-            } finally {
+                
+                // Gunakan cara fetch standar tanpa no-cors jika backend sudah diatur
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'login', username: user, password: pass })
+                }).then(r => r.json());
+
+                if (res.result === "success") {
+                    localStorage.setItem('nanda_user', JSON.stringify(res.data));
+                    showDashboard(res.data);
+                } else {
+                    msg.innerText = res.message;
+                    btn.disabled = false;
+                    btn.innerText = "MASUK";
+                }
+            } catch (e) {
+                msg.innerText = "Error Koneksi!";
                 btn.disabled = false;
-                btn.innerHTML = `<span>Masuk Sekarang</span> <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>`;
+                btn.innerText = "MASUK";
             }
-        });
+        }
+
+        function showDashboard(userData) {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboardPage').classList.remove('hidden');
+            document.getElementById('userNameDisplay').innerText = userData.nama;
+            loadData();
+        }
+
+        async function loadData() {
+            try {
+                // Ambil data workload (Default doGet)
+                const res = await fetch(API_URL).then(r => r.json());
+                const list = document.getElementById('workloadList');
+                list.innerHTML = "";
+
+                if(res.length > 0) {
+                    document.getElementById('txtBookingCount').innerText = res.length;
+                    res.forEach(item => {
+                        list.innerHTML += `
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-blue-500">
+                                <div class="flex justify-between">
+                                    <h5 class="font-bold text-gray-800">${item.nama}</h5>
+                                    <span class="text-[10px] bg-blue-50 px-2 py-1 rounded text-blue-600 font-bold">${item.status}</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">${item.pekerjaan}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    list.innerHTML = "<p class='text-center text-gray-400 py-10 text-sm'>Tidak ada kerjaan aktif.</p>";
+                }
+            } catch (e) {
+                console.log("Gagal muat data");
+            }
+        }
+
+        function handleLogout() {
+            localStorage.clear();
+            location.reload();
+        }
     </script>
 </body>
 </html>
