@@ -2,93 +2,165 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nanda Teknik - Mobile System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nanda Teknik - Premium Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .premium-gradient {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .bottom-nav {
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+        }
+        .shimmer {
+            background: linear-gradient(90deg, #eff1f3 25%, #e2e8f0 50%, #eff1f3 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
         .hidden { display: none; }
-        body { background-color: #f8fafc; font-family: sans-serif; }
     </style>
 </head>
-<body>
+<body class="antialiased text-slate-900">
 
-    <div id="loginPage" class="flex items-center justify-center min-h-screen p-6">
-        <div class="w-full max-w-sm bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-            <div class="text-center mb-8">
-                <div class="bg-blue-600 w-16 h-16 rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-4">
-                    <i class="fas fa-tools text-white text-2xl"></i>
+    <div id="loginPage" class="min-h-screen flex flex-col items-center justify-center p-8 bg-[#0F172A]">
+        <div class="w-full max-w-sm space-y-8">
+            <div class="text-center">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-blue-600 shadow-2xl shadow-blue-500/20 mb-6 transform rotate-3">
+                    <i class="fas fa-bolt-lightning text-white text-3xl"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-gray-800 tracking-tight">NANDA TEKNIK</h1>
-                <p class="text-gray-400 text-sm">Banyuwangi Core System</p>
+                <h1 class="text-3xl font-extrabold text-white tracking-tight">NANDA TEKNIK</h1>
+                <p class="text-slate-400 mt-2 text-sm font-medium tracking-wide uppercase">Core Management System</p>
             </div>
 
-            <div class="space-y-4">
-                <input type="text" id="user" placeholder="Username" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-                <input type="password" id="pass" placeholder="Password" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-                <button onclick="handleLogin()" id="btnLogin" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-blue-200 shadow-lg active:scale-95 transition-transform">
-                    MASUK
-                </button>
-                <p id="loginMsg" class="text-center text-red-500 text-sm font-medium h-4"></p>
+            <div class="bg-slate-800/50 p-8 rounded-[2.5rem] border border-slate-700/50 backdrop-blur-xl">
+                <div class="space-y-4">
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-4 top-4 text-slate-500 text-sm"></i>
+                        <input type="text" id="user" placeholder="Username" class="w-full bg-slate-900/50 border border-slate-700 text-white pl-11 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-600">
+                    </div>
+                    <div class="relative">
+                        <i class="fas fa-shield-halved absolute left-4 top-4 text-slate-500 text-sm"></i>
+                        <input type="password" id="pass" placeholder="Security Password" class="w-full bg-slate-900/50 border border-slate-700 text-white pl-11 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-600">
+                    </div>
+                    <button onclick="handleLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]">
+                        AUTHORIZE ACCESS
+                    </button>
+                    <p id="loginMsg" class="text-center text-rose-400 text-xs font-semibold uppercase tracking-widest h-2"></p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="dashboardPage" class="hidden">
-        <div class="bg-white p-6 shadow-sm flex justify-between items-center">
-            <div>
-                <p class="text-xs text-gray-400">Selamat datang,</p>
-                <h2 id="userNameDisplay" class="font-bold text-lg text-gray-800">Admin</h2>
+    <div id="dashboardPage" class="hidden min-h-screen pb-24 transition-opacity duration-500">
+        <header class="p-6 flex justify-between items-center bg-white/50 sticky top-0 z-50 backdrop-blur-md">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center shadow-lg">
+                    <i class="fas fa-grid-2 text-white text-xs"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-slate-400 uppercase tracking-tighter">Welcome back,</h2>
+                    <h1 id="userNameDisplay" class="text-xl font-extrabold text-slate-900 -mt-1 tracking-tight">Admin</h1>
+                </div>
             </div>
-            <button onclick="handleLogout()" class="text-gray-400 hover:text-red-500">
-                <i class="fas fa-sign-out-alt text-xl"></i>
+            <button onclick="handleLogout()" class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400">
+                <i class="fas fa-arrow-right-from-bracket"></i>
             </button>
-        </div>
+        </header>
 
-        <div class="p-4 grid grid-cols-2 gap-4">
-            <div class="bg-blue-600 p-4 rounded-3xl text-white shadow-lg shadow-blue-100">
-                <p class="text-xs opacity-80">Saldo Kas</p>
-                <h3 id="txtSaldo" class="text-lg font-bold">Rp 0</h3>
-            </div>
-            <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
-                <p class="text-xs text-gray-400">Booking Aktif</p>
-                <h3 id="txtBookingCount" class="text-lg font-bold text-gray-800">0</h3>
-            </div>
-        </div>
-
-        <div class="p-4 grid grid-cols-3 gap-4 text-center">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-50">
-                <i class="fas fa-calendar-check text-blue-500 mb-2"></i>
-                <p class="text-[10px] font-medium text-gray-600 leading-tight">Booking</p>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-50">
-                <i class="fas fa-file-invoice-dollar text-green-500 mb-2"></i>
-                <p class="text-[10px] font-medium text-gray-600 leading-tight">Nota</p>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-50">
-                <i class="fas fa-wallet text-red-400 mb-2"></i>
-                <p class="text-[10px] font-medium text-gray-600 leading-tight">Pengeluaran</p>
+        <div class="px-6 py-4">
+            <div class="premium-gradient rounded-[2rem] p-8 shadow-2xl shadow-slate-900/20 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Available Balance</p>
+                        <i class="fas fa-ellipsis text-slate-500"></i>
+                    </div>
+                    <h3 id="txtSaldo" class="text-3xl font-bold text-white mt-2 tracking-tighter tracking-tight">Rp 0</h3>
+                    <div class="mt-8 flex items-center justify-between border-t border-slate-700/50 pt-6">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span id="txtBookingCount" class="text-slate-300 text-xs font-semibold tracking-wide">0 Jobs Active</span>
+                        </div>
+                        <button onclick="loadFinance()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all">
+                            <i class="fas fa-rotate text-white text-xs"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="p-4">
-            <h4 class="font-bold text-gray-800 mb-3 ml-1">Pekerjaan Terkini</h4>
-            <div id="workloadList" class="space-y-3">
-                <p class="text-center text-gray-400 py-10 text-sm">Memuat data...</p>
+        <div class="px-6 py-4 grid grid-cols-4 gap-4">
+            <div class="flex flex-col items-center space-y-2">
+                <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-blue-600 text-xl">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Booking</span>
+            </div>
+            <div class="flex flex-col items-center space-y-2">
+                <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-emerald-600 text-xl">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Invoices</span>
+            </div>
+            <div class="flex flex-col items-center space-y-2">
+                <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-rose-500 text-xl">
+                    <i class="fas fa-arrow-up-right-from-square"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Expense</span>
+            </div>
+            <div class="flex flex-col items-center space-y-2">
+                <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-amber-500 text-xl">
+                    <i class="fas fa-users"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Client</span>
             </div>
         </div>
+
+        <div class="px-6 py-4 mt-4">
+            <div class="flex justify-between items-center mb-6">
+                <h4 class="text-lg font-extrabold text-slate-900 tracking-tight">Active Workload</h4>
+                <a href="#" class="text-blue-600 text-xs font-bold uppercase tracking-widest">View All</a>
+            </div>
+            <div id="workloadList" class="space-y-4">
+                <div class="h-24 w-full shimmer rounded-[1.5rem]"></div>
+                <div class="h-24 w-full shimmer rounded-[1.5rem]"></div>
+            </div>
+        </div>
+
+        <nav class="fixed bottom-6 left-6 right-6 h-16 glass-card rounded-2xl bottom-nav flex items-center justify-around px-4 z-50">
+            <i class="fas fa-house text-blue-600 text-lg"></i>
+            <i class="fas fa-chart-pie text-slate-400 text-lg"></i>
+            <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center -mt-10 shadow-xl shadow-slate-900/30">
+                <i class="fas fa-plus text-white"></i>
+            </div>
+            <i class="fas fa-envelope text-slate-400 text-lg"></i>
+            <i class="fas fa-gear text-slate-400 text-lg"></i>
+        </nav>
     </div>
 
     <script>
-        // GANTI DENGAN URL WEB APP GOOGLE SCRIPT ANDA
-        const API_URL = "https://script.google.com/macros/s/AKfycbzr4gEWPFsIpFCWycarI1JrSrVfU65IXTprI-s3AXNa4FWu80vCH0H6N3y3jlkESrHgEQ/exec";
+        // GANTI DENGAN URL WEB APP ANDA
+        const API_URL = "https://script.google.com/macros/s/AKfycbwYy_Vf-M9uS6_l6n8-0S2zO6D_g5Xg6qE_P0xX0/exec"; 
 
-        // Cek Session saat halaman dibuka
         window.onload = () => {
             const user = localStorage.getItem('nanda_user');
-            if (user) {
-                showDashboard(JSON.parse(user));
-            }
+            if (user) showDashboard(JSON.parse(user));
         };
 
         async function handleLogin() {
@@ -97,23 +169,20 @@
             const btn = document.getElementById('btnLogin');
             const msg = document.getElementById('loginMsg');
 
-            if(!user || !pass) return msg.innerText = "Isi semua field!";
+            if(!user || !pass) {
+                msg.innerText = "Security check failed";
+                return;
+            }
             
             btn.disabled = true;
-            btn.innerText = "Loading...";
+            btn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> AUTHORIZING...';
 
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Untuk bypass CORS sederhana jika perlu, tapi data JSON tidak akan terbaca. 
-                    // Sebaiknya Apps Script mengembalikan ContentService.createTextOutput().setMimeType(JSON)
-                });
-                
-                // Gunakan cara fetch standar tanpa no-cors jika backend sudah diatur
-                const res = await fetch(API_URL, {
-                    method: 'POST',
                     body: JSON.stringify({ action: 'login', username: user, password: pass })
-                }).then(r => r.json());
+                });
+                const res = await response.json();
 
                 if (res.result === "success") {
                     localStorage.setItem('nanda_user', JSON.stringify(res.data));
@@ -121,48 +190,70 @@
                 } else {
                     msg.innerText = res.message;
                     btn.disabled = false;
-                    btn.innerText = "MASUK";
+                    btn.innerHTML = 'AUTHORIZE ACCESS';
                 }
             } catch (e) {
-                msg.innerText = "Error Koneksi!";
+                msg.innerText = "System offline";
                 btn.disabled = false;
-                btn.innerText = "MASUK";
+                btn.innerHTML = 'AUTHORIZE ACCESS';
             }
         }
 
         function showDashboard(userData) {
             document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('dashboardPage').classList.remove('hidden');
+            const dash = document.getElementById('dashboardPage');
+            dash.classList.remove('hidden');
             document.getElementById('userNameDisplay').innerText = userData.nama;
             loadData();
+            loadFinance();
+        }
+
+        async function loadFinance() {
+            try {
+                const res = await fetch(API_URL + "?type=rekap_keuangan").then(r => r.json());
+                document.getElementById('txtSaldo').innerText = "Rp " + res.saldo.toLocaleString('id-ID');
+            } catch (e) { console.log("Finance error"); }
         }
 
         async function loadData() {
             try {
-                // Ambil data workload (Default doGet)
                 const res = await fetch(API_URL).then(r => r.json());
                 const list = document.getElementById('workloadList');
                 list.innerHTML = "";
 
                 if(res.length > 0) {
-                    document.getElementById('txtBookingCount').innerText = res.length;
+                    document.getElementById('txtBookingCount').innerText = res.length + " Jobs Active";
                     res.forEach(item => {
                         list.innerHTML += `
-                            <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-blue-500">
-                                <div class="flex justify-between">
-                                    <h5 class="font-bold text-gray-800">${item.nama}</h5>
-                                    <span class="text-[10px] bg-blue-50 px-2 py-1 rounded text-blue-600 font-bold">${item.status}</span>
+                            <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-xs">
+                                            ${item.nama.substring(0,2).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <h5 class="font-bold text-slate-900">${item.nama}</h5>
+                                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${item.pekerjaan}</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-[9px] px-2 py-1 rounded-lg font-extrabold uppercase tracking-tighter ${item.status === 'Proses' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}">
+                                        ${item.status}
+                                    </span>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1">${item.pekerjaan}</p>
+                                <div class="mt-4 flex justify-between items-center text-slate-400">
+                                    <div class="flex items-center space-x-1 text-[10px] font-medium">
+                                        <i class="far fa-clock"></i>
+                                        <span>Scheduled ${item.tanggal}</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-[10px]"></i>
+                                </div>
                             </div>
                         `;
                     });
                 } else {
-                    list.innerHTML = "<p class='text-center text-gray-400 py-10 text-sm'>Tidak ada kerjaan aktif.</p>";
+                    list.innerHTML = "<p class='text-center text-slate-400 py-10 text-sm italic'>No active workload found.</p>";
                 }
-            } catch (e) {
-                console.log("Gagal muat data");
-            }
+            } catch (e) { console.log("Data load error"); }
         }
 
         function handleLogout() {
