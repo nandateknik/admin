@@ -10,58 +10,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
-        .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+        .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; position: relative; border-left: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; }
         
-        /* Sidebar Navigation */
-        #sidebar { position: absolute; top: 0; left: -110%; width: 280px; height: 100%; background: white; z-index: 5000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; box-shadow: 20px 0 50px rgba(0,0,0,0.1); }
+        /* SIDEBAR FIXED (SAMA DENGAN DASHBOARD) */
+        #sidebar { position: absolute; top: 0; left: -100%; width: 280px; height: 100%; background: white; z-index: 5000; transition: 0.3s ease-in-out; display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
         #sidebar.open { left: 0; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #64748b; font-weight: 700; font-size: 0.85rem; transition: 0.2s; cursor: pointer; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 4999; display: none; backdrop-filter: blur(4px); }
+
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #64748b; font-weight: 700; font-size: 0.85rem; transition: 0.2s; cursor: pointer; text-decoration: none; }
         .nav-link:hover { background: #f1f5f9; color: #2563eb; }
         .nav-link.active { background: #2563eb; color: white; }
         .logout-btn { color: #ef4444 !important; border-top: 1px solid #f1f5f9; margin-top: auto; padding: 20px 16px; }
 
-        /* Premium PDF Styling */
-        .nota-premium { font-family: 'Inter', sans-serif; }
-        .invoice-header { border-bottom: 4px solid #1e293b; }
-        .table-premium th { background: #1e293b; color: white; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; padding: 12px; }
-        .table-premium td { border-bottom: 1px solid #e2e8f0; padding: 12px; font-size: 11px; }
-
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.3); z-index: 4999; display: none; backdrop-filter: blur(4px); }
+        /* TABS */
         .tab-active { color: #2563eb; border-bottom: 4px solid #2563eb; font-weight: 900; }
+
+        /* PDF AREA PREVIEW (BIAR GAK AMBURADUL DI LAYAR HP) */
+        #notaPrintArea { 
+            width: 210mm; 
+            padding: 20px; 
+            background: white; 
+            margin: 0 auto;
+        }
+        
+        /* Skill responsive untuk preview modal */
+        .pdf-preview-container {
+            overflow-x: auto;
+            background: #525659;
+            padding: 20px 10px;
+        }
+
         .loader { width: 24px; height: 24px; border: 3px solid #DDD; border-bottom-color: #2563eb; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="mobile-container shadow-2xl">
+<div class="mobile-container">
     <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
 
     <div id="sidebar">
         <div class="p-6 flex flex-col h-full">
             <div class="flex items-center gap-3 mb-8">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg">N</div>
-                <h1 class="font-extrabold text-slate-800 tracking-tight italic text-lg">NANDA <span class="text-blue-600">TEKNIK</span></h1>
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black">N</div>
+                <h1 class="font-extrabold text-slate-800 italic text-lg">NANDA <span class="text-blue-600">TEKNIK</span></h1>
             </div>
             <nav class="space-y-1 flex-1 overflow-y-auto">
                 <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mb-2 tracking-widest">Utama</p>
-                <a href="dashboard.html" class="nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> Monitoring Maps</a>
-                <a href="pelanggan.html" class="nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg> Database Pelanggan</a>
-
-                <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Transaksi & Marketing</p>
-                <a href="input-booking.html" class="nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Input Booking Baru</a>
-                <a href="penawaran.html" class="nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Penawaran Harga</a>
-                <a href="nota.html" class="nav-link active"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg> Buat Nota Lunas</a>
-                <a href="kirim-email.html" class="nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Kirim Email Notif</a>
-
-                <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Manajemen Data</p>
-                <a href="input-pelanggan.html" class="nav-link"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg> Tambah Pelanggan</a>
+                <a href="dashboard.html" class="nav-link">Monitoring Maps</a>
+                <a href="pelanggan.html" class="nav-link">Database Pelanggan</a>
+                <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Transaksi</p>
+                <a href="input-booking.html" class="nav-link">Input Booking Baru</a>
+                <a href="penawaran.html" class="nav-link">Penawaran Harga</a>
+                <a href="nota.html" class="nav-link active">Buat Nota Lunas</a>
+                <a href="kirim-email.html" class="nav-link">Kirim Email Notif</a>
             </nav>
-            <div onclick="logout()" class="nav-link logout-btn"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg> Logout Admin</div>
+            <div onclick="logout()" class="nav-link logout-btn">Logout Admin</div>
         </div>
     </div>
 
-    <header class="p-6">
+    <header class="p-6 pb-0">
         <div class="flex items-center justify-between mb-6">
             <button onclick="toggleSidebar()" class="bg-slate-50 p-3 rounded-2xl active:scale-90 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -70,16 +78,15 @@
             <div class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">PRO</div>
         </div>
         <nav class="flex border-b">
-            <button onclick="switchTab('buat')" id="tabBuat" class="flex-1 py-3 text-xs font-black uppercase tracking-widest tab-active">Buat Nota</button>
-            <button onclick="switchTab('riwayat')" id="tabRiwayat" class="flex-1 py-3 text-xs font-black uppercase tracking-widest text-slate-300">Riwayat</button>
+            <button onclick="switchTab('buat')" id="tabBuat" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest tab-active">Buat Nota</button>
+            <button onclick="switchTab('riwayat')" id="tabRiwayat" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-slate-300">Riwayat</button>
         </nav>
     </header>
 
-    <main id="contentBuat" class="p-6 space-y-6 flex-1 overflow-y-auto pb-20">
+    <main id="contentBuat" class="p-6 space-y-6 flex-1 overflow-y-auto pb-24">
         <div class="space-y-2">
-            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Pilih Pelanggan</label>
-            <input type="text" id="notaCustSearch" placeholder="Cari nama/email..." class="w-full bg-slate-50 border-2 border-slate-100 px-6 py-4 rounded-3xl font-bold outline-none focus:border-blue-500 transition-all">
-            <input type="hidden" id="finalEmail">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Nama Pelanggan / Email</label>
+            <input type="text" id="notaCustSearch" placeholder="Ketik nama..." class="w-full bg-slate-50 border-2 border-slate-100 px-6 py-4 rounded-3xl font-bold outline-none focus:border-blue-500">
         </div>
 
         <div id="itemContainer" class="space-y-4">
@@ -94,7 +101,7 @@
 
         <button onclick="tambahItem()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-3xl text-[10px] font-black text-slate-400 uppercase tracking-widest">+ Tambah Baris</button>
 
-        <div class="bg-slate-900 p-8 rounded-[3rem] text-white space-y-6">
+        <div class="bg-slate-900 p-6 rounded-[2.5rem] text-white space-y-4">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-black text-slate-400 uppercase">Status Bayar</span>
                 <select id="notaStatus" class="bg-slate-800 text-[10px] font-black p-2 px-4 rounded-full text-blue-400 outline-none">
@@ -107,96 +114,82 @@
                     <span class="text-[10px] font-black text-slate-500 uppercase block mb-1">Total Tagihan</span>
                     <span id="totalDisplay" class="text-2xl font-black">Rp 0</span>
                 </div>
-                <button onclick="simpanNota()" class="bg-blue-600 px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-lg shadow-blue-900/50 active:scale-95 transition">Simpan</button>
+                <button onclick="simpanNota()" class="bg-blue-600 px-6 py-3 rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-blue-900/50 active:scale-95 transition">Simpan & Cetak</button>
             </div>
         </div>
     </main>
 
     <main id="contentRiwayat" class="hidden p-6 space-y-4 flex-1 overflow-y-auto pb-20">
-        <input type="text" id="searchRiwayat" oninput="renderRiwayat()" placeholder="Cari nama pelanggan..." class="w-full p-4 bg-white border-2 border-slate-100 rounded-3xl text-xs font-black outline-none">
+        <input type="text" id="searchRiwayat" oninput="renderRiwayat()" placeholder="Cari nota..." class="w-full p-4 bg-white border-2 border-slate-100 rounded-3xl text-xs font-black outline-none">
         <div id="loadingRiwayat" class="hidden text-center py-10"><span class="loader"></span></div>
         <div id="listRiwayat" class="space-y-3"></div>
-        <div class="flex justify-between items-center pt-4" id="pagination">
-            <button onclick="prevPage()" class="bg-white border p-2 rounded-xl text-xs font-bold px-4">Prev</button>
-            <span id="pageNumber" class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Halaman 1</span>
-            <button onclick="nextPage()" class="bg-white border p-2 rounded-xl text-xs font-bold px-4">Next</button>
-        </div>
     </main>
 </div>
 
-<div id="modalNota" class="fixed inset-0 bg-black/80 z-[6000] hidden items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-4xl rounded-[2rem] overflow-hidden flex flex-col max-h-[95vh] shadow-2xl">
-        <div class="p-6 bg-white flex justify-between items-center border-b">
-            <div class="flex gap-2">
-                <button onclick="unduhPDF()" class="bg-slate-900 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg">Unduh PDF Premium</button>
-            </div>
-            <button onclick="tutupModal()" class="text-slate-400 p-2 text-xl font-black">✕</button>
-        </div>
-        
-        <div class="flex-1 overflow-y-auto p-10 bg-slate-100">
-            <div id="notaPrintArea" class="nota-premium mx-auto bg-white p-12 relative shadow-sm" style="width: 210mm; min-height: 297mm;">
-                <div class="flex justify-between items-start mb-10 invoice-header pb-8">
+<div id="modalNota" class="fixed inset-0 bg-black/90 z-[6000] hidden flex-col backdrop-blur-sm">
+    <div class="p-4 bg-white flex justify-between items-center shadow-lg">
+        <button onclick="unduhPDF()" class="bg-blue-600 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase">Unduh PDF</button>
+        <button onclick="tutupModal()" class="text-slate-900 p-2 font-black">TUTUP</button>
+    </div>
+    
+    <div class="flex-1 overflow-auto pdf-preview-container">
+        <div id="notaPrintArea" class="mx-auto shadow-2xl">
+            <div style="font-family: 'Inter', sans-serif; padding: 40px; border: 1px solid #eee;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 5px solid #1e293b; padding-bottom: 20px; margin-bottom: 30px;">
                     <div>
-                        <h1 class="text-4xl font-black tracking-tighter text-slate-900">NANDA <span class="text-blue-600">TEKNIK</span></h1>
-                        <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-[0.3em]">Network & Electrical Specialist</p>
+                        <h1 style="font-size: 32px; font-weight: 900; margin: 0; color: #0f172a;">NANDA <span style="color: #2563eb;">TEKNIK</span></h1>
+                        <p style="font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #64748b; margin-top: 5px;">NETWORK & ELECTRICAL SPECIALIST</p>
                     </div>
-                    <div class="text-right">
-                        <h2 class="text-3xl font-black text-slate-200 uppercase italic">Invoice</h2>
-                        <p class="text-sm font-bold text-slate-900 mt-1" id="invId"></p>
+                    <div style="text-align: right;">
+                        <h2 style="font-size: 24px; font-weight: 900; color: #e2e8f0; margin: 0; font-style: italic;">INVOICE</h2>
+                        <p style="font-size: 12px; font-weight: 800;" id="invId"></p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-10 mb-12">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px;">
                     <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase mb-3 tracking-widest">Ditujukan Kepada:</p>
-                        <p id="invCust" class="text-lg font-black text-slate-900 leading-tight"></p>
-                        <p class="text-[11px] text-slate-500 mt-2">Pelanggan Setia Nanda Teknik</p>
+                        <p style="font-size: 10px; font-weight: 900; color: #94a3b8; margin-bottom: 5px;">DITUJUKAN KEPADA:</p>
+                        <p id="invCust" style="font-size: 16px; font-weight: 900; color: #1e293b;"></p>
+                        <p style="font-size: 10px; color: #64748b; margin-top: 5px;">Pelanggan Setia Nanda Teknik</p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-[9px] font-black text-slate-400 uppercase mb-3 tracking-widest">Detail Tagihan:</p>
-                        <p class="text-xs font-bold text-slate-900 mb-1">Tanggal: <span id="invTgl" class="font-normal text-slate-500"></span></p>
-                        <p class="text-xs font-bold text-slate-900">Status: <span id="invStatusLabel"></span></p>
+                    <div style="text-align: right;">
+                        <p style="font-size: 10px; font-weight: 900; color: #94a3b8; margin-bottom: 5px;">DETAIL TAGIHAN:</p>
+                        <p style="font-size: 11px; font-weight: 700;">Tanggal: <span id="invTgl" style="font-weight: 400;"></span></p>
+                        <p style="font-size: 11px; font-weight: 700;">Status: <span id="invStatusLabel"></span></p>
                     </div>
                 </div>
 
-                <table class="w-full table-premium mb-12">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
                     <thead>
-                        <tr>
-                            <th class="text-left">Deskripsi Layanan</th>
-                            <th class="w-16 text-center">Qty</th>
-                            <th class="w-32 text-right">Harga</th>
-                            <th class="w-32 text-right">Subtotal</th>
+                        <tr style="background: #1e293b; color: white;">
+                            <th style="padding: 12px; text-align: left; font-size: 10px;">DESKRIPSI LAYANAN</th>
+                            <th style="padding: 12px; text-align: center; font-size: 10px; width: 50px;">QTY</th>
+                            <th style="padding: 12px; text-align: right; font-size: 10px; width: 120px;">HARGA</th>
+                            <th style="padding: 12px; text-align: right; font-size: 10px; width: 120px;">TOTAL</th>
                         </tr>
                     </thead>
                     <tbody id="invItems"></tbody>
                 </table>
 
-                <div class="flex justify-end mb-24">
-                    <div class="w-72 space-y-4">
-                        <div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase">
-                            <span>Subtotal</span>
-                            <span id="invSubtotal" class="text-slate-900"></span>
-                        </div>
-                        <div class="flex justify-between items-center pt-4 border-t-4 border-slate-900">
-                            <span class="text-xs font-black uppercase">Total Bayar</span>
-                            <span id="invTotal" class="text-2xl font-black text-slate-900"></span>
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 60px;">
+                    <div style="width: 250px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; border-top: 3px solid #1e293b; padding-top: 15px;">
+                            <span>TOTAL BAYAR</span>
+                            <span id="invTotal" style="font-size: 18px; color: #2563eb;"></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 items-end">
-                    <div class="text-[10px] space-y-5">
-                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                            <p class="font-black text-slate-900 uppercase mb-2">Metode Pembayaran:</p>
-                            <p class="text-slate-600 font-bold">Transfer BCA: 180-182-6011</p>
-                            <p class="text-slate-600">A/N: Nanda Krisbianto</p>
-                        </div>
-                        <p class="text-slate-400 leading-relaxed font-medium">Banyuwangi, Jawa Timur<br>WA: 0823-3120-1148</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; align-items: flex-end; font-size: 10px;">
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                        <p style="font-weight: 900; margin-bottom: 10px;">METODE PEMBAYARAN:</p>
+                        <p>Transfer BCA: 180-182-6011</p>
+                        <p>A/N: Nanda Krisbianto</p>
+                        <p style="margin-top: 10px; color: #64748b;">Banyuwangi, Jawa Timur<br>WA: 0823-3120-1148</p>
                     </div>
-                    <div class="text-center">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-20 italic">Hormat Kami,</p>
-                        <div class="w-40 h-[1px] bg-slate-200 mx-auto mb-3"></div>
-                        <p class="text-sm font-black text-slate-900 uppercase underline decoration-2 underline-offset-4">Nanda Krisbianto</p>
+                    <div style="text-align: center;">
+                        <p style="margin-bottom: 60px; font-style: italic; color: #94a3b8;">Hormat Kami,</p>
+                        <p style="font-weight: 900; text-decoration: underline;">NANDA KRISBIANTO</p>
                     </div>
                 </div>
             </div>
@@ -206,14 +199,13 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzg5RTkyWU_SlYftvpx3bEPGuaknDOaoJrtJv2dXJ1Ysn5FyWGv4z-YyI5sgidoLTCZuw/exec";
-    let databaseNota = [], currentPage = 1, rowsPerPage = 10, filteredNota = [];
+    let databaseNota = [], selectedNota = null;
 
-    // SIDEBAR & TABS
     function toggleSidebar() {
         const sb = document.getElementById('sidebar');
         const ov = document.getElementById('overlay');
-        sb.classList.toggle('open');
-        ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
+        const open = sb.classList.toggle('open');
+        ov.style.display = open ? 'block' : 'none';
     }
 
     function switchTab(tab) {
@@ -224,94 +216,34 @@
         if(tab === 'riwayat') loadRiwayat();
     }
 
-    // RIWAYAT & PAGINATION
     async function loadRiwayat() {
-        const loader = document.getElementById('loadingRiwayat');
-        loader.classList.remove('hidden');
+        document.getElementById('loadingRiwayat').classList.remove('hidden');
         try {
             const res = await fetch(SCRIPT_URL + "?type=nota");
             databaseNota = await res.json();
-            databaseNota.reverse();
-            filteredNota = [...databaseNota];
             renderRiwayat();
         } catch (e) { console.error(e); }
-        loader.classList.add('hidden');
+        document.getElementById('loadingRiwayat').classList.add('hidden');
     }
 
     function renderRiwayat() {
-        const search = document.getElementById('searchRiwayat').value.toLowerCase();
-        filteredNota = databaseNota.filter(n => n.email.toLowerCase().includes(search));
-        
         const list = document.getElementById('listRiwayat');
         list.innerHTML = "";
-        
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const paginatedData = filteredNota.slice(start, end);
-
-        paginatedData.forEach(n => {
+        databaseNota.slice().reverse().forEach(n => {
             list.innerHTML += `
-                <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm active:scale-95 transition cursor-pointer">
+                <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-4 rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm active:scale-95 transition cursor-pointer">
                     <div>
-                        <p class="text-[9px] font-black text-slate-300 uppercase mb-1">${n.id_nota}</p>
+                        <p class="text-[8px] font-black text-slate-300 uppercase">${n.id_nota}</p>
                         <p class="text-xs font-black text-slate-800 uppercase">${n.email}</p>
                     </div>
                     <div class="text-right">
                         <p class="text-sm font-black text-blue-600">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
-                        <span class="text-[9px] font-black ${n.status === 'PAID' ? 'text-green-500' : 'text-red-500'} uppercase">${n.status}</span>
+                        <span class="text-[8px] font-black ${n.status === 'PAID' ? 'text-emerald-500' : 'text-red-500'}">${n.status}</span>
                     </div>
                 </div>`;
         });
-        document.getElementById('pageNumber').innerText = `Halaman ${currentPage}`;
     }
 
-    function prevPage() { if(currentPage > 1) { currentPage--; renderRiwayat(); } }
-    function nextPage() { if(currentPage * rowsPerPage < filteredNota.length) { currentPage++; renderRiwayat(); } }
-
-    // DETAIL & PDF
-    function bukaDetail(n) {
-        selectedNota = n;
-        document.getElementById('invId').innerText = n.id_nota;
-        document.getElementById('invCust').innerText = n.email;
-        document.getElementById('invTgl').innerText = n.tanggal;
-        
-        const label = document.getElementById('invStatusLabel');
-        label.innerText = n.status;
-        label.className = n.status === 'PAID' ? 'text-green-500 font-black uppercase' : 'text-red-500 font-black uppercase';
-
-        const tbody = document.getElementById('invItems');
-        tbody.innerHTML = "";
-        let items = JSON.parse(n.items || "[]");
-        items.forEach(it => {
-            tbody.innerHTML += `
-                <tr>
-                    <td class="font-bold text-slate-800">${it.nama}</td>
-                    <td class="text-center font-bold text-slate-500">${it.qty}</td>
-                    <td class="text-right text-slate-500">${parseInt(it.harga).toLocaleString('id-ID')}</td>
-                    <td class="text-right font-black text-slate-900">${(it.qty * it.harga).toLocaleString('id-ID')}</td>
-                </tr>`;
-        });
-
-        document.getElementById('invSubtotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
-        document.getElementById('invTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
-        document.getElementById('modalNota').classList.replace('hidden', 'flex');
-    }
-
-    function unduhPDF() {
-        const el = document.getElementById('notaPrintArea');
-        const opt = {
-            margin: 0,
-            filename: `Invoice-${selectedNota.id_nota}.pdf`,
-            image: { type: 'jpeg', quality: 1 },
-            html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(el).save();
-    }
-
-    function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); }
-
-    // TAMBAH & SIMPAN (SAMA SEPERTI SEBELUMNYA)
     function tambahItem() {
         const div = document.createElement('div');
         div.className = "bg-white border-2 border-slate-100 p-5 rounded-[2rem] space-y-4 item-row relative shadow-sm";
@@ -333,6 +265,7 @@
     async function simpanNota() {
         const email = document.getElementById('notaCustSearch').value;
         if(!email) return Swal.fire('Error', 'Pilih pelanggan!', 'error');
+        
         const items = [];
         document.querySelectorAll('.item-row').forEach(row => {
             const nama = row.querySelector('.item-nama').value;
@@ -340,14 +273,67 @@
             const harga = row.querySelector('.item-harga').value;
             if(nama && harga) items.push({ nama, qty, harga });
         });
-        const payload = { action: 'simpanNota', id_nota: "INV-" + Date.now().toString().slice(-6), email, items, total: hitungTotal(), status: document.getElementById('notaStatus').value, tanggal: new Date().toLocaleDateString('id-ID') };
+
+        const payload = { 
+            action: 'simpanNota', 
+            id_nota: "INV-" + Date.now().toString().slice(-6), 
+            email, 
+            items, 
+            total: hitungTotal(), 
+            status: document.getElementById('notaStatus').value, 
+            tanggal: new Date().toLocaleDateString('id-ID') 
+        };
+
         Swal.fire({title: 'Menyimpan...', didOpen: () => Swal.showLoading()});
         await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)});
         Swal.fire('Sukses', 'Nota Berhasil Disimpan!', 'success').then(() => location.reload());
     }
 
+    function bukaDetail(n) {
+        selectedNota = n;
+        document.getElementById('invId').innerText = n.id_nota;
+        document.getElementById('invCust').innerText = n.email;
+        document.getElementById('invTgl').innerText = n.tanggal;
+        document.getElementById('invTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
+        
+        const label = document.getElementById('invStatusLabel');
+        label.innerText = n.status;
+        label.style.color = n.status === 'PAID' ? '#10b981' : '#ef4444';
+
+        const tbody = document.getElementById('invItems');
+        tbody.innerHTML = "";
+        const items = JSON.parse(n.items || "[]");
+        items.forEach(it => {
+            tbody.innerHTML += `
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 12px; font-size: 11px; font-weight: 700;">${it.nama}</td>
+                    <td style="padding: 12px; text-align: center; font-size: 11px;">${it.qty}</td>
+                    <td style="padding: 12px; text-align: right; font-size: 11px;">${parseInt(it.harga).toLocaleString('id-ID')}</td>
+                    <td style="padding: 12px; text-align: right; font-size: 11px; font-weight: 900;">${(it.qty * it.harga).toLocaleString('id-ID')}</td>
+                </tr>`;
+        });
+
+        document.getElementById('modalNota').classList.replace('hidden', 'flex');
+    }
+
+    function unduhPDF() {
+        const el = document.getElementById('notaPrintArea');
+        const opt = {
+            margin: 0,
+            filename: `INV-${selectedNota.id_nota}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(el).save();
+    }
+
+    function tutupModal() {
+        document.getElementById('modalNota').classList.replace('flex', 'hidden');
+    }
+
     function logout() {
-        localStorage.removeItem('isLoggedIn');
+        localStorage.clear();
         window.location.href = 'login.html';
     }
 </script>
