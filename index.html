@@ -3,152 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nanda Teknik - Management System</title>
+    <title>Nanda Teknik - Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
+        
+        :root {
+            --bg: #e0e5ec;
+            --shadow: #a3b1c6;
+            --light: #ffffff;
+            --brand: #facc15; /* Safety Yellow */
+        }
+
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #FBFBFE;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Space Grotesk', sans-serif; 
+            background-color: var(--bg);
+            color: #444;
         }
-        .premium-shadow {
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 10px -7px rgba(0, 0, 0, 0.02);
+
+        /* Neumorphic Shadow */
+        .neu-flat {
+            background: var(--bg);
+            box-shadow: 9px 9px 16px var(--shadow), -9px -9px 16px var(--light);
+            border-radius: 20px;
         }
-        .card-gradient {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+
+        .neu-inset {
+            background: var(--bg);
+            box-shadow: inset 6px 6px 12px var(--shadow), inset -6px -6px 12px var(--light);
+            border-radius: 20px;
         }
-        .bottom-nav-blur {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+        .neu-button {
+            background: var(--bg);
+            box-shadow: 4px 4px 8px var(--shadow), -4px -4px 8px var(--light);
+            transition: all 0.2s ease;
         }
-        .shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #f9f9f9 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+
+        .neu-button:active {
+            box-shadow: inset 3px 3px 6px var(--shadow), inset -3px -3px 6px var(--light);
+            transform: scale(0.98);
         }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+
+        .brand-gradient {
+            background: linear-gradient(145deg, #facc15, #eab308);
+            box-shadow: 5px 5px 10px #bec3ca, -5px -5px 10px #ffffff;
         }
+
         .hidden { display: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="antialiased text-slate-900">
+<body class="p-4 flex flex-col min-h-screen">
 
-    <div id="loginPage" class="min-h-screen flex flex-col items-center justify-center p-8 bg-white">
-        <div class="w-full max-w-sm space-y-10">
-            <div class="text-center">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-slate-900 shadow-xl mb-6">
-                    <i class="fas fa-screwdriver-wrench text-white text-3xl"></i>
-                </div>
-                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Nanda Teknik</h1>
-                <p class="text-slate-400 mt-2 text-sm font-medium tracking-wide">CORE SYSTEM LOGIN</p>
+    <div id="loginPage" class="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
+        <div class="text-center mb-10">
+            <div class="w-24 h-24 mx-auto neu-flat flex items-center justify-center mb-6">
+                <i class="fas fa-screwdriver-wrench text-3xl text-yellow-500"></i>
             </div>
+            <h1 class="text-3xl font-bold tracking-tighter text-slate-800 uppercase">Nanda Teknik</h1>
+            <p class="text-xs font-medium text-slate-500 tracking-[0.3em]">INDUSTRIAL SYSTEM</p>
+        </div>
 
-            <div class="space-y-4">
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase">Username</label>
-                    <input type="text" id="user" class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-300 shadow-sm">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase">Password</label>
-                    <input type="password" id="pass" class="w-full bg-slate-50 border border-slate-100 px-5 py-4 rounded-2xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-300 shadow-sm">
-                </div>
-                <button onclick="handleLogin()" id="btnLogin" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-xl active:scale-[0.98] transition-all pt-5 pb-5">
-                    MASUK SISTEM
-                </button>
-                <p id="loginMsg" class="text-center text-rose-500 text-xs font-bold h-2"></p>
+        <div class="space-y-6">
+            <div class="neu-inset p-2">
+                <input type="text" id="user" placeholder="Username" class="w-full bg-transparent p-4 outline-none text-slate-700">
             </div>
+            <div class="neu-inset p-2">
+                <input type="password" id="pass" placeholder="Password" class="w-full bg-transparent p-4 outline-none text-slate-700">
+            </div>
+            <button onclick="handleLogin()" id="btnLogin" class="w-full brand-gradient py-5 rounded-2xl font-bold text-slate-900 uppercase tracking-widest active:scale-95 transition-all">
+                Authorize Access
+            </button>
         </div>
     </div>
 
-    <div id="dashboardPage" class="hidden min-h-screen pb-28">
-        <header class="px-6 pt-8 pb-4 flex justify-between items-center bg-[#FBFBFE]">
-            <div>
-                <h2 id="userNameDisplay" class="text-2xl font-extrabold text-slate-900 tracking-tight tracking-tighter">Halo, Nanda</h2>
-                <p class="text-sm font-medium text-slate-400">Teknisi Banyuwangi</p>
+    <div id="dashboardPage" class="hidden animate-fade-in">
+        <div class="flex justify-between items-center mb-8">
+            <div class="neu-button w-12 h-12 flex items-center justify-center rounded-xl">
+                <i class="fas fa-bars-staggered"></i>
             </div>
-            <button onclick="handleLogout()" class="w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400">
+            <h2 id="userNameDisplay" class="font-bold text-slate-800 uppercase text-sm tracking-widest">Nanda K.</h2>
+            <div onclick="handleLogout()" class="neu-button w-12 h-12 flex items-center justify-center rounded-xl text-red-500">
                 <i class="fas fa-power-off"></i>
-            </button>
-        </header>
+            </div>
+        </div>
 
-        <div class="px-6 py-4">
-            <div class="card-gradient rounded-[2.5rem] p-8 shadow-2xl shadow-blue-200 relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full"></div>
-                
-                <div class="relative z-10">
-                    <p class="text-blue-100 text-xs font-bold uppercase tracking-widest opacity-80">Saldo Kas Anda</p>
-                    <h3 id="txtSaldo" class="text-4xl font-extrabold text-white mt-2 tracking-tighter tracking-tight">Rp 0</h3>
-                    
-                    <div class="mt-8 flex gap-3">
-                        <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl">
-                            <span id="txtBookingCount" class="text-white text-[10px] font-bold uppercase tracking-wide">0 Antrean</span>
-                        </div>
-                        <button onclick="loadFinance()" class="bg-white/20 px-3 py-2 rounded-xl">
-                            <i class="fas fa-rotate text-white text-xs"></i>
-                        </button>
-                    </div>
+        <div class="neu-flat p-6 mb-8 relative overflow-hidden">
+            <div class="flex justify-between items-start mb-4">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Operational Cash</span>
+                <i class="fas fa-chart-line text-yellow-600"></i>
+            </div>
+            <h3 id="txtSaldo" class="text-3xl font-bold text-slate-800 tracking-tighter">Rp 0</h3>
+            <div class="mt-6 flex gap-4">
+                <div class="neu-inset px-4 py-2 flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_8px_#facc15]"></div>
+                    <span id="txtBookingCount" class="text-[10px] font-bold text-slate-600 uppercase">0 Active Tasks</span>
                 </div>
             </div>
         </div>
 
-        <div class="px-6 py-6 flex justify-between items-center overflow-x-auto gap-4 no-scrollbar">
-            <div class="flex flex-col items-center min-w-[70px] space-y-2">
-                <div class="w-16 h-16 bg-white rounded-3xl premium-shadow flex items-center justify-center text-blue-600 text-xl">
-                    <i class="fas fa-plus"></i>
+        <div class="grid grid-cols-3 gap-6 mb-10">
+            <div class="flex flex-col items-center gap-3">
+                <div class="neu-button w-full aspect-square flex items-center justify-center text-slate-700 text-xl rounded-3xl">
+                    <i class="fas fa-calendar-check"></i>
                 </div>
-                <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-tighter">Booking</span>
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Booking</span>
             </div>
-            <div class="flex flex-col items-center min-w-[70px] space-y-2">
-                <div class="w-16 h-16 bg-white rounded-3xl premium-shadow flex items-center justify-center text-emerald-500 text-xl">
-                    <i class="fas fa-file-invoice"></i>
+            <div class="flex flex-col items-center gap-3">
+                <div class="neu-button w-full aspect-square flex items-center justify-center text-slate-700 text-xl rounded-3xl">
+                    <i class="fas fa-file-invoice-dollar"></i>
                 </div>
-                <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-tighter">Nota</span>
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Billing</span>
             </div>
-            <div class="flex flex-col items-center min-w-[70px] space-y-2">
-                <div class="w-16 h-16 bg-white rounded-3xl premium-shadow flex items-center justify-center text-rose-500 text-xl">
-                    <i class="fas fa-wallet"></i>
+            <div class="flex flex-col items-center gap-3">
+                <div class="neu-button w-full aspect-square flex items-center justify-center text-slate-700 text-xl rounded-3xl">
+                    <i class="fas fa-gear"></i>
                 </div>
-                <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-tighter">Biaya</span>
-            </div>
-            <div class="flex flex-col items-center min-w-[70px] space-y-2">
-                <div class="w-16 h-16 bg-white rounded-3xl premium-shadow flex items-center justify-center text-amber-500 text-xl">
-                    <i class="fas fa-star"></i>
-                </div>
-                <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-tighter">Ulasan</span>
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Service</span>
             </div>
         </div>
 
-        <div class="px-6 py-2">
-            <div class="flex justify-between items-end mb-4">
-                <h4 class="text-xl font-extrabold text-slate-900 tracking-tight">Kerjaan Aktif</h4>
-                <span class="text-blue-600 text-[10px] font-bold uppercase tracking-widest">Lihat Semua</span>
+        <div>
+            <div class="flex justify-between items-center mb-6 px-1">
+                <h4 class="font-bold text-slate-800 uppercase text-xs tracking-[0.2em]">Workload Feed</h4>
+                <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
             </div>
             
-            <div id="workloadList" class="space-y-4">
-                <div class="h-28 w-full bg-white rounded-[2rem] premium-shadow border border-slate-50 shimmer"></div>
-                <div class="h-28 w-full bg-white rounded-[2rem] premium-shadow border border-slate-50 shimmer"></div>
+            <div id="workloadList" class="space-y-6">
+                <div class="neu-flat p-5 animate-pulse h-24"></div>
+                <div class="neu-flat p-5 animate-pulse h-24"></div>
             </div>
         </div>
-
-        <nav class="fixed bottom-6 left-6 right-6 h-20 bottom-nav-blur rounded-[2.5rem] flex items-center justify-around px-4 z-50 premium-shadow border border-white">
-            <div class="text-blue-600"><i class="fas fa-house text-xl"></i></div>
-            <div class="text-slate-300"><i class="fas fa-users text-xl"></i></div>
-            <div class="w-14 h-14 bg-slate-900 rounded-full flex items-center justify-center text-white shadow-xl shadow-slate-200">
-                <i class="fas fa-qrcode"></i>
-            </div>
-            <div class="text-slate-300"><i class="fas fa-chart-line text-xl"></i></div>
-            <div class="text-slate-300"><i class="fas fa-gear text-xl"></i></div>
-        </nav>
     </div>
 
     <script>
-        // GANTI DENGAN URL WEB APP ANDA
-        const API_URL = "https://script.google.com/macros/s/AKfycbzr4gEWPFsIpFCWycarI1JrSrVfU65IXTprI-s3AXNa4FWu80vCH0H6N3y3jlkESrHgEQ/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbzr4gEWPFsIpFCWycarI1JrSrVfU65IXTprI-s3AXNa4FWu80vCH0H6N3y3jlkESrHgEQ/exec"; // Masukkan URL script anda
 
         window.onload = () => {
             const user = localStorage.getItem('nanda_user');
@@ -158,16 +149,9 @@
         async function handleLogin() {
             const user = document.getElementById('user').value;
             const pass = document.getElementById('pass').value;
-            const btn = document.getElementById('btnLogin');
-            const msg = document.getElementById('loginMsg');
+            if(!user || !pass) return alert("Missing credentials");
 
-            if(!user || !pass) {
-                msg.innerText = "LENGKAPI DATA LOGIN";
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> MEMPROSES...';
+            document.getElementById('btnLogin').innerText = "Authenticating...";
 
             try {
                 const response = await fetch(API_URL, {
@@ -175,74 +159,53 @@
                     body: JSON.stringify({ action: 'login', username: user, password: pass })
                 });
                 const res = await response.json();
-
                 if (res.result === "success") {
                     localStorage.setItem('nanda_user', JSON.stringify(res.data));
                     showDashboard(res.data);
                 } else {
-                    msg.innerText = res.message.toUpperCase();
-                    btn.disabled = false;
-                    btn.innerHTML = 'MASUK SISTEM';
+                    alert(res.message);
+                    document.getElementById('btnLogin').innerText = "Authorize Access";
                 }
             } catch (e) {
-                msg.innerText = "SISTEM OFFLINE";
-                btn.disabled = false;
-                btn.innerHTML = 'MASUK SISTEM';
+                alert("Network Error");
+                document.getElementById('btnLogin').innerText = "Authorize Access";
             }
         }
 
         function showDashboard(userData) {
             document.getElementById('loginPage').classList.add('hidden');
-            const dash = document.getElementById('dashboardPage');
-            dash.classList.remove('hidden');
-            document.getElementById('userNameDisplay').innerText = "Halo, " + userData.nama.split(' ')[0];
+            document.getElementById('dashboardPage').classList.remove('hidden');
+            document.getElementById('userNameDisplay').innerText = userData.nama;
             loadData();
             loadFinance();
         }
 
         async function loadFinance() {
-            try {
-                const res = await fetch(API_URL + "?type=rekap_keuangan").then(r => r.json());
-                document.getElementById('txtSaldo').innerText = "Rp " + res.saldo.toLocaleString('id-ID');
-            } catch (e) { console.log("Finance error"); }
+            const res = await fetch(API_URL + "?type=rekap_keuangan").then(r => r.json());
+            document.getElementById('txtSaldo').innerText = "Rp " + res.saldo.toLocaleString('id-ID');
         }
 
         async function loadData() {
-            try {
-                const res = await fetch(API_URL).then(r => r.json());
-                const list = document.getElementById('workloadList');
-                list.innerHTML = "";
-
-                if(res.length > 0) {
-                    document.getElementById('txtBookingCount').innerText = res.length + " Antrean";
-                    res.forEach(item => {
-                        list.innerHTML += `
-                            <div class="bg-white p-6 rounded-[2rem] premium-shadow border border-slate-50 transition-all active:scale-95">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900 border border-slate-100">
-                                            <i class="fas fa-briefcase text-sm"></i>
-                                        </div>
-                                        <div>
-                                            <h5 class="font-extrabold text-slate-900 tracking-tight">${item.nama}</h5>
-                                            <p class="text-[10px] text-blue-600 font-extrabold uppercase tracking-widest">${item.pekerjaan}</p>
-                                        </div>
-                                    </div>
-                                    <div class="bg-blue-50 px-3 py-1.5 rounded-xl">
-                                        <span class="text-[9px] text-blue-700 font-black uppercase tracking-tighter">${item.status}</span>
-                                    </div>
-                                </div>
-                                <div class="mt-5 pt-4 border-t border-slate-50 flex justify-between items-center text-slate-400">
-                                    <span class="text-[10px] font-bold uppercase"><i class="far fa-calendar-alt mr-1"></i> ${item.tanggal}</span>
-                                    <i class="fas fa-chevron-right text-[10px]"></i>
-                                </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    list.innerHTML = "<div class='text-center py-10'><p class='text-slate-400 text-sm font-medium italic'>Belum ada pengerjaan aktif</p></div>";
-                }
-            } catch (e) { console.log("Data load error"); }
+            const res = await fetch(API_URL).then(r => r.json());
+            const list = document.getElementById('workloadList');
+            list.innerHTML = "";
+            document.getElementById('txtBookingCount').innerText = res.length + " Active Tasks";
+            
+            res.forEach(item => {
+                list.innerHTML += `
+                    <div class="neu-flat p-5 border-l-4 border-yellow-500">
+                        <div class="flex justify-between items-start mb-2">
+                            <h5 class="font-bold text-slate-800 uppercase text-sm">${item.nama}</h5>
+                            <span class="text-[9px] font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded">${item.status}</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">${item.pekerjaan}</p>
+                        <div class="flex justify-between items-center text-[10px] font-bold text-slate-400">
+                            <span><i class="far fa-clock mr-1"></i> ${item.tanggal}</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
         function handleLogout() {
