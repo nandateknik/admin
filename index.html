@@ -2,190 +2,157 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nanda Teknik - Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Nanda Teknik</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f4f7fa;
-            color: #1e293b;
-        }
-        .main-card {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-        }
-        .status-pill {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        /* Menghilangkan scrollbar tapi tetap bisa scroll */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="pb-24">
+<body class="bg-gray-50 pb-24">
 
-    <header class="p-6 flex justify-between items-center bg-white shadow-sm sticky top-0 z-40">
-        <div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Administrator</p>
-            <h1 id="userNameDisplay" class="text-lg font-extrabold text-slate-900 leading-none">Nanda Krisbianto</h1>
-        </div>
-        <div class="flex gap-3">
-            <button onclick="location.reload()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 active:bg-blue-100 active:text-blue-600 transition-all">
-                <i class="fas fa-arrows-rotate text-sm"></i>
-            </button>
-            <button onclick="logout()" class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500">
-                <i class="fas fa-power-off text-sm"></i>
+    <header class="bg-blue-600 text-white p-4 sticky top-0 z-50 shadow-lg rounded-b-2xl">
+        <div class="flex justify-between items-center max-w-md mx-auto">
+            <div>
+                <p class="text-xs opacity-80" id="todayDate">Rabu, 11 Feb 2026</p>
+                <h1 class="font-bold text-xl" id="welcomeUser">Halo, Teknisi!</h1>
+            </div>
+            <button onclick="logout()" class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center hover:bg-red-500 transition">
+                <i class="fas fa-sign-out-alt"></i>
             </button>
         </div>
     </header>
 
-    <div class="p-5">
-        <div class="main-card p-6 rounded-[2rem] text-white shadow-xl shadow-blue-200 relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center gap-2 opacity-80 mb-1">
-                    <i class="fas fa-wallet text-xs"></i>
-                    <span class="text-[10px] font-bold uppercase tracking-wider">Saldo Operasional</span>
-                </div>
-                <h2 id="txtSaldo" class="text-3xl font-extrabold tracking-tight">Rp 0</h2>
-                
-                <div class="mt-6 grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
-                    <div>
-                        <p class="text-[9px] font-bold uppercase opacity-60">Total Masuk</p>
-                        <p id="txtMasuk" class="text-sm font-bold text-emerald-300">+ Rp 0</p>
-                    </div>
-                    <div>
-                        <p class="text-[9px] font-bold uppercase opacity-60">Total Keluar</p>
-                        <p id="txtKeluar" class="text-sm font-bold text-rose-300">- Rp 0</p>
-                    </div>
-                </div>
+    <main class="max-w-md mx-auto p-4 space-y-6">
+        
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div class="text-blue-500 mb-2"><i class="fas fa-wallet text-xl"></i></div>
+                <p class="text-xs text-gray-500">Saldo System</p>
+                <h3 id="txtSaldo" class="font-bold text-lg text-gray-800">Rp --</h3>
             </div>
-            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-white/10 rounded-full"></div>
-        </div>
-    </div>
-
-    <div class="px-5 grid grid-cols-4 gap-4 mb-8">
-        <div class="flex flex-col items-center gap-2">
-            <div class="w-full aspect-square bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-100 active:scale-90 transition-all">
-                <i class="fas fa-calendar-check text-xl"></i>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div class="text-orange-500 mb-2"><i class="fas fa-tasks text-xl"></i></div>
+                <p class="text-xs text-gray-500">Antrian Kerja</p>
+                <h3 id="txtWorkload" class="font-bold text-lg text-gray-800">--</h3>
             </div>
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Booking</span>
-        </div>
-        <div class="flex flex-col items-center gap-2">
-            <div class="w-full aspect-square bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-slate-100 active:scale-90 transition-all">
-                <i class="fas fa-file-invoice-dollar text-xl"></i>
-            </div>
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Buat Nota</span>
-        </div>
-        <div class="flex flex-col items-center gap-2">
-            <div class="w-full aspect-square bg-white rounded-2xl flex items-center justify-center text-rose-500 shadow-sm border border-slate-100 active:scale-90 transition-all">
-                <i class="fas fa-cart-shopping text-xl"></i>
-            </div>
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Biaya</span>
-        </div>
-        <div class="flex flex-col items-center gap-2">
-            <div class="w-full aspect-square bg-white rounded-2xl flex items-center justify-center text-amber-500 shadow-sm border border-slate-100 active:scale-90 transition-all">
-                <i class="fas fa-users text-xl"></i>
-            </div>
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Pelanggan</span>
-        </div>
-    </div>
-
-    <div class="px-5">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-extrabold text-slate-800 uppercase tracking-widest">Pekerjaan Aktif</h3>
-            <span id="jobCount" class="bg-blue-600 text-white text-[9px] px-2 py-1 rounded-full font-bold">0</span>
         </div>
 
-        <div id="workloadList" class="space-y-4">
-            <div class="bg-white p-5 rounded-3xl animate-pulse flex items-center gap-4">
-                <div class="w-12 h-12 bg-slate-100 rounded-2xl"></div>
-                <div class="flex-1 space-y-2">
-                    <div class="h-3 bg-slate-100 rounded w-1/2"></div>
-                    <div class="h-2 bg-slate-100 rounded w-full"></div>
-                </div>
+        <div>
+            <h2 class="font-bold text-gray-700 mb-3">Menu Cepat</h2>
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="Swal.fire('Fitur Segera Datang','Tambah Booking Baru','info')" class="bg-white p-3 rounded-xl shadow-sm text-center">
+                    <i class="fas fa-plus-circle text-blue-600 mb-1 block"></i><span class="text-[10px]">Booking</span>
+                </button>
+                <button onclick="Swal.fire('Fitur Segera Datang','Input Pengeluaran','info')" class="bg-white p-3 rounded-xl shadow-sm text-center">
+                    <i class="fas fa-receipt text-red-500 mb-1 block"></i><span class="text-[10px]">Keluar</span>
+                </button>
+                <button onclick="loadData()" class="bg-white p-3 rounded-xl shadow-sm text-center">
+                    <i class="fas fa-sync text-green-500 mb-1 block"></i><span class="text-[10px]">Refresh</span>
+                </button>
+                <button onclick="Swal.fire('Fitur Segera Datang','Catatan Pribadi','info')" class="bg-white p-3 rounded-xl shadow-sm text-center">
+                    <i class="fas fa-sticky-note text-yellow-500 mb-1 block"></i><span class="text-[10px]">Memo</span>
+                </button>
             </div>
         </div>
-    </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-8 py-4 flex justify-between items-center z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
-        <button class="text-blue-600"><i class="fas fa-house-chimney text-xl"></i></button>
-        <button class="text-slate-300"><i class="fas fa-clipboard-list text-xl"></i></button>
-        <button class="w-14 h-14 bg-slate-900 rounded-full flex items-center justify-center text-white -mt-12 shadow-lg shadow-slate-300 active:scale-90 transition-all">
-            <i class="fas fa-plus"></i>
+        <div>
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-bold text-gray-700">Pekerjaan Aktif</h2>
+                <span class="text-[10px] text-blue-600 font-bold">LIVE UPDATE</span>
+            </div>
+            <div id="jobContainer" class="space-y-3">
+                <div class="bg-gray-200 animate-pulse h-20 rounded-xl"></div>
+                <div class="bg-gray-200 animate-pulse h-20 rounded-xl"></div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-100 flex justify-around py-3 px-2 z-50">
+        <button class="flex flex-col items-center text-blue-600">
+            <i class="fas fa-home text-lg"></i><span class="text-[10px] mt-1">Beranda</span>
         </button>
-        <button class="text-slate-300"><i class="fas fa-chart-pie text-xl"></i></button>
-        <button class="text-slate-300"><i class="fas fa-gear text-xl"></i></button>
+        <button onclick="Swal.fire('Segera','Menu Jadwal','info')" class="flex flex-col items-center text-gray-400">
+            <i class="fas fa-calendar-check text-lg"></i><span class="text-[10px] mt-1">Jadwal</span>
+        </button>
+        <button onclick="Swal.fire('Segera','Menu Keuangan','info')" class="flex flex-col items-center text-gray-400">
+            <i class="fas fa-chart-line text-lg"></i><span class="text-[10px] mt-1">Laporan</span>
+        </button>
+        <button onclick="Swal.fire('Segera','Menu Pelanggan','info')" class="flex flex-col items-center text-gray-400">
+            <i class="fas fa-users text-lg"></i><span class="text-[10px] mt-1">Customer</span>
+        </button>
     </nav>
 
     <script>
-        // Masukkan URL Google Apps Script Anda
-        const API_URL = "https://script.google.com/macros/s/AKfycbzr4gEWPFsIpFCWycarI1JrSrVfU65IXTprI-s3AXNa4FWu80vCH0H6N3y3jlkESrHgEQ/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbzL-SgC...your_id.../exec";
+        
+        // 1. Validasi Login
+        const userData = JSON.parse(localStorage.getItem("user_nanda"));
+        if (!userData) {
+            window.location.href = "login.html";
+        } else {
+            document.getElementById('welcomeUser').innerText = "Halo, " + userData.nama.split(' ')[0] + "!";
+        }
 
-        window.onload = () => {
-            const user = localStorage.getItem('nanda_user');
-            // Jika tidak ada data login, lempar ke login.html
-            if (!user) {
-                window.location.href = "login.html";
-                return;
-            }
-            const userData = JSON.parse(user);
-            document.getElementById('userNameDisplay').innerText = userData.nama;
-            
-            loadDashboardData();
-        };
-
-        async function loadDashboardData() {
+        // 2. Load Data dari Apps Script
+        async function loadData() {
             try {
-                // 1. Ambil Rekap Keuangan
-                const resFin = await fetch(API_URL + "?type=rekap_keuangan").then(r => r.json());
-                document.getElementById('txtSaldo').innerText = "Rp " + resFin.saldo.toLocaleString('id-ID');
-                document.getElementById('txtMasuk').innerText = "+ Rp " + resFin.pendapatan.toLocaleString('id-ID');
-                document.getElementById('txtKeluar').innerText = "- Rp " + resFin.pengeluaran.toLocaleString('id-ID');
+                // Ambil Data Keuangan
+                const resKeuangan = await fetch(API_URL + "?type=rekap_keuangan");
+                const dataKeuangan = await resKeuangan.json();
+                document.getElementById('txtSaldo').innerText = "Rp " + dataKeuangan.saldo.toLocaleString('id-ID');
 
-                // 2. Ambil Pekerjaan Aktif
-                const resJob = await fetch(API_URL).then(r => r.json());
-                const list = document.getElementById('workloadList');
-                list.innerHTML = "";
-                document.getElementById('jobCount').innerText = resJob.length;
-
-                if(resJob.length > 0) {
-                    resJob.forEach(job => {
-                        list.innerHTML += `
-                            <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between active:bg-slate-50 transition-all">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                        <i class="fas fa-screwdriver-wrench"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-slate-800 text-sm leading-tight">${job.nama}</h4>
-                                        <p class="text-[10px] text-slate-400 font-medium mb-1">${job.pekerjaan}</p>
-                                        <span class="status-pill ${job.status.toLowerCase().includes('proses') ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}">
-                                            ${job.status}
-                                        </span>
-                                    </div>
-                                </div>
-                                <i class="fas fa-chevron-right text-slate-200 text-xs"></i>
-                            </div>
-                        `;
-                    });
+                // Ambil Data Workload (Default doGet)
+                const resWork = await fetch(API_URL);
+                const dataWork = await resWork.json();
+                
+                document.getElementById('txtWorkload').innerText = dataWork.length + " Task";
+                
+                let html = "";
+                if (dataWork.length === 0) {
+                    html = `<p class="text-center text-gray-400 text-sm py-10">Tidak ada pekerjaan aktif.</p>`;
                 } else {
-                    list.innerHTML = "<p class='text-center text-slate-400 text-xs py-10 italic'>Tidak ada kerjaan aktif</p>";
+                    dataWork.forEach(job => {
+                        html += `
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center group active:bg-gray-50 transition">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800 text-sm">${job.nama}</h4>
+                                <p class="text-xs text-gray-500">${job.pekerjaan}</p>
+                                <p class="text-[10px] text-blue-500 mt-1"><i class="far fa-clock mr-1"></i>${job.tanggal}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="inline-block px-2 py-1 rounded-lg text-[9px] font-bold bg-blue-100 text-blue-700 uppercase tracking-wider">${job.status}</span>
+                                <i class="fas fa-chevron-right text-gray-300 ml-2 text-xs"></i>
+                            </div>
+                        </div>`;
+                    });
                 }
+                document.getElementById('jobContainer').innerHTML = html;
+
             } catch (e) {
-                console.error("Gagal muat data", e);
+                Swal.fire({ icon: 'error', title: 'Data Error', text: 'Gagal memuat data dari spreadsheet.' });
             }
         }
 
         function logout() {
-            localStorage.removeItem('nanda_user');
-            window.location.href = "login.html";
+            Swal.fire({
+                title: 'Logout?',
+                text: "Anda harus login kembali nanti.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Keluar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.clear();
+                    window.location.href = "login.html";
+                }
+            })
         }
+
+        // Jalankan saat startup
+        window.onload = loadData;
+        document.getElementById('todayDate').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     </script>
 </body>
 </html>
