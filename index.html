@@ -3,378 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nanda Teknik - Management</title>
+    <title>Nanda Teknik - Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f4f7fa;
+            color: #1e293b;
         }
-        .status-badge {
-            font-size: 0.65rem;
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
-            font-weight: 800;
+        .main-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        .status-pill {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 700;
             text-transform: uppercase;
         }
-        .card-shadow {
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-        }
-        .hidden { display: none; }
+        /* Menghilangkan scrollbar tapi tetap bisa scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-slate-900">
+<body class="pb-24">
 
-    <div id="loginPage" class="min-h-screen flex items-center justify-center p-6 bg-slate-900">
-        <div class="w-full max-w-sm bg-white rounded-2xl p-8 shadow-2xl">
-            <div class="mb-8">
-                <h1 class="text-2xl font-black tracking-tight text-slate-900">NANDA<span class="text-blue-600">TEKNIK</span></h1>
-                <p class="text-slate-500 text-sm">Masuk ke sistem manajemen</p>
+    <header class="p-6 flex justify-between items-center bg-white shadow-sm sticky top-0 z-40">
+        <div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Administrator</p>
+            <h1 id="userNameDisplay" class="text-lg font-extrabold text-slate-900 leading-none">Nanda Krisbianto</h1>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="location.reload()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 active:bg-blue-100 active:text-blue-600 transition-all">
+                <i class="fas fa-arrows-rotate text-sm"></i>
+            </button>
+            <button onclick="logout()" class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500">
+                <i class="fas fa-power-off text-sm"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="p-5">
+        <div class="main-card p-6 rounded-[2rem] text-white shadow-xl shadow-blue-200 relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="flex items-center gap-2 opacity-80 mb-1">
+                    <i class="fas fa-wallet text-xs"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Saldo Operasional</span>
+                </div>
+                <h2 id="txtSaldo" class="text-3xl font-extrabold tracking-tight">Rp 0</h2>
+                
+                <div class="mt-6 grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
+                    <div>
+                        <p class="text-[9px] font-bold uppercase opacity-60">Total Masuk</p>
+                        <p id="txtMasuk" class="text-sm font-bold text-emerald-300">+ Rp 0</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-bold uppercase opacity-60">Total Keluar</p>
+                        <p id="txtKeluar" class="text-sm font-bold text-rose-300">- Rp 0</p>
+                    </div>
+                </div>
             </div>
-            <div class="space-y-4">
-                <input type="text" id="user" placeholder="Username" class="w-full px-4 py-3 bg-slate-100 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none transition-all">
-                <input type="password" id="pass" placeholder="Password" class="w-full px-4 py-3 bg-slate-100 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none transition-all">
-                <button onclick="handleLogin()" id="btnLogin" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-200">
-                    MASUK
-                </button>
-                <p id="loginMsg" class="text-center text-red-500 text-xs font-bold h-2"></p>
+            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-white/10 rounded-full"></div>
+        </div>
+    </div>
+
+    <div class="px-5 grid grid-cols-4 gap-4 mb-8">
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-full aspect-square bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-100 active:scale-90 transition-all">
+                <i class="fas fa-calendar-check text-xl"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Booking</span>
+        </div>
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-full aspect-square bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-slate-100 active:scale-90 transition-all">
+                <i class="fas fa-file-invoice-dollar text-xl"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Buat Nota</span>
+        </div>
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-full aspect-square bg-white rounded-2xl flex items-center justify-center text-rose-500 shadow-sm border border-slate-100 active:scale-90 transition-all">
+                <i class="fas fa-cart-shopping text-xl"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Biaya</span>
+        </div>
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-full aspect-square bg-white rounded-2xl flex items-center justify-center text-amber-500 shadow-sm border border-slate-100 active:scale-90 transition-all">
+                <i class="fas fa-users text-xl"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Pelanggan</span>
+        </div>
+    </div>
+
+    <div class="px-5">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-extrabold text-slate-800 uppercase tracking-widest">Pekerjaan Aktif</h3>
+            <span id="jobCount" class="bg-blue-600 text-white text-[9px] px-2 py-1 rounded-full font-bold">0</span>
+        </div>
+
+        <div id="workloadList" class="space-y-4">
+            <div class="bg-white p-5 rounded-3xl animate-pulse flex items-center gap-4">
+                <div class="w-12 h-12 bg-slate-100 rounded-2xl"></div>
+                <div class="flex-1 space-y-2">
+                    <div class="h-3 bg-slate-100 rounded w-1/2"></div>
+                    <div class="h-2 bg-slate-100 rounded w-full"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="dashboardPage" class="hidden pb-20">
-        <div class="bg-white border-b border-slate-200 px-6 py-5 flex justify-between items-center sticky top-0 z-50">
-            <h1 class="text-xl font-black tracking-tighter text-slate-900">NT<span class="text-blue-600">SYS</span></h1>
-            <div class="flex items-center gap-4">
-                <span id="userNameDisplay" class="text-xs font-bold text-slate-500">Admin</span>
-                <button onclick="handleLogout()" class="text-slate-400 hover:text-red-500"><i class="fas fa-sign-out-alt"></i></button>
-            </div>
-        </div>
-
-        <div class="p-4 grid grid-cols-2 gap-3">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 card-shadow">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kas Saldo</p>
-                <h3 id="txtSaldo" class="text-lg font-extrabold text-slate-900">Rp 0</h3>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 card-shadow">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Antrean</p>
-                <h3 id="txtBookingCount" class="text-lg font-extrabold text-slate-900">0 Pekerjaan</h3>
-            </div>
-        </div>
-
-        <div class="px-4 py-2 grid grid-cols-4 gap-2">
-            <button class="bg-blue-50 text-blue-600 p-4 rounded-xl flex flex-col items-center gap-2 border border-blue-100">
-                <i class="fas fa-calendar-plus text-lg"></i>
-                <span class="text-[9px] font-bold uppercase">Booking</span>
-            </button>
-            <button class="bg-emerald-50 text-emerald-600 p-4 rounded-xl flex flex-col items-center gap-2 border border-emerald-100">
-                <i class="fas fa-file-invoice text-lg"></i>
-                <span class="text-[9px] font-bold uppercase">Nota</span>
-            </button>
-            <button class="bg-rose-50 text-rose-600 p-4 rounded-xl flex flex-col items-center gap-2 border border-rose-100">
-                <i class="fas fa-wallet text-lg"></i>
-                <span class="text-[9px] font-bold uppercase">Biaya</span>
-            </button>
-            <button class="bg-slate-50 text-slate-600 p-4 rounded-xl flex flex-col items-center gap-2 border border-slate-200">
-                <i class="fas fa-users text-lg"></i>
-                <span class="text-[9px] font-bold uppercase">Client</span>
-            </button>
-        </div>
-
-        <div class="p-4">
-            <div class="flex items-center justify-between mb-4 px-1">
-                <h2 class="font-extrabold text-sm text-slate-800 uppercase tracking-widest">Pekerjaan Aktif</h2>
-                <div class="h-1 w-12 bg-blue-600 rounded-full"></div>
-            </div>
-
-            <div id="workloadList" class="space-y-3">
-                <div class="h-20 bg-white rounded-xl border border-slate-200 animate-pulse"></div>
-                <div class="h-20 bg-white rounded-xl border border-slate-200 animate-pulse"></div>
-            </div>
-        </div>
-
-        <div class="fixed bottom-6 right-6">
-            <button class="w-14 h-14 bg-blue-600 text-white rounded-full shadow-xl shadow-blue-300 flex items-center justify-center text-xl hover:scale-110 active:scale-90 transition-all">
-                <i class="fas fa-plus"></i>
-            </button>
-        </div>
-    </div>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-8 py-4 flex justify-between items-center z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+        <button class="text-blue-600"><i class="fas fa-house-chimney text-xl"></i></button>
+        <button class="text-slate-300"><i class="fas fa-clipboard-list text-xl"></i></button>
+        <button class="w-14 h-14 bg-slate-900 rounded-full flex items-center justify-center text-white -mt-12 shadow-lg shadow-slate-300 active:scale-90 transition-all">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="text-slate-300"><i class="fas fa-chart-pie text-xl"></i></button>
+        <button class="text-slate-300"><i class="fas fa-gear text-xl"></i></button>
+    </nav>
 
     <script>
-        // MASUKKAN URL WEB APP ANDA
-        const API_URL = "URL_WEB_APP_ANDA";
-
-        window.onload = () => {
-            const user = localStorage.getItem('nanda_user');
-            if (user) showDashboard(JSON.parse(user));
-        };
-
-        async function handleLogin() {
-            const user = document.getElementById('user').value;
-            const pass = document.getElementById('pass').value;
-            const btn = document.getElementById('btnLogin');
-            if(!user || !pass) return;
-
-            btn.disabled = true;
-            btn.innerText = "AUTHENTICATING...";
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'login', username: user, password: pass })
-                });
-                const res = await response.json();
-                if (res.result === "success") {
-                    localStorage.setItem('nanda_user', JSON.stringify(res.data));
-                    showDashboard(res.data);
-                } else {
-                    document.getElementById('loginMsg').innerText = res.message;
-                    btn.disabled = false;
-                    btn.innerText = "MASUK";
-                }
-            } catch (e) {
-                document.getElementById('loginMsg').innerText = "SYSTEM ERROR";
-                btn.disabled = false;
-                btn.innerText = "MASUK";
-            }
-        }
-
-        function showDashboard(userData) {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('dashboardPage').classList.remove('hidden');
-            document.getElementById('userNameDisplay').innerText = userData.nama;
-            loadData();
-            loadFinance();
-        }
-
-        async function loadFinance() {
-            try {
-                const res = await fetch(API_URL + "?type=rekap_keuangan").then(r => r.json());
-                document.getElementById('txtSaldo').innerText = "Rp " + res.saldo.toLocaleString('id-ID');
-            } catch (e) { console.log("Fin Error"); }
-        }
-
-        async function loadData() {
-            try {
-                const res = await fetch(API_URL).then(r => r.json());
-                const list = document.getElementById('workloadList');
-                list.innerHTML = "";
-                document.getElementById('txtBookingCount').innerText = res.length + " Pekerjaan";
-
-                res.forEach(item => {
-                    const statusColor = item.status.toLowerCase().includes('proses') ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600';
-                    list.innerHTML += `
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow flex justify-between items-center transition-all active:bg-slate-50">
-                            <div>
-                                <h4 class="font-bold text-slate-800 text-sm">${item.nama}</h4>
-                                <p class="text-xs text-slate-500 mb-2">${item.pekerjaan}</p>
-                                <span class="status-badge ${statusColor}">${item.status}</span>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] font-bold text-slate-300">${item.tanggal}</p>
-                                <i class="fas fa-chevron-right text-slate-200 mt-2"></i>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (e) { console.log("Data Error"); }
-        }
-
-        function handleLogout() {
-            localStorage.clear();
-            location.reload();
-        }
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nanda Teknik - Management</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #f1f5f9;
-        }
-        .status-badge {
-            font-size: 0.65rem;
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-        .card-shadow {
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-        }
-        .hidden { display: none; }
-    </style>
-</head>
-<body class="text-slate-900">
-
-    <div id="loginPage" class="min-h-screen flex items-center justify-center p-6 bg-slate-900">
-        <div class="w-full max-w-sm bg-white rounded-2xl p-8 shadow-2xl">
-            <div class="mb-8">
-                <h1 class="text-2xl font-black tracking-tight text-slate-900">NANDA<span class="text-blue-600">TEKNIK</span></h1>
-                <p class="text-slate-500 text-sm">Masuk ke sistem manajemen</p>
-            </div>
-            <div class="space-y-4">
-                <input type="text" id="user" placeholder="Username" class="w-full px-4 py-3 bg-slate-100 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none transition-all">
-                <input type="password" id="pass" placeholder="Password" class="w-full px-4 py-3 bg-slate-100 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none transition-all">
-                <button onclick="handleLogin()" id="btnLogin" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-200">
-                    MASUK
-                </button>
-                <p id="loginMsg" class="text-center text-red-500 text-xs font-bold h-2"></p>
-            </div>
-        </div>
-    </div>
-
-    <div id="dashboardPage" class="hidden pb-20">
-        <div class="bg-white border-b border-slate-200 px-6 py-5 flex justify-between items-center sticky top-0 z-50">
-            <h1 class="text-xl font-black tracking-tighter text-slate-900">NT<span class="text-blue-600">SYS</span></h1>
-            <div class="flex items-center gap-4">
-                <span id="userNameDisplay" class="text-xs font-bold text-slate-500">Admin</span>
-                <button onclick="handleLogout()" class="text-slate-400 hover:text-red-500"><i class="fas fa-sign-out-alt"></i></button>
-            </div>
-        </div>
-
-        <div class="p-4 grid grid-cols-2 gap-3">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 card-shadow">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kas Saldo</p>
-                <h3 id="txtSaldo" class="text-lg font-extrabold text-slate-900">Rp 0</h3>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 card-shadow">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Antrean</p>
-                <h3 id="txtBookingCount" class="text-lg font-extrabold text-slate-900">0 Pekerjaan</h3>
-            </div>
-        </div>
-
-        <div class="px-4 py-2 grid grid-cols-4 gap-2">
-            <button class="bg-blue-50 text-blue-600 p-4 rounded-xl flex flex-col items-center gap-2 border border-blue-100">
-                <i class="fas fa-calendar-plus text-lg"></i>
-                <span class="text-[9px] font-bold uppercase">Booking</span>
-            </button>
-            <button class="bg-emerald-50 text-emerald-600 p-4 rounded-xl flex flex-col items-center gap-2 border border-emerald-100">
-                <i class="fas fa-file-invoice text-lg"></i>
-                <span class="text-[9px] font-bold uppercase">Nota</span>
-            </button>
-            <button class="bg-rose-50 text-rose-600 p-4 rounded-xl flex flex-col items-center gap-2 border border-rose-100">
-                <i class="fas fa-wallet text-lg"></i>
-                <span class="text-[9px] font-bold uppercase">Biaya</span>
-            </button>
-            <button class="bg-slate-50 text-slate-600 p-4 rounded-xl flex flex-col items-center gap-2 border border-slate-200">
-                <i class="fas fa-users text-lg"></i>
-                <span class="text-[9px] font-bold uppercase">Client</span>
-            </button>
-        </div>
-
-        <div class="p-4">
-            <div class="flex items-center justify-between mb-4 px-1">
-                <h2 class="font-extrabold text-sm text-slate-800 uppercase tracking-widest">Pekerjaan Aktif</h2>
-                <div class="h-1 w-12 bg-blue-600 rounded-full"></div>
-            </div>
-
-            <div id="workloadList" class="space-y-3">
-                <div class="h-20 bg-white rounded-xl border border-slate-200 animate-pulse"></div>
-                <div class="h-20 bg-white rounded-xl border border-slate-200 animate-pulse"></div>
-            </div>
-        </div>
-
-        <div class="fixed bottom-6 right-6">
-            <button class="w-14 h-14 bg-blue-600 text-white rounded-full shadow-xl shadow-blue-300 flex items-center justify-center text-xl hover:scale-110 active:scale-90 transition-all">
-                <i class="fas fa-plus"></i>
-            </button>
-        </div>
-    </div>
-
-    <script>
-        // MASUKKAN URL WEB APP ANDA
+        // Masukkan URL Google Apps Script Anda
         const API_URL = "https://script.google.com/macros/s/AKfycbzr4gEWPFsIpFCWycarI1JrSrVfU65IXTprI-s3AXNa4FWu80vCH0H6N3y3jlkESrHgEQ/exec";
 
         window.onload = () => {
             const user = localStorage.getItem('nanda_user');
-            if (user) showDashboard(JSON.parse(user));
+            // Jika tidak ada data login, lempar ke login.html
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+            const userData = JSON.parse(user);
+            document.getElementById('userNameDisplay').innerText = userData.nama;
+            
+            loadDashboardData();
         };
 
-        async function handleLogin() {
-            const user = document.getElementById('user').value;
-            const pass = document.getElementById('pass').value;
-            const btn = document.getElementById('btnLogin');
-            if(!user || !pass) return;
-
-            btn.disabled = true;
-            btn.innerText = "AUTHENTICATING...";
-
+        async function loadDashboardData() {
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'login', username: user, password: pass })
-                });
-                const res = await response.json();
-                if (res.result === "success") {
-                    localStorage.setItem('nanda_user', JSON.stringify(res.data));
-                    showDashboard(res.data);
+                // 1. Ambil Rekap Keuangan
+                const resFin = await fetch(API_URL + "?type=rekap_keuangan").then(r => r.json());
+                document.getElementById('txtSaldo').innerText = "Rp " + resFin.saldo.toLocaleString('id-ID');
+                document.getElementById('txtMasuk').innerText = "+ Rp " + resFin.pendapatan.toLocaleString('id-ID');
+                document.getElementById('txtKeluar').innerText = "- Rp " + resFin.pengeluaran.toLocaleString('id-ID');
+
+                // 2. Ambil Pekerjaan Aktif
+                const resJob = await fetch(API_URL).then(r => r.json());
+                const list = document.getElementById('workloadList');
+                list.innerHTML = "";
+                document.getElementById('jobCount').innerText = resJob.length;
+
+                if(resJob.length > 0) {
+                    resJob.forEach(job => {
+                        list.innerHTML += `
+                            <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between active:bg-slate-50 transition-all">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                        <i class="fas fa-screwdriver-wrench"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-sm leading-tight">${job.nama}</h4>
+                                        <p class="text-[10px] text-slate-400 font-medium mb-1">${job.pekerjaan}</p>
+                                        <span class="status-pill ${job.status.toLowerCase().includes('proses') ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}">
+                                            ${job.status}
+                                        </span>
+                                    </div>
+                                </div>
+                                <i class="fas fa-chevron-right text-slate-200 text-xs"></i>
+                            </div>
+                        `;
+                    });
                 } else {
-                    document.getElementById('loginMsg').innerText = res.message;
-                    btn.disabled = false;
-                    btn.innerText = "MASUK";
+                    list.innerHTML = "<p class='text-center text-slate-400 text-xs py-10 italic'>Tidak ada kerjaan aktif</p>";
                 }
             } catch (e) {
-                document.getElementById('loginMsg').innerText = "SYSTEM ERROR";
-                btn.disabled = false;
-                btn.innerText = "MASUK";
+                console.error("Gagal muat data", e);
             }
         }
 
-        function showDashboard(userData) {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('dashboardPage').classList.remove('hidden');
-            document.getElementById('userNameDisplay').innerText = userData.nama;
-            loadData();
-            loadFinance();
-        }
-
-        async function loadFinance() {
-            try {
-                const res = await fetch(API_URL + "?type=rekap_keuangan").then(r => r.json());
-                document.getElementById('txtSaldo').innerText = "Rp " + res.saldo.toLocaleString('id-ID');
-            } catch (e) { console.log("Fin Error"); }
-        }
-
-        async function loadData() {
-            try {
-                const res = await fetch(API_URL).then(r => r.json());
-                const list = document.getElementById('workloadList');
-                list.innerHTML = "";
-                document.getElementById('txtBookingCount').innerText = res.length + " Pekerjaan";
-
-                res.forEach(item => {
-                    const statusColor = item.status.toLowerCase().includes('proses') ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600';
-                    list.innerHTML += `
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow flex justify-between items-center transition-all active:bg-slate-50">
-                            <div>
-                                <h4 class="font-bold text-slate-800 text-sm">${item.nama}</h4>
-                                <p class="text-xs text-slate-500 mb-2">${item.pekerjaan}</p>
-                                <span class="status-badge ${statusColor}">${item.status}</span>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] font-bold text-slate-300">${item.tanggal}</p>
-                                <i class="fas fa-chevron-right text-slate-200 mt-2"></i>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (e) { console.log("Data Error"); }
-        }
-
-        function handleLogout() {
-            localStorage.clear();
-            location.reload();
+        function logout() {
+            localStorage.removeItem('nanda_user');
+            window.location.href = "login.html";
         }
     </script>
 </body>
