@@ -13,12 +13,10 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
         .mobile-container { max-width: 480px; min-height: 100vh; margin: 0 auto; background: #f8fafc; position: relative; padding-bottom: 40px; }
         
-        /* Sidebar Style (Identik dengan pelanggan.html) */
         #sidebar {
-            position: absolute; top: 0; left: -110%; width: 280px; height: 100%;
+            position: fixed; top: 0; left: -110%; width: 280px; height: 100%;
             background: white; z-index: 5000; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column; box-shadow: 20px 0 50px rgba(0,0,0,0.1);
-            position: fixed;
         }
         #sidebar.open { left: 0; }
         .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #64748b; font-weight: 700; font-size: 0.85rem; transition: 0.2s; cursor: pointer; text-decoration: none; }
@@ -27,9 +25,8 @@
         .logout-btn { color: #ef4444 !important; border-top: 1px solid #f1f5f9; margin-top: auto; padding: 20px 16px; }
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.2); z-index: 4999; display: none; backdrop-filter: blur(2px); }
 
-        /* Card Style */
-        .glass-card { background: white; border-radius: 24px; border: 1px solid rgba(255,255,255,0.7); box-shadow: 0 10px 25px rgba(0,0,0,0.02); }
-        .stat-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
+        .job-card { background: white; border-radius: 24px; border: 1px solid #f1f5f9; transition: all 0.3s ease; }
+        .job-card:active { transform: scale(0.97); background: #fcfcfc; }
     </style>
 </head>
 <body>
@@ -41,84 +38,55 @@
             <div class="p-6 flex flex-col h-full">
                 <div class="flex items-center gap-3 mb-8">
                     <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg">N</div>
-                    <h1 class="font-extrabold text-slate-800 tracking-tight italic text-lg">NANDA <span class="text-blue-600">TEKNIK</span></h1>
+                    <h1 class="font-extrabold text-slate-800 tracking-tight italic text-lg text-blue-600">NANDA <span class="text-slate-800">TEKNIK</span></h1>
                 </div>
                 <nav class="space-y-1 flex-1 overflow-y-auto">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mb-2 tracking-widest">Utama</p>
-                    <a href="index.html" class="nav-link active">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        Dashboard Kerja
-                    </a>
-                    <a href="pelanggan.html" class="nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        Database Pelanggan
-                    </a>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Transaksi & Marketing</p>
-                    <a href="input-booking.html" class="nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
-                        Input Booking Baru
-                    </a>
-                    <a href="nota.html" class="nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        Buat Nota Lunas
-                    </a>
+                    <a href="index.html" class="nav-link active"><i class="fas fa-tasks w-5"></i> Dashboard Kerja</a>
+                    <a href="pelanggan.html" class="nav-link"><i class="fas fa-map-marked-alt w-5"></i> Database Pelanggan</a>
                 </nav>
-                <div onclick="logout()" class="nav-link logout-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    Logout Admin
-                </div>
+                <div onclick="logout()" class="nav-link logout-btn"><i class="fas fa-sign-out-alt w-5"></i> Logout Admin</div>
             </div>
         </div>
 
         <header class="p-6">
-            <div class="flex justify-between items-center mb-8">
-                <button onclick="toggleSidebar()" class="bg-white p-3 rounded-2xl shadow-sm text-slate-600 active:scale-90 transition border border-slate-50">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="toggleSidebar()" class="bg-white p-3 rounded-2xl shadow-sm text-slate-600 border border-slate-50">
+                    <i class="fas fa-bars text-xl"></i>
                 </button>
                 <div class="text-right">
                     <p id="curDate" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">---</p>
-                    <h2 id="userName" class="text-lg font-extrabold text-slate-800 italic">Halo, Nanda!</h2>
+                    <h2 id="userName" class="text-lg font-extrabold text-slate-800 italic">Halo, Teknisi!</h2>
                 </div>
             </div>
 
-            <div class="bg-slate-900 rounded-[32px] p-6 text-white mb-6 relative overflow-hidden shadow-2xl shadow-slate-200">
-                <div class="relative z-10">
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Total Saldo System</p>
-                    <h1 id="txtSaldo" class="text-3xl font-black italic mb-4 tracking-tight">Rp --</h1>
-                    <div class="flex gap-2">
-                        <span class="bg-white/10 px-3 py-1 rounded-full text-[10px] font-bold backdrop-blur-md italic">ULTIMATE STABLE 2026</span>
-                    </div>
-                </div>
-                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-600 rounded-full blur-[60px] opacity-40"></div>
+            <div class="bg-slate-900 rounded-[30px] p-6 text-white mb-6 shadow-xl relative overflow-hidden">
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Berjalan</p>
+                <h1 id="txtSaldo" class="text-3xl font-black italic tracking-tighter">Rp 0</h1>
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-blue-600 rounded-full blur-3xl opacity-30"></div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-                <div class="stat-card">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Antrian Kerja</p>
-                    <div class="flex items-end justify-between">
-                        <h3 id="txtWorkload" class="text-2xl font-black text-slate-800 italic">--</h3>
-                        <i class="fas fa-tools text-blue-100 text-2xl mb-1"></i>
-                    </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Antrian Aktif</p>
+                    <h3 id="txtWorkload" class="text-2xl font-black text-blue-600 italic">0</h3>
                 </div>
-                <div class="stat-card">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pengeluaran</p>
-                    <div class="flex items-end justify-between">
-                        <h3 id="txtExpense" class="text-xl font-black text-red-500 italic">--</h3>
-                        <i class="fas fa-arrow-up text-red-500/10 text-2xl mb-1"></i>
-                    </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Biaya Keluar</p>
+                    <h3 id="txtExpense" class="text-xl font-black text-red-500 italic">Rp 0</h3>
                 </div>
             </div>
         </header>
 
         <section class="px-6">
-            <div class="flex justify-between items-center mb-4 px-2">
-                <h3 class="font-extrabold text-slate-800 italic uppercase tracking-tighter">Pekerjaan Aktif</h3>
-                <button onclick="loadData()" class="text-blue-600 font-bold text-xs uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full">Refresh</button>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-extrabold text-slate-800 italic uppercase text-sm">Pekerjaan Belum Selesai</h3>
+                <span class="bg-green-100 text-green-600 text-[9px] font-bold px-2 py-0.5 rounded-full">LIVE</span>
             </div>
 
             <div id="jobContainer" class="space-y-4">
-                <div class="bg-white p-8 rounded-[24px] text-center border-2 border-dashed border-slate-100">
-                    <p class="text-slate-400 text-sm font-bold italic">Sedang menyinkronkan data...</p>
+                <div class="animate-pulse flex flex-col gap-4">
+                    <div class="h-24 bg-slate-200 rounded-2xl"></div>
+                    <div class="h-24 bg-slate-200 rounded-2xl"></div>
                 </div>
             </div>
         </section>
@@ -136,66 +104,62 @@
 
         async function loadData() {
             try {
-                // 1. Rekap Keuangan
+                // 1. Load Keuangan
                 const resFin = await fetch(API_URL + "?type=rekap_keuangan");
                 const dataFin = await resFin.json();
                 document.getElementById('txtSaldo').innerText = "Rp " + (dataFin.saldo || 0).toLocaleString('id-ID');
                 document.getElementById('txtExpense').innerText = "Rp " + (dataFin.pengeluaran || 0).toLocaleString('id-ID');
 
-                // 2. Workload Data (doGet default)
+                // 2. Load Workload (Default doGet GS)
                 const resWork = await fetch(API_URL);
                 const dataWork = await resWork.json();
+                
                 document.getElementById('txtWorkload').innerText = dataWork.length;
-
-                let html = "";
-                if (dataWork.length === 0) {
-                    html = `<div class="bg-white p-8 rounded-[24px] text-center border-2 border-dashed border-slate-100">
-                                <p class="text-slate-400 text-sm font-bold italic">Semua antrian sudah selesai!</p>
-                            </div>`;
-                } else {
-                    dataWork.forEach(job => {
-                        html += `
-                        <div class="glass-card p-5 active:scale-[0.98] transition">
-                            <div class="flex justify-between items-start mb-3">
-                                <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest italic">${job.status}</span>
-                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${job.tanggal}</span>
-                            </div>
-                            <h4 class="text-lg font-black text-slate-800 italic leading-tight mb-1">${job.nama}</h4>
-                            <p class="text-sm font-semibold text-slate-500 mb-4">${job.pekerjaan}</p>
-                            <div class="flex gap-2">
-                                <button onclick="Swal.fire('Info','Buka detail pekerjaan: ${job.nama}','info')" class="flex-1 bg-slate-50 text-slate-600 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest">Detail</button>
-                                <button onclick="Swal.fire('Update','Ubah status pekerjaan ini','question')" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-blue-100">Update</button>
-                            </div>
-                        </div>`;
-                    });
-                }
-                document.getElementById('jobContainer').innerHTML = html;
+                renderJobs(dataWork);
             } catch (e) {
-                console.error(e);
-                Swal.fire("Data Error", "Gagal sinkronisasi dengan Google Sheets", "error");
+                document.getElementById('jobContainer').innerHTML = `<p class="text-center text-red-500 text-xs py-10 font-bold">Gagal memuat data. Cek Koneksi / API URL.</p>`;
             }
         }
 
+        function renderJobs(data) {
+            let html = "";
+            if (!data || data.length === 0) {
+                html = `<div class="bg-white p-10 rounded-[24px] text-center border-2 border-dashed border-slate-100">
+                            <i class="fas fa-check-circle text-slate-200 text-3xl mb-2"></i>
+                            <p class="text-slate-400 text-xs font-bold italic">Tidak ada antrian kerja.</p>
+                        </div>`;
+            } else {
+                data.forEach(job => {
+                    // Mencegah undefined dengan fallback data
+                    const nama = job.nama || "Pelanggan";
+                    const task = job.pekerjaan || "Servis Umum";
+                    const status = job.status || "Antrian";
+                    const tgl = job.tanggal || "";
+
+                    html += `
+                    <div class="job-card p-5">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[9px] font-black uppercase italic">${status}</span>
+                            <span class="text-[9px] font-bold text-slate-300 uppercase">${tgl}</span>
+                        </div>
+                        <h4 class="text-lg font-black text-slate-800 italic leading-tight mb-1">${nama}</h4>
+                        <p class="text-xs font-semibold text-slate-500 mb-4">${task}</p>
+                        <div class="flex gap-2">
+                            <button onclick="window.location.href='pelanggan.html'" class="flex-1 bg-slate-900 text-white py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-widest">Buka Maps</button>
+                            <button onclick="Swal.fire('Catatan','${task}','info')" class="w-12 bg-slate-50 text-slate-400 py-2.5 rounded-xl border border-slate-100"><i class="fas fa-info-circle"></i></button>
+                        </div>
+                    </div>`;
+                });
+            }
+            document.getElementById('jobContainer').innerHTML = html;
+        }
+
         function logout() {
-            Swal.fire({
-                title: 'Logout Admin?',
-                text: "Anda akan diarahkan ke halaman login.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#2563eb',
-                cancelButtonColor: '#f1f5f9',
-                confirmButtonText: '<span style="color:white">Keluar Sekarang</span>',
-                cancelButtonText: '<span style="color:gray">Batal</span>'
-            }).then((res) => {
-                if(res.isConfirmed) {
-                    localStorage.removeItem('user_nanda');
-                    window.location.href = 'login.html';
-                }
-            });
+            localStorage.removeItem('user_nanda');
+            window.location.href = 'login.html';
         }
 
         window.onload = () => {
-            // Set User Name dari LocalStorage jika ada
             const user = JSON.parse(localStorage.getItem('user_nanda'));
             if(user) document.getElementById('userName').innerText = "Halo, " + user.nama.split(' ')[0] + "!";
             
