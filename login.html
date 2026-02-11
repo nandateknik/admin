@@ -2,110 +2,97 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Nanda Teknik</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
+        body { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
     </style>
 </head>
-<body>
-
-<div class="mobile-container shadow-2xl">
-    <div class="text-center mb-10">
-        <div class="bg-blue-500 w-20 h-20 rounded-[2.5rem] mx-auto mb-6 flex items-center justify-center shadow-lg shadow-blue-200">
-            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
+<body class="flex items-center justify-center h-screen p-4">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-tools text-3xl text-blue-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">NANDA TEKNIK</h2>
+            <p class="text-gray-500 text-sm">Core System Management</p>
         </div>
-        <h1 class="text-2xl font-black text-gray-800 uppercase italic">Nanda <span class="text-blue-500">Teknik</span></h1>
-        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Management System</p>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <input type="text" id="username" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition" placeholder="Masukkan username">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <input type="password" id="password" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none transition" placeholder="••••••••">
+                </div>
+            </div>
+            <button onclick="handleLogin()" id="btnLogin" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transform active:scale-95 transition shadow-lg shadow-blue-200">
+                MASUK KE SISTEM
+            </button>
+        </div>
+        
+        <p class="text-center text-gray-400 text-xs mt-8">© 2026 Nanda Teknik Banyuwangi</p>
     </div>
 
-    <form id="loginForm" class="space-y-4">
-        <div>
-            <label class="text-[10px] font-black text-gray-400 uppercase ml-2 mb-2 block">Username</label>
-            <input type="text" id="username" required class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-2xl font-bold text-gray-700 outline-none transition-all">
-        </div>
-        <div>
-            <label class="text-[10px] font-black text-gray-400 uppercase ml-2 mb-2 block">Password</label>
-            <input type="password" id="password" required class="w-full bg-gray-50 border-2 border-gray-100 focus:border-blue-500 px-6 py-4 rounded-2xl font-bold text-gray-700 outline-none transition-all">
-        </div>
-        <button type="submit" class="w-full bg-gray-900 text-white py-5 rounded-[2rem] font-black shadow-xl active:scale-95 transition-all mt-6 uppercase tracking-widest text-xs">Masuk Sekarang</button>
-    </form>
-    
-    <p class="text-center text-[10px] text-gray-400 font-bold mt-10 uppercase tracking-widest">Authorized Personnel Only</p>
-</div>
+    <script>
+        // GANTI URL INI DENGAN URL WEB APP GOOGLE SCRIPT ANDA
+        const API_URL = "https://script.google.com/macros/s/AKfycbzr4gEWPFsIpFCWycarI1JrSrVfU65IXTprI-s3AXNa4FWu80vCH0H6N3y3jlkESrHgEQ/exec";
 
-<script>
-    // URL Web App Google Script Anda
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCJTj3wdfl-a2x8BO0bha9-X05KiJAcv7EBp0G0vXBRyPvEfLlqznGoR1mkeFJPVgBVw/exec";
+        async function handleLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
 
-    document.getElementById('loginForm').onsubmit = async function(e) {
-        e.preventDefault();
-        
-        // Tampilkan loading supaya user tahu sedang proses
-        Swal.fire({
-            title: 'Memverifikasi...',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
-
-        const usernameInput = document.getElementById('username').value;
-        const passwordInput = document.getElementById('password').value;
-
-        try {
-            // Memanggil action getTeknisi yang sudah kita buat di Code.gs
-            const response = await fetch(SCRIPT_URL + "?action=getTeknisi");
-            const listTeknisi = await response.json();
-
-            // Validasi apakah data yang kembali adalah Array
-            if (!Array.isArray(listTeknisi)) {
-                throw new Error("Gagal mengambil database teknisi.");
+            if (!user || !pass) {
+                Swal.fire({ icon: 'warning', title: 'Ups!', text: 'Username dan Password wajib diisi.' });
+                return;
             }
 
-            // Mencari user di dalam array teknisi
-            const user = listTeknisi.find(u => 
-                String(u.username).toLowerCase() === usernameInput.toLowerCase() && 
-                String(u.password) === passwordInput
-            );
+            Swal.fire({
+                title: 'Verifikasi...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
 
-            if (user) {
-                // Cek apakah akun aktif (Kolom is_active di Sheet)
-                const isActive = String(user.is_active).toUpperCase();
-                if (isActive === 'TRUE' || isActive === '1') {
-                    
-                    // Simpan session
-                    localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('adminName', user.nama);
-                    
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'login', username: user, password: pass })
+                });
+                const result = await response.json();
+
+                if (result.result === "success") {
+                    localStorage.setItem("user_nanda", JSON.stringify(result.data));
                     Swal.fire({
                         icon: 'success',
-                        title: 'Login Berhasil',
-                        text: `Sugeng rawuh, ${user.nama}!`,
+                        title: 'Berhasil!',
+                        text: 'Selamat datang, ' + result.data.nama,
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        window.location.href = 'dashboard.html'; // Arahkan ke dashboard
+                        window.location.href = "index.html";
                     });
                 } else {
-                    throw new Error("Akun Anda dinonaktifkan!");
+                    Swal.fire({ icon: 'error', title: 'Login Gagal', text: result.message });
                 }
-            } else {
-                throw new Error("Username atau Password salah!");
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal terhubung ke server. Pastikan API URL benar.' });
             }
-
-        } catch (err) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Login Gagal',
-                text: err.message
-            });
         }
-    };
-</script>
+    </script>
 </body>
 </html>
