@@ -12,7 +12,20 @@
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #334155; }
         .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; display: flex; flex-direction: column; }
         .tab-active { border-bottom: 4px solid #1e293b; color: #1e293b; font-weight: 900; }
-        .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; position: relative; color: #000; }
+        
+        /* Area Nota PDF */
+        .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; position: relative; color: #000; overflow: hidden; }
+        
+        /* Watermark Desain */
+        .watermark {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 60px; font-weight: 900; opacity: 0.15; pointer-events: none;
+            border: 8px solid; padding: 10px 20px; text-transform: uppercase; z-index: 0;
+            white-space: nowrap; display: none;
+        }
+        .wm-paid { color: #16a34a; border-color: #16a34a; }
+        .wm-unpaid { color: #dc2626; border-color: #dc2626; }
+
         .autocomplete-items {
             position: absolute; border-radius: 1rem; border: 1px solid #e2e8f0;
             background: white; z-index: 100; top: 100%; left: 0; right: 0; 
@@ -20,6 +33,9 @@
         }
         .status-unpaid { background: #fee2e2; color: #dc2626; }
         .status-paid { background: #dcfce7; color: #16a34a; }
+        
+        /* Fix PDF Terpotong */
+        #notaPrintArea { width: 100%; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -45,10 +61,10 @@
             <input type="text" id="custSearch" placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-slate-50 border-2 border-transparent p-5 rounded-[2rem] font-bold outline-none focus:border-slate-400 focus:bg-white transition-all shadow-sm">
             <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
             <input type="hidden" id="finalEmail">
+            <input type="hidden" id="finalNama">
         </div>
 
         <div id="itemContainer" class="space-y-4"></div>
-
         <button onclick="tambahItem()" class="w-full py-5 text-[10px] font-900 text-slate-400 border-2 border-dashed border-slate-200 rounded-[1.5rem] hover:bg-slate-50 uppercase tracking-widest">+ Tambah Item Pekerjaan</button>
 
         <div class="bg-slate-800 p-7 rounded-[2.5rem] text-white shadow-xl">
@@ -75,14 +91,16 @@
             <button onclick="tutupModal()" class="text-slate-400 p-2 text-xl font-black">✕</button>
         </div>
 
-        <div id="notaPrintArea" class="p-8 nota-kertas flex-1 overflow-y-auto bg-white text-black">
-            <div class="text-center mb-6 border-b-4 border-black pb-4">
+        <div id="notaPrintArea" class="p-8 nota-kertas flex-1 overflow-y-auto bg-white text-black relative">
+            <div id="vWatermark" class="watermark">PAID</div>
+
+            <div class="text-center mb-6 border-b-4 border-black pb-4 relative z-10">
                 <h2 class="font-900 text-xl uppercase tracking-widest mb-1">NANDA TEKNIK BANYUWANGI</h2>
                 <p class="text-[9px] font-bold uppercase">Network, Software & Electrical Engineering</p>
                 <p class="text-[8px] italic">Sukowidi Indah Residence, Blok D-5 | WA: 0823-3120-1148</p>
             </div>
 
-            <div class="grid grid-cols-2 text-[10px] mb-4">
+            <div class="grid grid-cols-2 text-[10px] mb-4 relative z-10">
                 <div class="space-y-1">
                     <p><span class="inline-block w-12 font-black">NOMOR</span>: <span id="vId" class="font-bold"></span></p>
                     <p><span class="inline-block w-12 font-black">KEPADA</span>: <span id="vCust" class="font-black underline uppercase"></span></p>
@@ -93,9 +111,9 @@
                 </div>
             </div>
 
-            <p class="text-[9px] font-black uppercase mb-2 italic">Perihal: Nota Pembayaran (Invoice)</p>
+            <p class="text-[9px] font-black uppercase mb-2 italic relative z-10">Perihal: Nota Pembayaran (Invoice)</p>
 
-            <table class="w-full text-[10px] mb-4 border-2 border-black">
+            <table class="w-full text-[10px] mb-4 border-2 border-black relative z-10">
                 <thead>
                     <tr class="border-b-2 border-black bg-gray-100 uppercase font-black">
                         <th class="py-2 px-3 border-r-2 border-black text-left">Deskripsi Pekerjaan</th>
@@ -112,7 +130,7 @@
                 </tfoot>
             </table>
 
-            <div class="flex justify-between items-start mt-8">
+            <div class="flex justify-between items-start mt-8 relative z-10">
                 <div class="border-2 border-dashed border-gray-300 p-3 rounded-lg w-56">
                     <p class="text-[8px] font-black uppercase mb-1">Status Pembayaran:</p>
                     <p class="text-[9px] font-bold text-gray-700">Pembayaran Melalui:</p>
@@ -160,6 +178,7 @@
             div.onclick = () => {
                 searchInput.value = p.nama;
                 document.getElementById('finalEmail').value = p.email;
+                document.getElementById('finalNama').value = p.nama; // Simpan Nama
                 autoList.classList.add('hidden');
             };
             autoList.appendChild(div);
@@ -222,8 +241,13 @@
         const list = document.getElementById('listRiwayat');
         list.innerHTML = `<div class="flex justify-center py-20"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div></div>`;
         try {
-            const res = await fetch(SCRIPT_URL + "?type=nota");
-            riwayatData = await res.json();
+            // Kita load data Nota dan Pelanggan agar bisa mapping Nama
+            const [resNota, resPel] = await Promise.all([
+                fetch(SCRIPT_URL + "?type=nota"),
+                fetch(SCRIPT_URL + "?type=pelanggan")
+            ]);
+            riwayatData = await resNota.json();
+            pelangganData = await resPel.json();
             filterRiwayat();
         } catch(e) { list.innerHTML = "<p class='text-center py-20 text-slate-400 font-black'>Gagal Sinkron Data</p>"; }
     }
@@ -232,14 +256,20 @@
         const key = document.getElementById('searchRiwayat').value.toLowerCase();
         const list = document.getElementById('listRiwayat');
         list.innerHTML = "";
+        
+        // Buat map email ke nama
+        const pelMap = {};
+        pelangganData.forEach(p => pelMap[p.email.toLowerCase()] = p.nama);
+
         riwayatData.filter(n => (n.id + n.email).toLowerCase().includes(key)).forEach(n => {
+            const namaPel = pelMap[n.email.toLowerCase()] || n.email;
             const isPaid = n.status.toUpperCase() === 'PAID';
             const sClass = isPaid ? 'status-paid' : 'status-unpaid';
             list.innerHTML += `
-                <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-[2rem] border-2 border-slate-50 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all">
+                <div onclick='bukaDetail(${JSON.stringify(n)}, "${namaPel}")' class="bg-white p-5 rounded-[2rem] border-2 border-slate-50 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all">
                     <div class="overflow-hidden">
                         <p class="text-[9px] font-900 text-slate-400 uppercase tracking-tighter">${n.id} • ${n.tanggal}</p>
-                        <p class="text-sm font-black text-slate-700 truncate w-40 uppercase">${n.email}</p>
+                        <p class="text-sm font-black text-slate-700 truncate w-40 uppercase">${namaPel}</p>
                         <span class="text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest ${sClass}">${n.status}</span>
                     </div>
                     <p class="text-sm font-black text-slate-800">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
@@ -247,16 +277,24 @@
         });
     }
 
-    function bukaDetail(n) {
+    function bukaDetail(n, namaLengkap) {
         selectedNota = n;
+        const isPaid = n.status.toUpperCase() === 'PAID';
+        
         document.getElementById('vId').innerText = n.id;
-        document.getElementById('vCust').innerText = n.email;
+        document.getElementById('vCust').innerText = namaLengkap || n.email;
         document.getElementById('vTgl').innerText = n.tanggal;
         document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
         
+        // Watermark Logic
+        const wm = document.getElementById('vWatermark');
+        wm.style.display = 'block';
+        wm.innerText = isPaid ? 'LUNAS' : 'UNPAID';
+        wm.className = `watermark ${isPaid ? 'wm-paid' : 'wm-unpaid'}`;
+
         const st = document.getElementById('vStatusText');
         st.innerText = n.status;
-        st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + (n.status === 'PAID' ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
+        st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
         
         const body = document.getElementById('vItems'); body.innerHTML = "";
         const items = typeof n.items_json === 'string' ? JSON.parse(n.items_json) : (n.items_json || []);
@@ -282,7 +320,6 @@
         if (st) {
             Swal.fire({title: 'Updating...', didOpen: () => Swal.showLoading()});
             try {
-                // Mengirim ke action updateStatus di GS dengan id_nota
                 await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'updateStatus', id_nota: selectedNota.id, status: st })});
                 Swal.fire('Berhasil', 'Status Terupdate', 'success').then(() => { tutupModal(); loadRiwayat(); });
             } catch(e) { Swal.fire('Error', 'Gagal Update', 'error'); }
@@ -292,10 +329,10 @@
     function downloadPdf() {
         const el = document.getElementById('notaPrintArea');
         const opt = { 
-            margin: 10, 
+            margin: [10, 5, 10, 5], // T, L, B, R
             filename: `NOTA-${selectedNota.id}.pdf`, 
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 3, useCORS: true },
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 3, useCORS: true, letterRendering: true, scrollY: 0 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         html2pdf().set(opt).from(el).save();
