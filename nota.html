@@ -10,191 +10,209 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
-        .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; display: flex; flex-direction: column; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; display: flex; flex-direction: column; box-shadow: 0 0 100px rgba(0,0,0,0.1); }
         
-        /* SIDEBAR STYLE */
-        #sidebar { position: fixed; top: 0; left: -110%; width: 280px; height: 100%; background: white; z-index: 9999; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 20px 0 50px rgba(0,0,0,0.1); }
+        /* SIDEBAR PREMIUM */
+        #sidebar { position: fixed; top: 0; left: -100%; width: 300px; height: 100%; background: white; z-index: 10000; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         #sidebar.open { left: 0; }
-        .nav-link { display: flex; align-items: center; gap: 15px; padding: 12px 20px; border-radius: 12px; color: #64748b; font-weight: 700; font-size: 0.85rem; transition: 0.2s; cursor: pointer; text-decoration: none; margin: 2px 0; }
-        .nav-link:hover, .nav-link.active { background: #2563eb; color: white; }
-        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.3); z-index: 9998; display: none; backdrop-filter: blur(4px); }
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); z-index: 9999; display: none; }
         
-        .tab-btn.active { color: #2563eb; border-bottom: 3px solid #2563eb; }
-        .item-row { transition: all 0.2s; border: 1px solid #f1f5f9; }
-        .item-row:hover { border-color: #2563eb; }
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 14px 20px; border-radius: 16px; color: #64748b; font-weight: 700; font-size: 14px; transition: 0.3s; margin-bottom: 4px; }
+        .nav-item:hover { background: #f1f5f9; color: #2563eb; }
+        .nav-item.active { background: #2563eb; color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+
+        .tab-active { color: #2563eb; border-bottom: 3px solid #2563eb; }
+        .receipt-modal { transform: translateY(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .receipt-modal.show { transform: translateY(0); }
     </style>
 </head>
 <body>
 
-<div class="mobile-container shadow-2xl">
-    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+<div class="mobile-container">
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div id="sidebar">
-        <div class="p-6 flex flex-col h-full">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-bolt"></i></div>
-                <h1 class="font-extrabold text-slate-800 italic text-lg uppercase">NANDA <span class="text-blue-600">TEKNIK</span></h1>
+        <div class="p-8 flex flex-col h-full">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                    <i class="fas fa-bolt text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-slate-800 text-lg leading-none">NANDA <span class="text-blue-600">TEKNIK</span></h1>
+                    <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Admin Panel</p>
+                </div>
             </div>
-            <nav class="space-y-1">
-                <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mb-2">Utama</p>
-                <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
-                <a href="pelanggan.html" class="nav-link"><i class="fas fa-users"></i> Database Pelanggan</a>
-                <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2">Transaksi</p>
-                <a href="nota.html" class="nav-link active"><i class="fas fa-receipt"></i> Billing / Nota</a>
-                <a href="booking.html" class="nav-link"><i class="fas fa-calendar-check"></i> Data Booking</a>
+
+            <nav class="flex-1">
+                <p class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-4 tracking-[0.2em]">Menu Utama</p>
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-grid-2"></i> Dashboard</a>
+                <a href="pelanggan.html" class="nav-item"><i class="fas fa-users"></i> Data Pelanggan</a>
+                <a href="nota.html" class="nav-item active"><i class="fas fa-file-invoice-dollar"></i> Billing & Nota</a>
+                <a href="booking.html" class="nav-item"><i class="fas fa-calendar-alt"></i> Kelola Booking</a>
+                
+                <p class="text-[10px] font-black text-slate-400 uppercase ml-2 mt-8 mb-4 tracking-[0.2em]">Pengaturan</p>
+                <a href="layanan.html" class="nav-item"><i class="fas fa-tools"></i> Daftar Layanan</a>
+                <button onclick="logout()" class="nav-item w-full text-red-500 hover:bg-red-50"><i class="fas fa-sign-out-alt"></i> Keluar</button>
             </nav>
         </div>
     </div>
 
-    <header class="p-6 bg-white sticky top-0 z-10 border-b border-slate-50 flex items-center justify-between">
-        <button onclick="toggleSidebar()" class="bg-slate-50 p-2 rounded-lg text-slate-600"><i class="fas fa-bars text-xl"></i></button>
-        <h1 class="text-lg font-black text-slate-800 italic uppercase">Admin <span class="text-blue-600">Billing</span></h1>
-        <div class="w-10"></div>
+    <header class="p-6 bg-white border-b border-slate-50 flex items-center justify-between sticky top-0 z-50">
+        <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-xl text-slate-600 active:scale-90 transition">
+            <i class="fas fa-bars-staggered"></i>
+        </button>
+        <h2 class="font-black text-slate-800 italic uppercase tracking-tight">System <span class="text-blue-600">Billing</span></h2>
+        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+            <i class="fas fa-user-shield"></i>
+        </div>
     </header>
 
-    <div class="flex px-6 bg-white border-b border-slate-50">
-        <button onclick="switchTab('buat')" id="tabBuat" class="tab-btn active flex-1 py-4 text-[10px] font-black uppercase tracking-widest">Buat Nota</button>
-        <button onclick="switchTab('riwayat')" id="tabRiwayat" class="tab-btn flex-1 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Riwayat Nota</button>
+    <div class="flex bg-white px-6 border-b border-slate-50">
+        <button onclick="switchTab('buat')" id="btnBuat" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest tab-active">Buat Nota</button>
+        <button onclick="switchTab('riwayat')" id="btnRiwayat" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Riwayat</button>
     </div>
 
-    <main id="contentBuat" class="p-6 space-y-6 flex-grow pb-32">
+    <div id="sectionBuat" class="p-6 space-y-6 pb-32">
         <div class="space-y-2">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Pilih Pelanggan</label>
-            <select id="selectPelanggan" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-2 border-transparent focus:border-blue-500 outline-none transition"></select>
+            <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Pilih Pelanggan</label>
+            <select id="selCustomer" class="w-full p-4 bg-slate-50 rounded-2xl font-bold border-2 border-transparent focus:border-blue-500 outline-none transition"></select>
         </div>
 
-        <div id="itemList" class="space-y-3">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Rincian Barang / Jasa</label>
-            <div class="item-row p-4 bg-slate-50 rounded-2xl space-y-3 relative">
-                <input type="text" placeholder="Nama Barang" class="w-full bg-transparent font-bold text-sm outline-none border-b border-slate-200 pb-1 item-nama">
+        <div id="containerItems" class="space-y-3">
+            <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Rincian Nota</label>
+            <div class="item-card bg-slate-50 p-4 rounded-2xl space-y-3">
+                <input type="text" placeholder="Nama Barang/Jasa" class="w-full bg-transparent font-bold border-b border-slate-200 pb-2 outline-none in-nama">
                 <div class="flex gap-3">
-                    <input type="number" value="1" oninput="hitungTotal()" class="w-16 bg-white p-2 rounded-xl font-bold text-center item-qty">
-                    <input type="number" placeholder="Harga Satuan" oninput="hitungTotal()" class="flex-1 bg-white p-2 rounded-xl font-bold text-right item-harga">
+                    <input type="number" value="1" oninput="calcTotal()" class="w-20 p-2 rounded-xl font-bold text-center in-qty">
+                    <input type="number" placeholder="Harga Satuan" oninput="calcTotal()" class="flex-1 p-2 rounded-xl font-bold text-right in-harga">
                 </div>
             </div>
         </div>
 
-        <button onclick="tambahBaris()" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-black text-slate-400 uppercase"><i class="fas fa-plus mr-1"></i> Tambah Item</button>
+        <button onclick="addRow()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-black text-slate-400 uppercase hover:bg-slate-50">
+            <i class="fas fa-plus-circle mr-2"></i> Tambah Item
+        </button>
+    </div>
 
-        <div class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto p-6 bg-white border-t border-slate-100 flex justify-between items-center shadow-2xl z-20">
-            <div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Total Tagihan</p>
-                <p id="totalDisplay" class="text-xl font-black text-blue-600">Rp 0</p>
-            </div>
-            <button onclick="simpanNota()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl">Simpan Nota</button>
+    <div id="sectionRiwayat" class="p-6 space-y-4 hidden">
+        <div class="relative">
+            <i class="fas fa-search absolute left-4 top-4 text-slate-300"></i>
+            <input type="text" id="inSearch" oninput="renderHistory()" placeholder="Cari ID atau Email..." class="w-full pl-10 p-4 bg-slate-50 rounded-2xl text-xs font-bold outline-none border-2 border-transparent focus:bg-white focus:border-blue-100 transition">
         </div>
-    </main>
+        <div id="historyList" class="space-y-3"></div>
+    </div>
 
-    <main id="contentRiwayat" class="p-6 hidden space-y-4 flex-grow">
-        <input type="text" id="searchRiwayat" oninput="renderRiwayat()" placeholder="Cari ID atau Email..." class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold outline-none border-2 border-transparent focus:border-blue-500">
-        <div id="listRiwayat" class="space-y-3"></div>
-    </main>
+    <div id="totalBar" class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-white p-6 border-t flex justify-between items-center z-50">
+        <div>
+            <p class="text-[9px] font-black text-slate-400 uppercase">Grand Total</p>
+            <p id="txtGrandTotal" class="text-xl font-black text-blue-600">Rp 0</p>
+        </div>
+        <button onclick="saveInvoice()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl active:scale-95 transition">Simpan</button>
+    </div>
 </div>
 
-<div id="modalDetail" class="fixed inset-0 z-[10000] hidden flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="tutupModal()"></div>
-    <div class="bg-white w-full max-w-md rounded-[2.5rem] relative overflow-hidden flex flex-col max-h-[85vh]">
-        <div class="p-6 border-b flex justify-between items-center bg-slate-50">
-            <h3 class="font-black text-slate-800 uppercase text-sm">Detail Nota</h3>
-            <button onclick="tutupModal()" class="text-slate-400"><i class="fas fa-times text-xl"></i></button>
-        </div>
-        <div class="p-6 overflow-y-auto space-y-4" id="modalBody">
-            <div class="flex justify-between text-xs font-bold border-b pb-2"><span class="text-slate-400">ID NOTA</span><span id="detId"></span></div>
-            <div class="flex justify-between text-xs font-bold border-b pb-2"><span class="text-slate-400">PELANGGAN</span><span id="detEmail"></span></div>
-            <div id="detItems" class="space-y-3 py-2 border-b"></div>
-            <div class="flex justify-between items-center pt-2">
-                <span class="font-black text-lg">TOTAL</span>
-                <span id="detTotal" class="text-xl font-black text-blue-600"></span>
+<div id="modalNota" class="fixed inset-0 z-[20000] hidden">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="absolute bottom-0 left-0 right-0 p-4 flex justify-center">
+        <div class="receipt-modal show bg-white w-full max-w-[440px] rounded-[2.5rem] p-8 shadow-2xl">
+            <div class="text-center mb-6 border-b border-dashed pb-4">
+                <h3 class="font-black text-slate-800 uppercase">Detail Invoice</h3>
+                <p id="detId" class="text-[10px] font-bold text-blue-600 mt-1"></p>
             </div>
-        </div>
-        <div class="p-6 bg-slate-50">
-            <button id="btnPrint" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase shadow-lg shadow-blue-200"><i class="fas fa-file-pdf mr-2"></i> Unduh PDF</button>
+            <div id="detItems" class="space-y-4 mb-6"></div>
+            <div class="flex justify-between items-center pt-4 border-t border-slate-100 mb-8">
+                <span class="text-[10px] font-black uppercase text-slate-400">Total Akhir</span>
+                <span id="detTotal" class="text-2xl font-black text-blue-600 font-mono"></span>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeModal()" class="bg-slate-100 text-slate-500 py-4 rounded-2xl text-[10px] font-black uppercase">Tutup</button>
+                <button id="btnDownload" class="bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase shadow-lg">Unduh PDF</button>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="notaPrintArea" class="hidden" style="width: 794px; min-height: 1123px; padding: 50px; background: white; color: black; position: relative; font-family: 'Courier New', Courier, monospace;">
-    <div id="pdf-watermark" style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 150px; font-weight: 900; opacity: 0.08; border: 15px solid; padding: 30px; border-radius: 30px; pointer-events: none; z-index: 0; text-transform: uppercase;"></div>
-    <div style="position: relative; z-index: 1;">
-        <div style="text-align: center; border-bottom: 3px double black; padding-bottom: 15px; margin-bottom: 25px;">
-            <h1 style="font-size: 32px; font-weight: bold; margin: 0;">NANDA TEKNIK BANYUWANGI</h1>
-            <p style="font-size: 14px; margin: 5px 0;">Network, Software & Electrical Engineering</p>
-            <p style="font-size: 13px;">Sukowidi Indah Residence, Blok D-5 | WA: 0823-3120-1148</p>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 15px;">
-            <div><p><strong>INVOICE :</strong> <span id="pdf-id"></span></p><p><strong>KEPADA  :</strong> <span id="pdf-nama"></span></p></div>
-            <div style="text-align: right;"><p><strong>TANGGAL :</strong> <span id="pdf-tgl"></span></p><p><strong>STATUS  :</strong> <span id="pdf-status" style="font-weight: 900; text-transform: uppercase; padding: 2px 8px; border: 1px solid;"></span></p></div>
-        </div>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 14px; border: 1px solid black;">
-            <thead><tr style="background: #eee; border-bottom: 2px solid black;"><th style="padding: 12px; text-align: left; border-right: 1px solid black;">DESKRIPSI</th><th style="padding: 12px; text-align: center; border-right: 1px solid black; width: 60px;">QTY</th><th style="padding: 12px; text-align: right; border-right: 1px solid black; width: 120px;">HARGA</th><th style="padding: 12px; text-align: right; width: 120px;">SUBTOTAL</th></tr></thead>
-            <tbody id="pdf-body"></tbody>
-            <tfoot><tr style="border-top: 2px solid black; background: #fafafa;"><td colspan="3" style="padding: 15px; text-align: right; font-weight: bold;">TOTAL AKHIR :</td><td id="pdf-total" style="padding: 15px; text-align: right; font-weight: 900; font-size: 18px;"></td></tr></tfoot>
-        </table>
+<div id="printArea" class="hidden" style="width: 794px; padding: 50px; background: white; font-family: 'Courier New', monospace;">
+    <div style="text-align: center; border-bottom: 3px double black; padding-bottom: 20px; margin-bottom: 30px;">
+        <h1 style="font-size: 30px; margin: 0;">NANDA TEKNIK BANYUWANGI</h1>
+        <p>Sukowidi Indah Residence, Blok D-5 | WA: 0823-3120-1148</p>
     </div>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 1px solid #000;">
+        <thead><tr style="background: #eee;"><th style="padding: 10px; border: 1px solid #000;">DESKRIPSI</th><th style="padding: 10px; border: 1px solid #000;">QTY</th><th style="padding: 10px; border: 1px solid #000;">HARGA</th><th style="padding: 10px; border: 1px solid #000;">SUBTOTAL</th></tr></thead>
+        <tbody id="printBody"></tbody>
+    </table>
+    <div style="text-align: right; font-size: 20px; font-weight: bold;">TOTAL: <span id="printTotal"></span></div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzg5RTkyWU_SlYftvpx3bEPGuaknDOaoJrtJv2dXJ1Ysn5FyWGv4z-YyI5sgidoLTCZuw/exec";
-    let databaseNota = [];
+    const API = "https://script.google.com/macros/s/AKfycbzg5RTkyWU_SlYftvpx3bEPGuaknDOaoJrtJv2dXJ1Ysn5FyWGv4z-YyI5sgidoLTCZuw/exec";
+    let dataNota = [];
 
     function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+        const side = document.getElementById('sidebar');
+        const over = document.getElementById('sidebarOverlay');
+        const isOpen = side.classList.contains('open');
+        side.classList.toggle('open');
+        over.style.display = isOpen ? 'none' : 'block';
     }
 
     function switchTab(tab) {
-        document.getElementById('contentBuat').classList.toggle('hidden', tab !== 'buat');
-        document.getElementById('contentRiwayat').classList.toggle('hidden', tab !== 'riwayat');
-        document.getElementById('tabBuat').classList.toggle('active', tab === 'buat');
-        document.getElementById('tabRiwayat').classList.toggle('active', tab === 'riwayat');
-        if(tab === 'riwayat') loadRiwayat();
+        document.getElementById('sectionBuat').classList.toggle('hidden', tab !== 'buat');
+        document.getElementById('sectionRiwayat').classList.toggle('hidden', tab !== 'riwayat');
+        document.getElementById('totalBar').classList.toggle('hidden', tab !== 'buat');
+        document.getElementById('btnBuat').classList.toggle('tab-active', tab === 'buat');
+        document.getElementById('btnRiwayat').classList.toggle('tab-active', tab === 'riwayat');
+        if(tab === 'riwayat') fetchHistory();
     }
 
     async function init() {
-        const res = await fetch(SCRIPT_URL + "?type=pelanggan");
-        const data = await res.json();
-        const sel = document.getElementById('selectPelanggan');
-        data.forEach(p => {
-            if(String(p.is_active).toUpperCase() === "TRUE") sel.innerHTML += `<option value="${p.email}">${p.nama.toUpperCase()}</option>`;
-        });
+        try {
+            const r = await fetch(API + "?type=pelanggan");
+            const d = await r.json();
+            const sel = document.getElementById('selCustomer');
+            d.forEach(p => {
+                if(String(p.is_active).toLowerCase() === "true")
+                    sel.innerHTML += `<option value="${p.email}">${p.nama.toUpperCase()}</option>`;
+            });
+        } catch(e) { console.error("Gagal load pelanggan"); }
     }
 
-    function tambahBaris() {
+    function addRow() {
         const div = document.createElement('div');
-        div.className = "item-row p-4 bg-slate-50 rounded-2xl space-y-3 relative";
+        div.className = "item-card bg-slate-50 p-4 rounded-2xl space-y-3 relative";
         div.innerHTML = `
-            <button onclick="this.parentElement.remove(); hitungTotal()" class="absolute top-2 right-2 text-slate-300 hover:text-red-500"><i class="fas fa-times-circle"></i></button>
-            <input type="text" placeholder="Nama Barang" class="w-[90%] bg-transparent font-bold text-sm outline-none border-b border-slate-200 pb-1 item-nama">
+            <button onclick="this.parentElement.remove(); calcTotal()" class="absolute top-2 right-2 text-slate-300"><i class="fas fa-times-circle"></i></button>
+            <input type="text" placeholder="Nama Barang/Jasa" class="w-[90%] bg-transparent font-bold border-b border-slate-200 pb-2 outline-none in-nama">
             <div class="flex gap-3">
-                <input type="number" value="1" oninput="hitungTotal()" class="w-16 bg-white p-2 rounded-xl font-bold text-center item-qty">
-                <input type="number" placeholder="Harga Satuan" oninput="hitungTotal()" class="flex-1 bg-white p-2 rounded-xl font-bold text-right item-harga">
+                <input type="number" value="1" oninput="calcTotal()" class="w-20 p-2 rounded-xl font-bold text-center in-qty">
+                <input type="number" placeholder="Harga Satuan" oninput="calcTotal()" class="flex-1 p-2 rounded-xl font-bold text-right in-harga">
             </div>`;
-        document.getElementById('itemList').appendChild(div);
+        document.getElementById('containerItems').appendChild(div);
     }
 
-    function hitungTotal() {
-        let total = 0;
-        document.querySelectorAll('.item-row').forEach(row => {
-            const q = row.querySelector('.item-qty').value || 0;
-            const h = row.querySelector('.item-harga').value || 0;
-            total += (q * h);
+    function calcTotal() {
+        let grand = 0;
+        document.querySelectorAll('.item-card').forEach(card => {
+            const q = card.querySelector('.in-qty').value || 0;
+            const h = card.querySelector('.in-harga').value || 0;
+            grand += (q * h);
         });
-        document.getElementById('totalDisplay').innerText = "Rp " + total.toLocaleString('id-ID');
-        return total;
+        document.getElementById('txtGrandTotal').innerText = "Rp " + grand.toLocaleString('id-ID');
+        return grand;
     }
 
-    async function simpanNota() {
-        const email = document.getElementById('selectPelanggan').value;
+    async function saveInvoice() {
+        const email = document.getElementById('selCustomer').value;
         const items = [];
-        document.querySelectorAll('.item-row').forEach(row => {
-            const n = row.querySelector('.item-nama').value;
-            const q = row.querySelector('.item-qty').value;
-            const h = row.querySelector('.item-harga').value;
+        document.querySelectorAll('.item-card').forEach(card => {
+            const n = card.querySelector('.in-nama').value;
+            const q = card.querySelector('.in-qty').value;
+            const h = card.querySelector('.in-harga').value;
             if(n && h) items.push({ nama: n, qty: q, harga: h });
         });
 
-        if(!email || items.length === 0) return Swal.fire('Error', 'Data belum lengkap', 'error');
+        if(items.length === 0) return Swal.fire('Error', 'Isi minimal satu barang', 'error');
 
         Swal.fire({title: 'Menyimpan...', didOpen: () => Swal.showLoading()});
         
@@ -202,45 +220,40 @@
             action: 'simpanNota',
             id_nota: "INV-" + Date.now(),
             email: email,
-            items: items,
-            total: hitungTotal(),
+            items: JSON.stringify(items),
+            total: calcTotal(),
             status: "PAID",
             tanggal: new Date().toLocaleDateString('id-ID')
         };
 
         try {
-            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-            Swal.fire('Sukses', 'Nota tersimpan', 'success').then(() => location.reload());
+            await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
+            Swal.fire('Berhasil', 'Nota telah disimpan', 'success').then(() => location.reload());
         } catch(e) { Swal.fire('Gagal', 'Koneksi error', 'error'); }
     }
 
-    async function loadRiwayat() {
-        const res = await fetch(SCRIPT_URL + "?type=nota");
-        databaseNota = await res.json();
-        renderRiwayat();
+    async function fetchHistory() {
+        const r = await fetch(API + "?type=nota");
+        dataNota = await r.json();
+        renderHistory();
     }
 
-    function renderRiwayat() {
-        const list = document.getElementById('listRiwayat');
-        const q = document.getElementById('searchRiwayat').value.toLowerCase();
+    function renderHistory() {
+        const list = document.getElementById('historyList');
+        const q = document.getElementById('inSearch').value.toLowerCase();
         list.innerHTML = "";
         
-        databaseNota.forEach(n => {
-            // FIX: Gunakan n.id_nota ATAU n.id agar sinkron dengan format Pelanggan
-            const id = n.id_nota || n.id || "INV-000";
-            const email = n.email || "Guest";
-            const total = n.total || 0;
-            
-            if(id.toLowerCase().includes(q) || email.toLowerCase().includes(q)) {
+        dataNota.forEach(n => {
+            const id = n.id_nota || n.id || "INV-???";
+            if(id.toLowerCase().includes(q) || n.email.toLowerCase().includes(q)) {
                 list.innerHTML += `
-                <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-4 rounded-2xl shadow-sm border border-slate-50 flex justify-between items-center cursor-pointer active:scale-95 transition">
+                <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-4 rounded-2xl border flex justify-between items-center cursor-pointer active:scale-95 transition">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"><i class="fas fa-file-invoice"></i></div>
-                        <div><p class="text-[10px] font-black text-blue-600 uppercase">${id}</p><p class="text-xs font-black text-slate-800 uppercase">${email.split('@')[0]}</p></div>
+                        <div><p class="text-[10px] font-black text-blue-600 uppercase">${id}</p><p class="text-xs font-bold text-slate-800">${n.email.split('@')[0].toUpperCase()}</p></div>
                     </div>
                     <div class="text-right">
-                        <p class="text-sm font-black text-slate-900">Rp ${Number(total).toLocaleString('id-ID')}</p>
-                        <p class="text-[8px] font-bold ${n.status === 'PAID' ? 'text-green-500' : 'text-red-500'} uppercase">${n.status || 'UNPAID'}</p>
+                        <p class="text-sm font-black text-slate-900 font-mono">Rp ${Number(n.total).toLocaleString('id-ID')}</p>
                     </div>
                 </div>`;
             }
@@ -248,76 +261,55 @@
     }
 
     function bukaDetail(n) {
-        // FIX LOGIC PEMBACAAN DATA:
-        const id = n.id_nota || n.id;
-        const status = (n.status || "UNPAID").toUpperCase();
-        
-        document.getElementById('detId').innerText = id;
-        document.getElementById('detEmail').innerText = n.email;
+        document.getElementById('detId').innerText = n.id_nota || n.id;
         document.getElementById('detTotal').innerText = "Rp " + Number(n.total).toLocaleString('id-ID');
 
-        // Render Detail Barang
+        // PERBAIKAN: Proteksi forEach error
         let items = [];
-        try { 
-            // Cek apakah items berupa string JSON atau sudah Array
-            items = typeof n.items === 'string' ? JSON.parse(n.items) : n.items; 
-        } catch(e) { 
-            items = [{nama: "Data barang tidak terbaca", qty: 1, harga: n.total}]; 
+        try {
+            if (n.items) {
+                items = typeof n.items === 'string' ? JSON.parse(n.items) : n.items;
+            }
+        } catch(e) { console.error("Parse items failed"); }
+
+        const container = document.getElementById('detItems');
+        container.innerHTML = "";
+
+        // Validasi jika items adalah Array sebelum forEach
+        if (Array.isArray(items) && items.length > 0) {
+            items.forEach(it => {
+                container.innerHTML += `
+                    <div class="flex justify-between text-xs">
+                        <span class="font-bold text-slate-800 uppercase">${it.nama} (x${it.qty})</span>
+                        <span class="font-mono font-bold">Rp ${Number(it.qty * it.harga).toLocaleString('id-ID')}</span>
+                    </div>`;
+            });
+        } else {
+            container.innerHTML = `<p class="text-center text-slate-400 text-[10px] italic">Detail barang tidak tersedia</p>`;
         }
 
-        const detItems = document.getElementById('detItems');
-        detItems.innerHTML = "";
-        items.forEach(it => {
-            detItems.innerHTML += `
-                <div class="flex justify-between text-xs">
-                    <span class="font-bold uppercase">${it.nama} (x${it.qty})</span>
-                    <span class="font-mono">Rp ${Number(it.qty * it.harga).toLocaleString('id-ID')}</span>
-                </div>`;
-        });
-
-        document.getElementById('btnPrint').onclick = () => unduhPDF(n, items);
-        document.getElementById('modalDetail').classList.remove('hidden');
+        document.getElementById('btnDownload').onclick = () => cetak(n, items);
+        document.getElementById('modalNota').classList.remove('hidden');
     }
 
-    function unduhPDF(n, items) {
-        const isP = (n.status || "UNPAID").toUpperCase() === 'PAID';
-        const color = isP ? '#16a34a' : '#dc2626';
-
-        // Set PDF Content
-        document.getElementById('pdf-id').innerText = n.id_nota || n.id;
-        document.getElementById('pdf-nama').innerText = n.email.toUpperCase();
-        document.getElementById('pdf-tgl').innerText = n.tanggal || "-";
-        document.getElementById('pdf-status').innerText = n.status || "UNPAID";
-        document.getElementById('pdf-status').style.color = color;
-        document.getElementById('pdf-status').style.borderColor = color;
-        document.getElementById('pdf-total').innerText = "Rp " + Number(n.total).toLocaleString('id-ID');
-
-        const wm = document.getElementById('pdf-watermark');
-        wm.innerText = isP ? 'LUNAS' : 'TAGIHAN';
-        wm.style.color = color;
-        wm.style.borderColor = color;
-
-        const body = document.getElementById('pdf-body');
-        body.innerHTML = items.map(it => `
-            <tr style="border-bottom: 1px solid black;">
-                <td style="padding: 12px; border-right: 1px solid black; text-transform: uppercase;">${it.nama}</td>
-                <td style="padding: 12px; text-align: center; border-right: 1px solid black;">${it.qty}</td>
-                <td style="padding: 12px; text-align: right; border-right: 1px solid black;">${Number(it.harga).toLocaleString('id-ID')}</td>
-                <td style="padding: 12px; text-align: right; font-weight: bold;">${Number(it.qty * it.harga).toLocaleString('id-ID')}</td>
+    function cetak(n, items) {
+        const body = document.getElementById('printBody');
+        body.innerHTML = Array.isArray(items) ? items.map(it => `
+            <tr>
+                <td style="padding:10px; border:1px solid #000;">${it.nama.toUpperCase()}</td>
+                <td style="padding:10px; border:1px solid #000; text-align:center;">${it.qty}</td>
+                <td style="padding:10px; border:1px solid #000; text-align:right;">${Number(it.harga).toLocaleString('id-ID')}</td>
+                <td style="padding:10px; border:1px solid #000; text-align:right;">${Number(it.qty*it.harga).toLocaleString('id-ID')}</td>
             </tr>
-        `).join('');
-
-        const el = document.getElementById('notaPrintArea');
+        `).join('') : '';
+        
+        document.getElementById('printTotal').innerText = "Rp " + Number(n.total).toLocaleString('id-ID');
+        const el = document.getElementById('printArea');
         el.classList.remove('hidden');
-        html2pdf().from(el).set({
-            margin: 0,
-            filename: `NOTA-${n.id_nota || n.id}.pdf`,
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).save().then(() => el.classList.add('hidden'));
+        html2pdf().from(el).set({ margin:10, filename: `Invoice-${n.id_nota}.pdf` }).save().then(() => el.classList.add('hidden'));
     }
 
-    function tutupModal() { document.getElementById('modalDetail').classList.add('hidden'); }
+    function closeModal() { document.getElementById('modalNota').classList.add('hidden'); }
     window.onload = init;
 </script>
 </body>
