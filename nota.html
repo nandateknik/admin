@@ -261,54 +261,78 @@
     }
 
     function bukaDetail(n) {
-        document.getElementById('detId').innerText = n.id_nota || n.id;
-        document.getElementById('detTotal').innerText = "Rp " + Number(n.total).toLocaleString('id-ID');
+    document.getElementById('detId').innerText = n.id_nota || n.id;
+    document.getElementById('detTotal').innerText = "Rp " + Number(n.total).toLocaleString('id-ID');
 
-        // PERBAIKAN: Proteksi forEach error
-        let items = [];
-        try {
-            if (n.items) {
-                items = typeof n.items === 'string' ? JSON.parse(n.items) : n.items;
+    let items = [];
+    
+    // --- PROSES PARSING YANG LEBIH KUAT ---
+    try {
+        if (n.items) {
+            if (typeof n.items === 'string') {
+                // Jika isinya string "[{...}]", kita ubah jadi array
+                items = JSON.parse(n.items);
+            } else if (Array.isArray(n.items)) {
+                // Jika sudah memang array, langsung pakai
+                items = n.items;
             }
-        } catch(e) { console.error("Parse items failed"); }
-
-        const container = document.getElementById('detItems');
-        container.innerHTML = "";
-
-        // Validasi jika items adalah Array sebelum forEach
-        if (Array.isArray(items) && items.length > 0) {
-            items.forEach(it => {
-                container.innerHTML += `
-                    <div class="flex justify-between text-xs">
-                        <span class="font-bold text-slate-800 uppercase">${it.nama} (x${it.qty})</span>
-                        <span class="font-mono font-bold">Rp ${Number(it.qty * it.harga).toLocaleString('id-ID')}</span>
-                    </div>`;
-            });
-        } else {
-            container.innerHTML = `<p class="text-center text-slate-400 text-[10px] italic">Detail barang tidak tersedia</p>`;
         }
-
-        document.getElementById('btnDownload').onclick = () => cetak(n, items);
-        document.getElementById('modalNota').classList.remove('hidden');
+    } catch (e) {
+        console.error("Gagal parse, mencoba fallback manual");
+        // Fallback jika formatnya rusak: masukkan total sebagai satu item
+        items = [{ nama: "Layanan/Jasa (Tanpa Detail)", qty: 1, harga: n.total }];
     }
 
-    function cetak(n, items) {
-        const body = document.getElementById('printBody');
-        body.innerHTML = Array.isArray(items) ? items.map(it => `
-            <tr>
-                <td style="padding:10px; border:1px solid #000;">${it.nama.toUpperCase()}</td>
-                <td style="padding:10px; border:1px solid #000; text-align:center;">${it.qty}</td>
-                <td style="padding:10px; border:1px solid #000; text-align:right;">${Number(it.harga).toLocaleString('id-ID')}</td>
-                <td style="padding:10px; border:1px solid #000; text-align:right;">${Number(it.qty*it.harga).toLocaleString('id-ID')}</td>
-            </tr>
-        `).join('') : '';
-        
-        document.getElementById('printTotal').innerText = "Rp " + Number(n.total).toLocaleString('id-ID');
-        const el = document.getElementById('printArea');
-        el.classList.remove('hidden');
-        html2pdf().from(el).set({ margin:10, filename: `Invoice-${n.id_nota}.pdf` }).save().then(() => el.classList.add('hidden'));
+    // Jika setelah di-parse ternyata masih bukan array atau kosong
+    if (!Array.isArray(items) || items.length === 0) {
+        items = [{ nama: "Pekerjaan Teknik (Sesuai Nota)", qty: 1, harga: n.total }];
     }
 
+    const container = document.getElementById('detItems');
+    container.innerHTML = "";
+
+    // Render ke layar
+    items.forEach(it => {
+        const nama = it.nama || "Item";
+        const qty = it.qty || 1;
+        const harga = it.harga || 0;
+        container.innerHTML += `
+            <div class="flex justify-between text-xs border-b border-slate-50 pb-2">
+                <div class="flex flex-col">
+                    <span class="font-bold text-slate-800 uppercase">${nama}</span>
+                    <span class="text-[9px] text-slate-400 font-bold">${qty} x Rp ${Number(harga).toLocaleString('id-ID')}</span>
+                </div>
+                <span class="font-mono font-black text-slate-900">Rp ${Number(qty * harga).toLocaleString('id-ID')}</span>
+            </div>`;
+    });
+
+    document.getElementById('btnDownload').onclick = () => cetak(n, items);
+    document.getElementById('modalNota').classList.remove('hidden');
+}
+
+function cetak(n, items) {
+    const body = document.getElementById('printBody');
+    body.innerHTML = items.map(it => `
+        <tr>
+            <td style="padding:10px; border:1px solid #000; text-transform:uppercase;">${it.nama}</td>
+            <td style="padding:10px; border:1px solid #000; text-align:center;">${it.qty}</td>
+            <td style="padding:10px; border:1px solid #000; text-align:right;">${Number(it.harga).toLocaleString('id-ID')}</td>
+            <td style="padding:10px; border:1px solid #000; text-align:right; font-weight:bold;">${Number(it.qty * it.harga).toLocaleString('id-ID')}</td>
+        </tr>
+    `).join('');
+    
+    document.getElementById('printTotal').innerText = "Rp " + Number(n.total).toLocaleString('id-ID');
+    const el = document.getElementById('printArea');
+    el.classList.remove('hidden');
+    
+    html2pdf().from(el).set({ 
+        margin: 10, 
+        filename: `Nota-${n.id_nota || n.id}.pdf`,
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }).save().then(() => el.classList.add('hidden'));
+}
+    
     function closeModal() { document.getElementById('modalNota').classList.add('hidden'); }
     window.onload = init;
 </script>
