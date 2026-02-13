@@ -134,6 +134,13 @@
 </div>
 
 <script>
+    (function() {
+        const user = localStorage.getItem("user_nanda");
+        if (!user) {
+            // Jika tidak ada kunci login, paksa balik ke halaman login
+            window.location.href = "login.html";
+            }
+        })();
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQz16cIzrcWxvlL90YpJm3r9z1MZ_YM0mPbP_xD3z5HH5zuLp6VRIhcyuHOKYGN1_rVg/exec";
     let pelangganData = [], riwayatData = [], selectedQuote = null;
 
