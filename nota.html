@@ -32,7 +32,6 @@
         .status-paid { background: #dcfce7; color: #16a34a; }
         #notaPrintArea { width: 100%; box-sizing: border-box; }
 
-        /* Style untuk toggle status di form */
         .status-toggle { display: flex; background: #f1f5f9; padding: 4px; border-radius: 1rem; gap: 4px; }
         .status-btn { flex: 1; padding: 10px; border-radius: 0.8rem; font-size: 10px; font-weight: 900; transition: all 0.3s; text-align: center; cursor: pointer; color: #94a3b8; }
         .status-btn.active-paid { background: #16a34a; color: white; shadow: 0 4px 10px rgba(22, 163, 74, 0.3); }
@@ -107,7 +106,7 @@
                 <h2 class="font-900 text-xl uppercase tracking-widest mb-1">NANDA TEKNIK BANYUWANGI</h2>
                 <p class="text-[9px] font-bold uppercase">Network, Software & Electrical Engineering</p>
                 <p class="text-[8px] italic">Sukowidi Indah Residence Blok D-5, Banyuwangi. 68421</p>
-                <p class="text-[8px] italic">Email : nandateknik02@gmail.com | Whatsapp : +6282331201148 | Website : www.nandateknik.com</p>
+                <p class="text-[8px] italic text-blue-600">Email: nandateknik02@gmail.com | WA: +6282331201148</p>
             </div>
 
             <div class="grid grid-cols-2 text-[10px] mb-4 relative z-10">
@@ -140,12 +139,13 @@
 
             <div class="flex justify-between items-start mt-8 relative z-10">
                 <div class="border-2 border-dashed border-gray-300 p-3 rounded-lg w-56">
-                    <p class="text-[8px] font-black uppercase mb-1">Status Pembayaran:</p>
+                    <p class="text-[8px] font-black uppercase mb-1">Metode Pembayaran:</p>
                     <p class="text-[10px] font-black underline">BCA - 1801826011</p>
                     <p class="text-[7px] italic text-gray-500 mt-2 leading-tight">* Simpan nota sebagai bukti garansi.</p>
                 </div>
                 <div class="text-center w-32">
                     <p class="text-[9px] font-bold mb-12">Hormat Kami,</p>
+                    <div class="h-4"></div>
                     <p class="text-[10px] font-black uppercase underline">NANDA TEKNIK</p>
                 </div>
             </div>
@@ -168,7 +168,6 @@
         if(tab === 'riwayat') loadRiwayat();
     }
 
-    // Fungsi Toggle Status Form
     function setStatus(status) {
         document.getElementById('inputStatus').value = status;
         const btnP = document.getElementById('btnPaid');
@@ -182,7 +181,7 @@
         }
     }
 
-    // Autocomplete logic
+    // Autocomplete
     const searchInput = document.getElementById('custSearch');
     const autoList = document.getElementById('autocomplete-list');
 
@@ -295,77 +294,66 @@
         });
     }
 
-   function bukaDetail(n, namaLengkap) {
-    selectedNota = n;
-    
-    // 1. Standarisasi Status
-    const statusNota = (n.status || "UNPAID").toUpperCase();
-    const isPaid = statusNota === 'PAID';
-    
-    // 2. Isi data Header Nota
-    document.getElementById('vId').innerText = n.id || '-';
-    document.getElementById('vCust').innerText = namaLengkap || n.email;
-    document.getElementById('vTgl').innerText = n.tanggal || '-';
-    document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total || 0).toLocaleString('id-ID');
-    
-    // 3. Atur Watermark & Warna Status
-    const wm = document.getElementById('vWatermark');
-    wm.style.display = 'block';
-    wm.innerText = isPaid ? 'LUNAS' : 'UNPAID';
-    wm.className = `watermark ${isPaid ? 'wm-paid' : 'wm-unpaid'}`;
+    function bukaDetail(n, namaLengkap) {
+        selectedNota = n;
+        const statusNota = (n.status || "UNPAID").toUpperCase();
+        const isPaid = statusNota === 'PAID';
+        
+        document.getElementById('vId').innerText = n.id || '-';
+        document.getElementById('vCust').innerText = namaLengkap || n.email;
+        document.getElementById('vTgl').innerText = n.tanggal || '-';
+        document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total || 0).toLocaleString('id-ID');
+        
+        const wm = document.getElementById('vWatermark');
+        wm.style.display = 'block';
+        wm.innerText = isPaid ? 'LUNAS' : 'UNPAID';
+        wm.className = `watermark ${isPaid ? 'wm-paid' : 'wm-unpaid'}`;
 
-    const st = document.getElementById('vStatusText');
-    st.innerText = statusNota;
-    st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + 
-                  (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
-    
-    // 4. Render Tabel Item (LOGIKA ANTI-ERROR FOR-EACH)
-    const body = document.getElementById('vItems'); 
-    body.innerHTML = "";
-    
-    let items = [];
-    try {
-        // Ambil data mentah (cek properti items atau items_json)
-        let raw = n.items || n.items_json;
+        const st = document.getElementById('vStatusText');
+        st.innerText = statusNota;
+        st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + 
+                      (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
+        
+        const body = document.getElementById('vItems'); 
+        body.innerHTML = "";
+        
+        let items = [];
+        try {
+            let raw = n.items || n.items_json;
 
-        // Tahap A: Jika datanya String (JSON), kita pecah dulu jadi objek
-        if (typeof raw === 'string') {
-            raw = JSON.parse(raw);
+            if (typeof raw === 'string') {
+                // LOGIKA ANTI-BACKSLASH (Double Parse)
+                let p1 = JSON.parse(raw);
+                items = typeof p1 === 'string' ? JSON.parse(p1) : p1;
+            } else if (Array.isArray(raw)) {
+                items = raw;
+            } else if (raw && typeof raw === 'object') {
+                items = [raw];
+            }
+        } catch (e) { 
+            console.error("Gagal parsing data:", e);
         }
 
-        // Tahap B: PAKSA JADI ARRAY (Ini kunci perbaikannya)
-        if (Array.isArray(raw)) {
-            items = raw;
-        } else if (raw && typeof raw === 'object') {
-            // Jika datanya cuma 1 baris/objek, bungkus dalam kurung siku []
-            items = [raw];
+        if (Array.isArray(items) && items.length > 0) {
+            items.forEach(it => {
+                const deskripsi = it.nama || it.nama_barang || "Deskripsi Kosong";
+                const q = it.qty || 1;
+                const h = it.harga || 0;
+                const sub = Number(q) * Number(h);
+
+                body.innerHTML += `
+                    <tr class="border-b border-black">
+                        <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${deskripsi}</td>
+                        <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${q}</td>
+                        <td class="text-right py-2 px-3 font-black text-[10px]">${sub.toLocaleString('id-ID')}</td>
+                    </tr>`;
+            });
+        } else {
+            body.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400 italic text-[10px]">Detail kosong</td></tr>';
         }
-    } catch (e) { 
-        console.error("Gagal parsing data:", e);
+
+        document.getElementById('modalNota').classList.replace('hidden', 'flex');
     }
-
-    // 5. Masukkan ke Tabel
-    if (items.length > 0) {
-        items.forEach(it => {
-            const deskripsi = it.nama || it.nama_barang || "Deskripsi tidak tersedia";
-            const q = it.qty || it.kuantitas || 1;
-            const h = it.harga || 0;
-            const sub = Number(q) * Number(h);
-
-            body.innerHTML += `
-                <tr class="border-b border-black">
-                    <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${deskripsi}</td>
-                    <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${q}</td>
-                    <td class="text-right py-2 px-3 font-black text-[10px]">${sub.toLocaleString('id-ID')}</td>
-                </tr>`;
-        });
-    } else {
-        body.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400 italic text-[10px]">Detail pekerjaan kosong</td></tr>';
-    }
-
-    // Tampilkan Modal
-    document.getElementById('modalNota').classList.replace('hidden', 'flex');
-}
 
     async function updateStatusDialog() {
         if(!selectedNota) return;
