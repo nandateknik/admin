@@ -49,6 +49,14 @@
     </div>
 
     <script>
+
+        (function() {
+            const user = localStorage.getItem("user_nanda");
+                if (user) {
+                    // Jika sudah ada data login, tidak boleh buka halaman login lagi
+                    window.location.href = "index.html";
+                }
+            })();
         // GANTI URL INI DENGAN URL WEB APP GOOGLE SCRIPT ANDA
         const API_URL = "https://script.google.com/macros/s/AKfycbzr4gEWPFsIpFCWycarI1JrSrVfU65IXTprI-s3AXNa4FWu80vCH0H6N3y3jlkESrHgEQ/exec";
 
