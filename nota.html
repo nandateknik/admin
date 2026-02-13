@@ -12,11 +12,8 @@
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #334155; }
         .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; display: flex; flex-direction: column; }
         .tab-active { border-bottom: 4px solid #1e293b; color: #1e293b; font-weight: 900; }
-        
-        /* Area Nota PDF */
         .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; position: relative; color: #000; overflow: hidden; }
         
-        /* Watermark Desain */
         .watermark {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
             font-size: 60px; font-weight: 900; opacity: 0.15; pointer-events: none;
@@ -33,9 +30,13 @@
         }
         .status-unpaid { background: #fee2e2; color: #dc2626; }
         .status-paid { background: #dcfce7; color: #16a34a; }
-        
-        /* Fix PDF Terpotong */
         #notaPrintArea { width: 100%; box-sizing: border-box; }
+
+        /* Style untuk toggle status di form */
+        .status-toggle { display: flex; background: #f1f5f9; padding: 4px; border-radius: 1rem; gap: 4px; }
+        .status-btn { flex: 1; padding: 10px; border-radius: 0.8rem; font-size: 10px; font-weight: 900; transition: all 0.3s; text-align: center; cursor: pointer; color: #94a3b8; }
+        .status-btn.active-paid { background: #16a34a; color: white; shadow: 0 4px 10px rgba(22, 163, 74, 0.3); }
+        .status-btn.active-unpaid { background: #dc2626; color: white; shadow: 0 4px 10px rgba(220, 38, 38, 0.3); }
     </style>
 </head>
 <body>
@@ -62,6 +63,15 @@
             <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
             <input type="hidden" id="finalEmail">
             <input type="hidden" id="finalNama">
+        </div>
+
+        <div>
+            <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Status Pembayaran</label>
+            <div class="status-toggle">
+                <div id="btnUnpaid" onclick="setStatus('UNPAID')" class="status-btn active-unpaid">UNPAID</div>
+                <div id="btnPaid" onclick="setStatus('PAID')" class="status-btn">PAID</div>
+            </div>
+            <input type="hidden" id="inputStatus" value="UNPAID">
         </div>
 
         <div id="itemContainer" class="space-y-4"></div>
@@ -93,7 +103,6 @@
 
         <div id="notaPrintArea" class="p-8 nota-kertas flex-1 overflow-y-auto bg-white text-black relative">
             <div id="vWatermark" class="watermark">PAID</div>
-
             <div class="text-center mb-6 border-b-4 border-black pb-4 relative z-10">
                 <h2 class="font-900 text-xl uppercase tracking-widest mb-1">NANDA TEKNIK BANYUWANGI</h2>
                 <p class="text-[9px] font-bold uppercase">Network, Software & Electrical Engineering</p>
@@ -111,8 +120,6 @@
                     <p><span id="vStatusText" class="border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase"></span></p>
                 </div>
             </div>
-
-            <p class="text-[9px] font-black uppercase mb-2 italic relative z-10">Perihal: Nota Pembayaran (Invoice)</p>
 
             <table class="w-full text-[10px] mb-4 border-2 border-black relative z-10">
                 <thead>
@@ -134,9 +141,8 @@
             <div class="flex justify-between items-start mt-8 relative z-10">
                 <div class="border-2 border-dashed border-gray-300 p-3 rounded-lg w-56">
                     <p class="text-[8px] font-black uppercase mb-1">Status Pembayaran:</p>
-                    <p class="text-[9px] font-bold text-gray-700">Pembayaran Melalui:</p>
                     <p class="text-[10px] font-black underline">BCA - 1801826011</p>
-                    <p class="text-[7px] italic text-gray-500 mt-2 leading-tight">* Simpan nota ini sebagai bukti garansi pengerjaan.</p>
+                    <p class="text-[7px] italic text-gray-500 mt-2 leading-tight">* Simpan nota sebagai bukti garansi.</p>
                 </div>
                 <div class="text-center w-32">
                     <p class="text-[9px] font-bold mb-12">Hormat Kami,</p>
@@ -144,7 +150,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="p-6 bg-slate-100">
             <button onclick="downloadPdf()" class="w-full py-4 rounded-2xl font-900 text-[10px] text-white bg-slate-800 shadow-lg uppercase active:scale-95 transition-all">Download PDF Nota</button>
         </div>
@@ -163,7 +168,21 @@
         if(tab === 'riwayat') loadRiwayat();
     }
 
-    // Autocomplete Pelanggan
+    // Fungsi Toggle Status Form
+    function setStatus(status) {
+        document.getElementById('inputStatus').value = status;
+        const btnP = document.getElementById('btnPaid');
+        const btnU = document.getElementById('btnUnpaid');
+        if(status === 'PAID') {
+            btnP.classList.add('active-paid');
+            btnU.classList.remove('active-unpaid');
+        } else {
+            btnU.classList.add('active-unpaid');
+            btnP.classList.remove('active-paid');
+        }
+    }
+
+    // Autocomplete logic
     const searchInput = document.getElementById('custSearch');
     const autoList = document.getElementById('autocomplete-list');
 
@@ -179,7 +198,7 @@
             div.onclick = () => {
                 searchInput.value = p.nama;
                 document.getElementById('finalEmail').value = p.email;
-                document.getElementById('finalNama').value = p.nama; // Simpan Nama
+                document.getElementById('finalNama').value = p.nama;
                 autoList.classList.add('hidden');
             };
             autoList.appendChild(div);
@@ -213,6 +232,7 @@
 
     async function simpanNota() {
         const email = document.getElementById('finalEmail').value;
+        const status = document.getElementById('inputStatus').value;
         const items = [];
         document.querySelectorAll('.item-row').forEach(row => {
             const n = row.querySelector('.item-nama').value, q = row.querySelector('.item-qty').value, h = row.querySelector('.item-harga').value;
@@ -228,7 +248,7 @@
             email: email, 
             items: JSON.stringify(items), 
             total: hitungTotal(), 
-            status: "UNPAID",
+            status: status,
             tanggal: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
         };
 
@@ -242,7 +262,6 @@
         const list = document.getElementById('listRiwayat');
         list.innerHTML = `<div class="flex justify-center py-20"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div></div>`;
         try {
-            // Kita load data Nota dan Pelanggan agar bisa mapping Nama
             const [resNota, resPel] = await Promise.all([
                 fetch(SCRIPT_URL + "?type=nota"),
                 fetch(SCRIPT_URL + "?type=pelanggan")
@@ -257,12 +276,10 @@
         const key = document.getElementById('searchRiwayat').value.toLowerCase();
         const list = document.getElementById('listRiwayat');
         list.innerHTML = "";
-        
-        // Buat map email ke nama
         const pelMap = {};
         pelangganData.forEach(p => pelMap[p.email.toLowerCase()] = p.nama);
 
-        riwayatData.filter(n => (n.id + n.email).toLowerCase().includes(key)).forEach(n => {
+        riwayatData.filter(n => (n.id + n.email).toLowerCase().includes(key)).reverse().forEach(n => {
             const namaPel = pelMap[n.email.toLowerCase()] || n.email;
             const isPaid = n.status.toUpperCase() === 'PAID';
             const sClass = isPaid ? 'status-paid' : 'status-unpaid';
@@ -278,79 +295,55 @@
         });
     }
 
-// GANTI FUNGSI bukaDetail ANDA DENGAN KODE DI BAWAH INI:
+    function bukaDetail(n, namaLengkap) {
+        selectedNota = n;
+        const statusNota = (n.status || "UNPAID").toUpperCase();
+        const isPaid = statusNota === 'PAID';
+        
+        document.getElementById('vId').innerText = n.id || '-';
+        document.getElementById('vCust').innerText = namaLengkap || n.email;
+        document.getElementById('vTgl').innerText = n.tanggal || '-';
+        document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total || 0).toLocaleString('id-ID');
+        
+        const wm = document.getElementById('vWatermark');
+        wm.style.display = 'block';
+        wm.innerText = isPaid ? 'LUNAS' : 'UNPAID';
+        wm.className = `watermark ${isPaid ? 'wm-paid' : 'wm-unpaid'}`;
 
-function bukaDetail(n, namaLengkap) {
-    selectedNota = n;
-    
-    // 1. Standarisasi Status
-    const statusNota = (n.status || "UNPAID").toUpperCase();
-    const isPaid = statusNota === 'PAID';
-    
-    // 2. Set Header
-    document.getElementById('vId').innerText = n.id || '-';
-    document.getElementById('vCust').innerText = namaLengkap || n.email;
-    document.getElementById('vTgl').innerText = n.tanggal || '-';
-    document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total || 0).toLocaleString('id-ID');
-    
-    // 3. Watermark & Status Text
-    const wm = document.getElementById('vWatermark');
-    wm.style.display = 'block';
-    wm.innerText = isPaid ? 'LUNAS' : 'UNPAID';
-    wm.className = `watermark ${isPaid ? 'wm-paid' : 'wm-unpaid'}`;
+        const st = document.getElementById('vStatusText');
+        st.innerText = statusNota;
+        st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + 
+                      (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
+        
+        const body = document.getElementById('vItems'); 
+        body.innerHTML = "";
+        
+        let items = [];
+        try {
+            // Membaca items (simpan) atau items_json (database)
+            let raw = n.items || n.items_json;
+            items = typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : []);
+        } catch (e) { items = []; }
 
-    const st = document.getElementById('vStatusText');
-    st.innerText = statusNota;
-    st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + 
-                  (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
-    
-    // 4. Render Items (Logika Anti-Error)
-    const body = document.getElementById('vItems'); 
-    body.innerHTML = "";
-    
-    let items = [];
-    try {
-        let rawData = n.items_json;
-
-        if (typeof rawData === 'string') {
-            // Jika data berupa string JSON, kita parse
-            items = JSON.parse(rawData);
-        } else if (typeof rawData === 'object' && rawData !== null) {
-            // Jika data SUDAH berupa objek/array (ini yang sering bikin Unpaid error)
-            items = rawData;
+        if (items.length > 0) {
+            items.forEach(it => {
+                const deskripsi = it.nama || it.nama_barang || "Deskripsi kosong";
+                const q = it.qty || it.kuantitas || 1;
+                const h = it.harga || 0;
+                const sub = Number(q) * Number(h);
+                body.innerHTML += `
+                    <tr class="border-b border-black">
+                        <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${deskripsi}</td>
+                        <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${q}</td>
+                        <td class="text-right py-2 px-3 font-black text-[10px]">${sub.toLocaleString('id-ID')}</td>
+                    </tr>`;
+            });
+        } else {
+            body.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400 italic text-[10px]">Data item tidak ditemukan</td></tr>';
         }
-
-        // Pastikan hasil akhirnya selalu Array
-        if (!Array.isArray(items)) {
-            items = items ? [items] : [];
-        }
-    } catch (e) {
-        console.error("Gagal parsing data item:", e);
-        items = [];
+        document.getElementById('modalNota').classList.replace('hidden', 'flex');
     }
 
-    // 5. Tampilkan ke Tabel
-    if (items.length > 0) {
-        items.forEach(it => {
-            // Cek properti 'nama' atau 'nama_barang'
-            const deskripsi = it.nama || it.nama_barang || "Deskripsi tidak tersedia";
-            const q = it.qty || it.kuantitas || 1;
-            const h = it.harga || 0;
-            const sub = Number(q) * Number(h);
-
-            body.innerHTML += `
-                <tr class="border-b border-black">
-                    <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${deskripsi}</td>
-                    <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${q}</td>
-                    <td class="text-right py-2 px-3 font-black text-[10px]">${sub.toLocaleString('id-ID')}</td>
-                </tr>`;
-        });
-    } else {
-        body.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400 italic">Detail pekerjaan kosong</td></tr>';
-    }
-
-    document.getElementById('modalNota').classList.replace('hidden', 'flex');
-}
     async function updateStatusDialog() {
         if(!selectedNota) return;
         const { value: st } = await Swal.fire({
@@ -371,10 +364,10 @@ function bukaDetail(n, namaLengkap) {
     function downloadPdf() {
         const el = document.getElementById('notaPrintArea');
         const opt = { 
-            margin: [10, 5, 10, 5], // T, L, B, R
+            margin: [5, 5, 5, 5],
             filename: `NOTA-${selectedNota.id}.pdf`, 
             image: { type: 'jpeg', quality: 1 },
-            html2canvas: { scale: 3, useCORS: true, letterRendering: true, scrollY: 0 },
+            html2canvas: { scale: 3, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         html2pdf().set(opt).from(el).save();
