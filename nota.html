@@ -56,36 +56,41 @@
     </header>
 
     <main id="contentBuat" class="p-8 space-y-6 flex-1">
-        <div class="relative">
-            <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Cari Pelanggan</label>
-            <input type="text" id="custSearch" placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-slate-50 border-2 border-transparent p-5 rounded-[2rem] font-bold outline-none focus:border-slate-400 focus:bg-white transition-all shadow-sm">
-            <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
-            <input type="hidden" id="finalEmail">
-            <input type="hidden" id="finalNama">
-        </div>
+    <div class="relative">
+        <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Cari Pelanggan</label>
+        <input type="text" id="custSearch" placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-slate-50 border-2 border-transparent p-5 rounded-[2rem] font-bold outline-none focus:border-slate-400 focus:bg-white transition-all shadow-sm">
+        <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
+        <input type="hidden" id="finalEmail">
+        <input type="hidden" id="finalNama">
+    </div>
 
-        <div>
-            <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Status Pembayaran</label>
-            <div class="status-toggle">
-                <div id="btnUnpaid" onclick="setStatus('UNPAID')" class="status-btn active-unpaid">UNPAID</div>
-                <div id="btnPaid" onclick="setStatus('PAID')" class="status-btn">PAID</div>
+    <div>
+        <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Status Pembayaran</label>
+        <div class="status-toggle">
+            <div id="btnUnpaid" onclick="setStatus('UNPAID')" class="status-btn active-unpaid">UNPAID</div>
+            <div id="btnPaid" onclick="setStatus('PAID')" class="status-btn">PAID</div>
+        </div>
+        <input type="hidden" id="inputStatus" value="UNPAID">
+    </div>
+
+    <div>
+        <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Tanggal Nota</label>
+        <input type="date" id="inputTanggal" class="w-full bg-slate-50 border-2 border-transparent p-5 rounded-[2rem] font-bold outline-none focus:border-slate-400 focus:bg-white transition-all shadow-sm text-sm">
+    </div>
+
+    <div id="itemContainer" class="space-y-4"></div>
+    <button onclick="tambahItem()" class="w-full py-5 text-[10px] font-900 text-slate-400 border-2 border-dashed border-slate-200 rounded-[1.5rem] hover:bg-slate-50 uppercase tracking-widest">+ Tambah Item Pekerjaan</button>
+
+    <div class="bg-slate-800 p-7 rounded-[2.5rem] text-white shadow-xl">
+        <div class="flex justify-between items-end">
+            <div>
+                <span class="text-[10px] font-800 text-slate-400 block mb-1 uppercase tracking-widest">Total Tagihan</span>
+                <span id="totalDisplay" class="text-3xl font-900 text-white leading-none">Rp 0</span>
             </div>
-            <input type="hidden" id="inputStatus" value="UNPAID">
+            <button onclick="simpanNota()" class="bg-white text-slate-900 px-8 py-4 rounded-2xl font-900 text-xs shadow-lg active:scale-95 transition-all uppercase">Simpan</button>
         </div>
-
-        <div id="itemContainer" class="space-y-4"></div>
-        <button onclick="tambahItem()" class="w-full py-5 text-[10px] font-900 text-slate-400 border-2 border-dashed border-slate-200 rounded-[1.5rem] hover:bg-slate-50 uppercase tracking-widest">+ Tambah Item Pekerjaan</button>
-
-        <div class="bg-slate-800 p-7 rounded-[2.5rem] text-white shadow-xl">
-            <div class="flex justify-between items-end">
-                <div>
-                    <span class="text-[10px] font-800 text-slate-400 block mb-1 uppercase tracking-widest">Total Tagihan</span>
-                    <span id="totalDisplay" class="text-3xl font-900 text-white leading-none">Rp 0</span>
-                </div>
-                <button onclick="simpanNota()" class="bg-white text-slate-900 px-8 py-4 rounded-2xl font-900 text-xs shadow-lg active:scale-95 transition-all uppercase">Simpan</button>
-            </div>
-        </div>
-    </main>
+    </div>
+</main>
 
     <main id="contentRiwayat" class="p-8 hidden bg-slate-50 flex-1 space-y-4 overflow-y-auto">
         <input type="text" id="searchRiwayat" oninput="filterRiwayat()" placeholder="Cari ID / Nama..." class="w-full p-5 bg-white border border-slate-200 rounded-[2rem] text-xs font-black outline-none shadow-sm">
@@ -157,7 +162,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPhSPmjtO871LsFY5Up8bCRfTk_pZXZivfp3Mf_O4oL0c2bP6aO-JzjiLlfqV9Cwa4/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHkWR0rjBAeSGa1qE4S2WC7GsIjQOiI50VN0jJGGq5T-ufb2vHTg_XUcRUiRQUkvonmA/exec";
     let pelangganData = [], riwayatData = [], selectedNota = null;
 
     function switchTab(tab) {
@@ -229,9 +234,11 @@
         return total;
     }
 
+    // RAPID SIMPAN (Input Tanggal)
     async function simpanNota() {
         const email = document.getElementById('finalEmail').value;
         const status = document.getElementById('inputStatus').value;
+        const tglManual = document.getElementById('inputTanggal').value;
         const items = [];
         
         document.querySelectorAll('.item-row').forEach(row => {
@@ -241,71 +248,108 @@
             if(n && h) items.push({ nama: n, qty: q, harga: h });
         });
 
-        if(!email || items.length === 0) return Swal.fire('Error', 'Pilih pelanggan & isi item pekerjaan.', 'warning');
+        if(!email || !tglManual) return Swal.fire('Error', 'Lengkapi data pelanggan & tanggal.', 'warning');
         
-        Swal.fire({title: 'Menyimpan Nota...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
+        // Format tanggal bray
+        const dateObj = new Date(tglManual);
+        const tglFormatted = dateObj.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
+
+        Swal.fire({title: 'Menyimpan...', didOpen: () => Swal.showLoading()});
         
-        // PERBAIKAN: Jangan lakukan JSON.stringify pada variabel items di sini.
-        // Biarkan items tetap berupa Array Object.
         const payload = {
             action: 'simpanNota',
             id_nota: "INV-" + Date.now().toString().slice(-6),
             email: email, 
-            items: items, // KIRIM SEBAGAI ARRAY LANGSUNG
+            items: items,
             total: hitungTotal(), 
             status: status,
-            tanggal: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
+            tanggal: tglFormatted
         };
 
         try {
-            // Karena kita menggunakan mode: 'no-cors', pastikan payload di-stringify satu kali saja di sini.
-            await fetch(SCRIPT_URL, {
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify(payload) 
-            });
-            
-            Swal.fire('Berhasil', 'Nota Berhasil Dibuat', 'success').then(() => location.reload());
-        } catch(e) { 
-            Swal.fire('Error', 'Gagal Koneksi Server', 'error'); 
-        }
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            Swal.fire('Berhasil', 'Nota Tersimpan', 'success').then(() => location.reload());
+        } catch(e) { Swal.fire('Error', 'Gagal!', 'error'); }
     }
 
-    async function loadRiwayat() {
+    // Tombol Update Status yang Lebih Rapi
+    async function updateStatusDialog() {
+        if(!selectedNota) return;
+        
+        Swal.fire({
+            title: 'Update Status',
+            html: `
+                <div class="flex flex-col gap-3 p-2">
+                    <button onclick="Swal.clickConfirm(); window.tmpStatus='PAID'" class="py-4 bg-green-500 text-white rounded-2xl font-black text-xs uppercase">Set LUNAS (PAID)</button>
+                    <button onclick="Swal.clickConfirm(); window.tmpStatus='UNPAID'" class="py-4 bg-red-500 text-white rounded-2xl font-black text-xs uppercase">Set BELUM BAYAR (UNPAID)</button>
+                </div>`,
+            showConfirmButton: false,
+            showCancelButton: true,
+            cancelButtonText: 'BATAL',
+            customClass: { popup: 'rounded-[2rem]' }
+        }).then(async (result) => {
+            if (window.tmpStatus) {
+                const st = window.tmpStatus;
+                Swal.fire({title: 'Updating...', didOpen: () => Swal.showLoading()});
+                try {
+                    await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'updateStatus', id_nota: selectedNota.id_nota, status: st })});
+                    Swal.fire('Selesai', 'Status Berhasil Diubah', 'success').then(() => { tutupModal(); switchTab('riwayat'); });
+                } catch(e) { Swal.fire('Error', 'Gagal', 'error'); }
+                delete window.tmpStatus;
+            }
+        });
+    }
+
+    // PENCARIAN DATABASE & PAGINATION
+    async function loadRiwayat(isNext = false) {
+        if(isLoading) return;
+        if(isNext && !hasMore) return;
+        
+        isLoading = true;
         const list = document.getElementById('listRiwayat');
-        list.innerHTML = `<div class="flex justify-center py-20"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div></div>`;
+        const loaderId = "loader-riwayat";
+
+        if(!isNext) list.innerHTML = "";
+        list.innerHTML += `<div id="${loaderId}" class="flex justify-center py-5"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-slate-800"></div></div>`;
+
         try {
-            const [resNota, resPel] = await Promise.all([
-                fetch(SCRIPT_URL + "?type=nota"),
-                fetch(SCRIPT_URL + "?type=pelanggan")
-            ]);
-            riwayatData = await resNota.json();
-            pelangganData = await resPel.json();
-            filterRiwayat();
-        } catch(e) { list.innerHTML = "<p class='text-center py-20 text-slate-400 font-black'>Gagal Sinkron Data</p>"; }
+            const res = await fetch(`${SCRIPT_URL}?type=nota&page=${currentPage}&search=${currentSearch}`);
+            const result = await res.json();
+            
+            document.getElementById(loaderId)?.remove();
+            
+            result.data.forEach(n => {
+                const isPaid = n.status.toUpperCase() === 'PAID';
+                const sClass = isPaid ? 'status-paid' : 'status-unpaid';
+                list.innerHTML += `
+                    <div onclick='bukaDetail(${JSON.stringify(n)})' class="bg-white p-5 rounded-[2rem] border-2 border-slate-50 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all mb-4">
+                        <div class="overflow-hidden">
+                            <p class="text-[9px] font-900 text-slate-400 uppercase tracking-tighter">${n.id_nota} • ${n.tanggal}</p>
+                            <p class="text-sm font-black text-slate-700 truncate w-40 uppercase">${n.email}</p>
+                            <span class="text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest ${sClass}">${n.status}</span>
+                        </div>
+                        <p class="text-sm font-black text-slate-800">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
+                    </div>`;
+            });
+
+            hasMore = result.hasMore;
+            if(hasMore) {
+                list.innerHTML += `<button id="btnLoadMore" onclick="currentPage++; loadRiwayat(true)" class="w-full py-4 text-[10px] font-900 text-slate-400 uppercase tracking-widest">Muat Lebih Banyak...</button>`;
+            }
+        } catch(e) { 
+            console.log(e);
+            list.innerHTML = "<p class='text-center py-20 text-slate-400 font-black'>Gagal Load Data</p>"; 
+        }
+        isLoading = false;
     }
 
     function filterRiwayat() {
-        const key = document.getElementById('searchRiwayat').value.toLowerCase();
-        const list = document.getElementById('listRiwayat');
-        list.innerHTML = "";
-        const pelMap = {};
-        pelangganData.forEach(p => pelMap[p.email.toLowerCase()] = p.nama);
-
-        riwayatData.filter(n => (n.id + n.email).toLowerCase().includes(key)).reverse().forEach(n => {
-            const namaPel = pelMap[n.email.toLowerCase()] || n.email;
-            const isPaid = n.status.toUpperCase() === 'PAID';
-            const sClass = isPaid ? 'status-paid' : 'status-unpaid';
-            list.innerHTML += `
-                <div onclick='bukaDetail(${JSON.stringify(n)}, "${namaPel}")' class="bg-white p-5 rounded-[2rem] border-2 border-slate-50 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all">
-                    <div class="overflow-hidden">
-                        <p class="text-[9px] font-900 text-slate-400 uppercase tracking-tighter">${n.id} • ${n.tanggal}</p>
-                        <p class="text-sm font-black text-slate-700 truncate w-40 uppercase">${namaPel}</p>
-                        <span class="text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest ${sClass}">${n.status}</span>
-                    </div>
-                    <p class="text-sm font-black text-slate-800">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>
-                </div>`;
-        });
+        clearTimeout(window.searchTimer);
+        window.searchTimer = setTimeout(() => {
+            currentSearch = document.getElementById('searchRiwayat').value;
+            currentPage = 1;
+            loadRiwayat();
+        }, 500); // Delay 500ms biar gak spam request ke database
     }
 
     function bukaDetail(n, namaLengkap) {
