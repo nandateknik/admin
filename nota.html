@@ -295,54 +295,77 @@
         });
     }
 
-    function bukaDetail(n, namaLengkap) {
-        selectedNota = n;
-        const statusNota = (n.status || "UNPAID").toUpperCase();
-        const isPaid = statusNota === 'PAID';
-        
-        document.getElementById('vId').innerText = n.id || '-';
-        document.getElementById('vCust').innerText = namaLengkap || n.email;
-        document.getElementById('vTgl').innerText = n.tanggal || '-';
-        document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total || 0).toLocaleString('id-ID');
-        
-        const wm = document.getElementById('vWatermark');
-        wm.style.display = 'block';
-        wm.innerText = isPaid ? 'LUNAS' : 'UNPAID';
-        wm.className = `watermark ${isPaid ? 'wm-paid' : 'wm-unpaid'}`;
+   function bukaDetail(n, namaLengkap) {
+    selectedNota = n;
+    
+    // 1. Standarisasi Status
+    const statusNota = (n.status || "UNPAID").toUpperCase();
+    const isPaid = statusNota === 'PAID';
+    
+    // 2. Isi data Header Nota
+    document.getElementById('vId').innerText = n.id || '-';
+    document.getElementById('vCust').innerText = namaLengkap || n.email;
+    document.getElementById('vTgl').innerText = n.tanggal || '-';
+    document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total || 0).toLocaleString('id-ID');
+    
+    // 3. Atur Watermark & Warna Status
+    const wm = document.getElementById('vWatermark');
+    wm.style.display = 'block';
+    wm.innerText = isPaid ? 'LUNAS' : 'UNPAID';
+    wm.className = `watermark ${isPaid ? 'wm-paid' : 'wm-unpaid'}`;
 
-        const st = document.getElementById('vStatusText');
-        st.innerText = statusNota;
-        st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + 
-                      (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
-        
-        const body = document.getElementById('vItems'); 
-        body.innerHTML = "";
-        
-        let items = [];
-        try {
-            // Membaca items (simpan) atau items_json (database)
-            let raw = n.items || n.items_json;
-            items = typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : []);
-        } catch (e) { items = []; }
+    const st = document.getElementById('vStatusText');
+    st.innerText = statusNota;
+    st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + 
+                  (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
+    
+    // 4. Render Tabel Item (LOGIKA ANTI-ERROR FOR-EACH)
+    const body = document.getElementById('vItems'); 
+    body.innerHTML = "";
+    
+    let items = [];
+    try {
+        // Ambil data mentah (cek properti items atau items_json)
+        let raw = n.items || n.items_json;
 
-        if (items.length > 0) {
-            items.forEach(it => {
-                const deskripsi = it.nama || it.nama_barang || "Deskripsi kosong";
-                const q = it.qty || it.kuantitas || 1;
-                const h = it.harga || 0;
-                const sub = Number(q) * Number(h);
-                body.innerHTML += `
-                    <tr class="border-b border-black">
-                        <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${deskripsi}</td>
-                        <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${q}</td>
-                        <td class="text-right py-2 px-3 font-black text-[10px]">${sub.toLocaleString('id-ID')}</td>
-                    </tr>`;
-            });
-        } else {
-            body.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400 italic text-[10px]">Data item tidak ditemukan</td></tr>';
+        // Tahap A: Jika datanya String (JSON), kita pecah dulu jadi objek
+        if (typeof raw === 'string') {
+            raw = JSON.parse(raw);
         }
-        document.getElementById('modalNota').classList.replace('hidden', 'flex');
+
+        // Tahap B: PAKSA JADI ARRAY (Ini kunci perbaikannya)
+        if (Array.isArray(raw)) {
+            items = raw;
+        } else if (raw && typeof raw === 'object') {
+            // Jika datanya cuma 1 baris/objek, bungkus dalam kurung siku []
+            items = [raw];
+        }
+    } catch (e) { 
+        console.error("Gagal parsing data:", e);
     }
+
+    // 5. Masukkan ke Tabel
+    if (items.length > 0) {
+        items.forEach(it => {
+            const deskripsi = it.nama || it.nama_barang || "Deskripsi tidak tersedia";
+            const q = it.qty || it.kuantitas || 1;
+            const h = it.harga || 0;
+            const sub = Number(q) * Number(h);
+
+            body.innerHTML += `
+                <tr class="border-b border-black">
+                    <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${deskripsi}</td>
+                    <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${q}</td>
+                    <td class="text-right py-2 px-3 font-black text-[10px]">${sub.toLocaleString('id-ID')}</td>
+                </tr>`;
+        });
+    } else {
+        body.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400 italic text-[10px]">Detail pekerjaan kosong</td></tr>';
+    }
+
+    // Tampilkan Modal
+    document.getElementById('modalNota').classList.replace('hidden', 'flex');
+}
 
     async function updateStatusDialog() {
         if(!selectedNota) return;
