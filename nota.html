@@ -233,28 +233,42 @@
         const email = document.getElementById('finalEmail').value;
         const status = document.getElementById('inputStatus').value;
         const items = [];
+        
         document.querySelectorAll('.item-row').forEach(row => {
-            const n = row.querySelector('.item-nama').value, q = row.querySelector('.item-qty').value, h = row.querySelector('.item-harga').value;
+            const n = row.querySelector('.item-nama').value, 
+                  q = row.querySelector('.item-qty').value, 
+                  h = row.querySelector('.item-harga').value;
             if(n && h) items.push({ nama: n, qty: q, harga: h });
         });
+
         if(!email || items.length === 0) return Swal.fire('Error', 'Pilih pelanggan & isi item pekerjaan.', 'warning');
         
         Swal.fire({title: 'Menyimpan Nota...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
         
+        // PERBAIKAN: Jangan lakukan JSON.stringify pada variabel items di sini.
+        // Biarkan items tetap berupa Array Object.
         const payload = {
             action: 'simpanNota',
             id_nota: "INV-" + Date.now().toString().slice(-6),
             email: email, 
-            items: JSON.stringify(items), 
+            items: items, // KIRIM SEBAGAI ARRAY LANGSUNG
             total: hitungTotal(), 
             status: status,
             tanggal: new Date().toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
         };
 
         try {
-            await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)});
+            // Karena kita menggunakan mode: 'no-cors', pastikan payload di-stringify satu kali saja di sini.
+            await fetch(SCRIPT_URL, {
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify(payload) 
+            });
+            
             Swal.fire('Berhasil', 'Nota Berhasil Dibuat', 'success').then(() => location.reload());
-        } catch(e) { Swal.fire('Error', 'Gagal Koneksi Server', 'error'); }
+        } catch(e) { 
+            Swal.fire('Error', 'Gagal Koneksi Server', 'error'); 
+        }
     }
 
     async function loadRiwayat() {
