@@ -282,61 +282,75 @@
 
 function bukaDetail(n, namaLengkap) {
     selectedNota = n;
-    const isPaid = n.status.toUpperCase() === 'PAID';
     
-    // Set Header Nota
-    document.getElementById('vId').innerText = n.id;
-    document.getElementById('vCust').innerText = namaLengkap;
-    document.getElementById('vTgl').innerText = n.tanggal;
-    document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
+    // 1. Standarisasi Status
+    const statusNota = (n.status || "UNPAID").toUpperCase();
+    const isPaid = statusNota === 'PAID';
     
-    // Watermark Logic
+    // 2. Set Header
+    document.getElementById('vId').innerText = n.id || '-';
+    document.getElementById('vCust').innerText = namaLengkap || n.email;
+    document.getElementById('vTgl').innerText = n.tanggal || '-';
+    document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total || 0).toLocaleString('id-ID');
+    
+    // 3. Watermark & Status Text
     const wm = document.getElementById('vWatermark');
     wm.style.display = 'block';
     wm.innerText = isPaid ? 'LUNAS' : 'UNPAID';
     wm.className = `watermark ${isPaid ? 'wm-paid' : 'wm-unpaid'}`;
 
     const st = document.getElementById('vStatusText');
-    st.innerText = n.status;
+    st.innerText = statusNota;
     st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + 
                   (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
     
-    // --- PERBAIKAN ERROR .forEach DI SINI ---
+    // 4. Render Items (Logika Anti-Error)
     const body = document.getElementById('vItems'); 
     body.innerHTML = "";
     
     let items = [];
     try {
-        // Cek apakah items_json adalah string atau sudah objek
-        const parsed = typeof n.items_json === 'string' ? JSON.parse(n.items_json) : n.items_json;
-        
-        // Pastikan hasilnya adalah Array
-        items = Array.isArray(parsed) ? parsed : [parsed];
+        let rawData = n.items_json;
+
+        if (typeof rawData === 'string') {
+            // Jika data berupa string JSON, kita parse
+            items = JSON.parse(rawData);
+        } else if (typeof rawData === 'object' && rawData !== null) {
+            // Jika data SUDAH berupa objek/array (ini yang sering bikin Unpaid error)
+            items = rawData;
+        }
+
+        // Pastikan hasil akhirnya selalu Array
+        if (!Array.isArray(items)) {
+            items = items ? [items] : [];
+        }
     } catch (e) {
-        console.error("Gagal parsing items:", e);
-        items = []; // Fallback jika data rusak
+        console.error("Gagal parsing data item:", e);
+        items = [];
     }
 
-    // Looping dengan proteksi
-    if (items && items.length > 0) {
+    // 5. Tampilkan ke Tabel
+    if (items.length > 0) {
         items.forEach(it => {
-            if (it && it.nama) { // Pastikan objek item valid
-                body.innerHTML += `
-                    <tr class="border-b border-black">
-                        <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${it.nama}</td>
-                        <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${it.qty}</td>
-                        <td class="text-right py-2 px-3 font-black text-[10px]">${(Number(it.harga) * Number(it.qty)).toLocaleString('id-ID')}</td>
-                    </tr>`;
-            }
+            // Cek properti 'nama' atau 'nama_barang'
+            const deskripsi = it.nama || it.nama_barang || "Deskripsi tidak tersedia";
+            const q = it.qty || it.kuantitas || 1;
+            const h = it.harga || 0;
+            const sub = Number(q) * Number(h);
+
+            body.innerHTML += `
+                <tr class="border-b border-black">
+                    <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${deskripsi}</td>
+                    <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${q}</td>
+                    <td class="text-right py-2 px-3 font-black text-[10px]">${sub.toLocaleString('id-ID')}</td>
+                </tr>`;
         });
     } else {
-        body.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400">Tidak ada detail pekerjaan</td></tr>';
+        body.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400 italic">Detail pekerjaan kosong</td></tr>';
     }
-    // --- AKHIR PERBAIKAN ---
 
     document.getElementById('modalNota').classList.replace('hidden', 'flex');
 }
-
     async function updateStatusDialog() {
         if(!selectedNota) return;
         const { value: st } = await Swal.fire({
