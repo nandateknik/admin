@@ -278,37 +278,64 @@
         });
     }
 
-    function bukaDetail(n, namaLengkap) {
-        selectedNota = n;
-        const isPaid = n.status.toUpperCase() === 'PAID';
-        
-        document.getElementById('vId').innerText = n.id;
-        document.getElementById('vCust').innerText = namaLengkap;
-        document.getElementById('vTgl').innerText = n.tanggal;
-        document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
-        
-        // Watermark Logic
-        const wm = document.getElementById('vWatermark');
-        wm.style.display = 'block';
-        wm.innerText = isPaid ? 'LUNAS' : 'UNPAID';
-        wm.className = `watermark ${isPaid ? 'wm-paid' : 'wm-unpaid'}`;
+// GANTI FUNGSI bukaDetail ANDA DENGAN KODE DI BAWAH INI:
 
-        const st = document.getElementById('vStatusText');
-        st.innerText = n.status;
-        st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
+function bukaDetail(n, namaLengkap) {
+    selectedNota = n;
+    const isPaid = n.status.toUpperCase() === 'PAID';
+    
+    // Set Header Nota
+    document.getElementById('vId').innerText = n.id;
+    document.getElementById('vCust').innerText = namaLengkap;
+    document.getElementById('vTgl').innerText = n.tanggal;
+    document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total).toLocaleString('id-ID');
+    
+    // Watermark Logic
+    const wm = document.getElementById('vWatermark');
+    wm.style.display = 'block';
+    wm.innerText = isPaid ? 'LUNAS' : 'UNPAID';
+    wm.className = `watermark ${isPaid ? 'wm-paid' : 'wm-unpaid'}`;
+
+    const st = document.getElementById('vStatusText');
+    st.innerText = n.status;
+    st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + 
+                  (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
+    
+    // --- PERBAIKAN ERROR .forEach DI SINI ---
+    const body = document.getElementById('vItems'); 
+    body.innerHTML = "";
+    
+    let items = [];
+    try {
+        // Cek apakah items_json adalah string atau sudah objek
+        const parsed = typeof n.items_json === 'string' ? JSON.parse(n.items_json) : n.items_json;
         
-        const body = document.getElementById('vItems'); body.innerHTML = "";
-        const items = typeof n.items_json === 'string' ? JSON.parse(n.items_json) : (n.items_json || []);
-        items.forEach(it => {
-            body.innerHTML += `
-                <tr class="border-b border-black">
-                    <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${it.nama}</td>
-                    <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${it.qty}</td>
-                    <td class="text-right py-2 px-3 font-black text-[10px]">${(it.harga * it.qty).toLocaleString('id-ID')}</td>
-                </tr>`;
-        });
-        document.getElementById('modalNota').classList.replace('hidden', 'flex');
+        // Pastikan hasilnya adalah Array
+        items = Array.isArray(parsed) ? parsed : [parsed];
+    } catch (e) {
+        console.error("Gagal parsing items:", e);
+        items = []; // Fallback jika data rusak
     }
+
+    // Looping dengan proteksi
+    if (items && items.length > 0) {
+        items.forEach(it => {
+            if (it && it.nama) { // Pastikan objek item valid
+                body.innerHTML += `
+                    <tr class="border-b border-black">
+                        <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${it.nama}</td>
+                        <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${it.qty}</td>
+                        <td class="text-right py-2 px-3 font-black text-[10px]">${(Number(it.harga) * Number(it.qty)).toLocaleString('id-ID')}</td>
+                    </tr>`;
+            }
+        });
+    } else {
+        body.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400">Tidak ada detail pekerjaan</td></tr>';
+    }
+    // --- AKHIR PERBAIKAN ---
+
+    document.getElementById('modalNota').classList.replace('hidden', 'flex');
+}
 
     async function updateStatusDialog() {
         if(!selectedNota) return;
