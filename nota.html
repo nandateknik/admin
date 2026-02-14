@@ -13,7 +13,19 @@
         .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; display: flex; flex-direction: column; }
         .tab-active { border-bottom: 4px solid #1e293b; color: #1e293b; font-weight: 900; }
         .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; position: relative; color: #000; overflow: hidden; }
-        
+        @media print {
+    #notaPrintArea {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+}
+
+/* Pastikan container nota punya lebar tetap saat diproses html2pdf */
+.nota-kertas {
+    width: 700px; /* Standar lebar agar pas di A4 saat di-scale */
+    margin: auto;
+}
         .watermark {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
             font-size: 60px; font-weight: 900; opacity: 0.15; pointer-events: none;
@@ -441,16 +453,31 @@
     };
 
     function downloadPdf() {
-        const el = document.getElementById('notaPrintArea');
-        const opt = { 
-            margin: [5, 5, 5, 5],
-            filename: `NOTA-${selectedNota.id_nota || 'NB'}.pdf`, 
-            image: { type: 'jpeg', quality: 1 },
-            html2canvas: { scale: 3, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(el).save();
-    }
+    const el = document.getElementById('notaPrintArea');
+    
+    // Pastikan modal/area terlihat saat diproses agar tidak putih polos
+    const opt = { 
+        margin: [10, 10, 10, 10], // Margin diperlebar dikit biar gak kepotong
+        filename: `NOTA-${selectedNota.id_nota || 'NB'}.pdf`, 
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2, // Skala ditingkatkan agar teks tajam
+            useCORS: true,
+            letterRendering: true,
+            scrollY: 0
+        },
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait' 
+        }
+    };
+
+    // Jalankan konversi
+    html2pdf().set(opt).from(el).toPdf().get('pdf').then(function (pdf) {
+        // Logika tambahan jika ingin otomatis buka di tab baru atau langsung save
+    }).save();
+}
 
     function tutupModal() { 
         document.getElementById('modalNota').classList.replace('flex', 'hidden'); 
