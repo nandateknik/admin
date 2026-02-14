@@ -371,47 +371,52 @@
     }
 
     // PDF ENGINE FIX (A4 CENTERED)
-    function downloadPdf() {
-        if (!selectedNota) return;
-        const area = document.getElementById('notaPrintArea');
-        const scroll = document.getElementById('scrollContainer');
-        const originalStyle = area.getAttribute('style') || '';
-        const originalScroll = scroll.scrollTop;
-        const idNota = selectedNota.id_nota || selectedNota.id || "NB";
+   function downloadPdf() {
+    if (!selectedNota) return;
+    const area = document.getElementById('notaPrintArea');
+    const scroll = document.getElementById('scrollContainer');
+    
+    // Simpan style asli buat dibalikin nanti
+    const originalStyle = area.getAttribute('style') || '';
+    const idNota = selectedNota.id_nota || selectedNota.id || "NB";
 
-        Swal.fire({ title: 'Mencetak PDF...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    Swal.fire({ title: 'Generating PDF...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-        // Paksa Ukuran A4 agar tidak kebesaran
-        area.style.width = '794px'; 
-        area.style.minHeight = '1123px';
-        area.style.padding = '40px';
-        area.style.margin = '0 auto';
+    // --- KUNCI LAYOUT DISINI ---
+    // Kita paksa lebar 794px (A4) dan hilangkan semua margin/transform luar
+    area.style.width = '794px';
+    area.style.padding = '40px';
+    area.style.margin = '0 auto';
+    area.style.backgroundColor = 'white';
+    area.style.transform = 'none';
 
-        const opt = {
-            margin: 0,
-            filename: `NOTA-${idNota}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
-                scale: 2, 
-                useCORS: true, 
-                width: 794,
-                windowWidth: 794,
-                scrollY: 0
-            },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
+    const opt = {
+        margin: 0,
+        filename: `NOTA-${idNota}.pdf`,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { 
+            scale: 2, // Biar gak pecah
+            useCORS: true, 
+            width: 794,
+            windowWidth: 794,
+            scrollY: 0,
+            x: 0
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
-        setTimeout(() => {
-            html2pdf().set(opt).from(area).save().then(() => {
-                area.setAttribute('style', originalStyle);
-                scroll.scrollTop = originalScroll;
-                Swal.close();
-            }).catch(e => {
-                area.setAttribute('style', originalStyle);
-                Swal.fire('Error', 'Gagal cetak PDF', 'error');
-            });
-        }, 600);
-    }
+    // Kasih jeda 500ms biar browser selesai render ulang lebar 794px
+    setTimeout(() => {
+        html2pdf().set(opt).from(area).save().then(() => {
+            area.setAttribute('style', originalStyle); // Balikin tampilan HP
+            Swal.close();
+        }).catch(err => {
+            console.error(err);
+            area.setAttribute('style', originalStyle);
+            Swal.fire('Gagal', 'Cek koneksi atau sistem', 'error');
+        });
+    }, 500);
+}
 
     function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); selectedNota = null; }
 </script>
