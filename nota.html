@@ -12,20 +12,19 @@
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #334155; }
         .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; display: flex; flex-direction: column; }
         .tab-active { border-bottom: 4px solid #1e293b; color: #1e293b; font-weight: 900; }
-        .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; position: relative; color: #000; overflow: hidden; }
-        @media print {
-    #notaPrintArea {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 20px !important;
-    }
-}
+        
+        /* CSS KHUSUS NOTA & PDF */
+        .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; position: relative; color: #000; }
+        
+        /* Agar preview di layar HP tetap proporsional */
+        #notaPrintArea { width: 100%; box-sizing: border-box; }
 
-/* Pastikan container nota punya lebar tetap saat diproses html2pdf */
-.nota-kertas {
-    width: 700px; /* Standar lebar agar pas di A4 saat di-scale */
-    margin: auto;
-}
+        /* Styling khusus saat proses HTML2PDF (Lebar statis A4) */
+        .html2pdf__container .nota-kertas {
+            width: 794px !important; /* Standar Pixel A4 */
+            padding: 40px !important;
+        }
+
         .watermark {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
             font-size: 60px; font-weight: 900; opacity: 0.15; pointer-events: none;
@@ -42,12 +41,11 @@
         }
         .status-unpaid { background: #fee2e2; color: #dc2626; }
         .status-paid { background: #dcfce7; color: #16a34a; }
-        #notaPrintArea { width: 100%; box-sizing: border-box; }
 
         .status-toggle { display: flex; background: #f1f5f9; padding: 4px; border-radius: 1rem; gap: 4px; }
         .status-btn { flex: 1; padding: 10px; border-radius: 0.8rem; font-size: 10px; font-weight: 900; transition: all 0.3s; text-align: center; cursor: pointer; color: #94a3b8; }
-        .status-btn.active-paid { background: #16a34a; color: white; shadow: 0 4px 10px rgba(22, 163, 74, 0.3); }
-        .status-btn.active-unpaid { background: #dc2626; color: white; shadow: 0 4px 10px rgba(220, 38, 38, 0.3); }
+        .status-btn.active-paid { background: #16a34a; color: white; }
+        .status-btn.active-unpaid { background: #dc2626; color: white; }
     </style>
 </head>
 <body>
@@ -176,9 +174,7 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzP7D7BcoH1E9C7J711ULgZxLq5vOkpchN_PF0lQ2b1sC0Z0JFEbK6q4DL_TGzmkU1T6g/exec";
     
-    // VARIABEL GLOBAL (STATE) - Diletakkan di sini agar tidak 'Not Defined'
     let pelangganData = [];
-    let riwayatData = [];
     let selectedNota = null;
     let currentPage = 1;
     let currentSearch = "";
@@ -186,7 +182,6 @@
     let isLoading = false;
 
     window.onload = async () => {
-        // Set tanggal otomatis hari ini
         document.getElementById('inputTanggal').valueAsDate = new Date();
         tambahItem();
         try { 
@@ -306,7 +301,6 @@
         } catch(e) { Swal.fire('Error', 'Gagal Simpan!', 'error'); }
     }
 
-    // RIWAYAT DENGAN PAGINATION & SEARCH DATABASE
     async function loadRiwayat(isNext = false) {
         if(isLoading) return;
         if(isNext && !hasMore) return;
@@ -319,7 +313,6 @@
             currentPage = 1;
         }
 
-        // Loader item
         const loader = document.createElement('div');
         loader.id = "loader-temp";
         loader.className = "flex justify-center py-5";
@@ -334,14 +327,18 @@
             document.getElementById('btnLoadMore')?.remove();
             
             result.data.forEach(n => {
-                const isPaid = n.status.toUpperCase() === 'PAID';
+                const isPaid = n.status && n.status.toUpperCase() === 'PAID';
                 const sClass = isPaid ? 'status-paid' : 'status-unpaid';
                 const card = document.createElement('div');
                 card.onclick = () => bukaDetail(n);
                 card.className = "bg-white p-5 rounded-[2rem] border-2 border-slate-50 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all mb-4";
+                
+                // Pastikan ID tidak undefined
+                const idTampil = n.id_nota || n.id || "INV-???";
+
                 card.innerHTML = `
                     <div class="overflow-hidden">
-                        <p class="text-[9px] font-900 text-slate-400 uppercase tracking-tighter">${n.id_nota} • ${n.tanggal}</p>
+                        <p class="text-[9px] font-900 text-slate-400 uppercase tracking-tighter">${idTampil} • ${n.tanggal}</p>
                         <p class="text-sm font-black text-slate-700 truncate w-40 uppercase">${n.email}</p>
                         <span class="text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest ${sClass}">${n.status}</span>
                     </div>
@@ -377,7 +374,8 @@
         const statusNota = (n.status || "UNPAID").toUpperCase();
         const isPaid = statusNota === 'PAID';
         
-        document.getElementById('vId').innerText = n.id_nota || n.id || '-';
+        // PERBAIKAN ID DI MODAL
+        document.getElementById('vId').innerText = n.id_nota || n.id || 'INV-???';
         document.getElementById('vCust').innerText = n.email || '-';
         document.getElementById('vTgl').innerText = n.tanggal || '-';
         document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total || 0).toLocaleString('id-ID');
@@ -427,7 +425,7 @@
 
     async function updateStatusDialog() {
         if(!selectedNota) return;
-        const { value: st } = await Swal.fire({
+        await Swal.fire({
             title: 'Update Status',
             html: `
                 <div class="flex flex-col gap-3 p-2">
@@ -441,7 +439,6 @@
         });
     }
 
-    // Helper Global Update Status
     window.setNewStatus = async (status) => {
         Swal.close();
         Swal.fire({title: 'Updating...', didOpen: () => Swal.showLoading()});
@@ -452,32 +449,29 @@
         } catch(e) { Swal.fire('Error', 'Gagal', 'error'); }
     };
 
+    // PERBAIKAN DOWNLOAD PDF (RAPI & PAS A4)
     function downloadPdf() {
-    const el = document.getElementById('notaPrintArea');
-    
-    // Pastikan modal/area terlihat saat diproses agar tidak putih polos
-    const opt = { 
-        margin: [10, 10, 10, 10], // Margin diperlebar dikit biar gak kepotong
-        filename: `NOTA-${selectedNota.id_nota || 'NB'}.pdf`, 
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, // Skala ditingkatkan agar teks tajam
-            useCORS: true,
-            letterRendering: true,
-            scrollY: 0
-        },
-        jsPDF: { 
-            unit: 'mm', 
-            format: 'a4', 
-            orientation: 'portrait' 
-        }
-    };
+        const el = document.getElementById('notaPrintArea');
+        const opt = { 
+            margin: [10, 10, 10, 10],
+            filename: `NOTA-${selectedNota.id_nota || 'NB'}.pdf`, 
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true,
+                letterRendering: true,
+                width: 794, // Paksa lebar A4 pixel agar tidak menciut
+                windowWidth: 794
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
 
-    // Jalankan konversi
-    html2pdf().set(opt).from(el).toPdf().get('pdf').then(function (pdf) {
-        // Logika tambahan jika ingin otomatis buka di tab baru atau langsung save
-    }).save();
-}
+        Swal.fire({title: 'Menghasilkan PDF...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
+
+        html2pdf().set(opt).from(el).save().then(() => {
+            Swal.close();
+        });
+    }
 
     function tutupModal() { 
         document.getElementById('modalNota').classList.replace('flex', 'hidden'); 
