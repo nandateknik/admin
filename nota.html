@@ -9,44 +9,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Courier+Prime&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #334155; }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #334155; -webkit-tap-highlight-color: transparent; }
         .mobile-container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; position: relative; display: flex; flex-direction: column; }
         .tab-active { border-bottom: 4px solid #1e293b; color: #1e293b; font-weight: 900; }
         
-        /* CSS KHUSUS NOTA & PDF */
+        /* CSS NOTA */
         .nota-kertas { font-family: 'Courier Prime', monospace; background: #fff; position: relative; color: #000; }
-        
-        /* Agar preview di layar HP tetap proporsional */
-        #notaPrintArea { width: 100%; box-sizing: border-box; }
+        #notaPrintArea b, #notaPrintArea span, #notaPrintArea p, #notaPrintArea td { color: #000 !important; }
 
-        /* Styling khusus saat proses HTML2PDF (Lebar statis A4) */
-        .html2pdf__container .nota-kertas {
-            width: 794px !important; /* Standar Pixel A4 */
-            padding: 40px !important;
-        }
-
-        /* Sembunyikan container bayangan agar tidak merusak tampilan HP */
-        #nota-shadow-clone {
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-            width: 794px; /* Fix A4 Width */
-            background: white;
-        }
-
-        /* Pastikan saat clone, semua teks terlihat */
-#notaPrintArea b, #notaPrintArea span, #notaPrintArea p {
-    color: #000 !important;
-}
-
-/* Supaya tabel tidak kepotong di PDF */
-table {
-    page-break-inside: auto;
-}
-tr {
-    page-break-inside: avoid;
-    page-break-after: auto;
-}
         .watermark {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
             font-size: 60px; font-weight: 900; opacity: 0.15; pointer-events: none;
@@ -68,6 +38,11 @@ tr {
         .status-btn { flex: 1; padding: 10px; border-radius: 0.8rem; font-size: 10px; font-weight: 900; transition: all 0.3s; text-align: center; cursor: pointer; color: #94a3b8; }
         .status-btn.active-paid { background: #16a34a; color: white; }
         .status-btn.active-unpaid { background: #dc2626; color: white; }
+
+        /* Mencegah pecah saat render */
+        #notaPrintArea { width: 100%; }
+        table { page-break-inside: auto; }
+        tr { page-break-inside: avoid; page-break-after: auto; }
     </style>
 </head>
 <body>
@@ -75,10 +50,10 @@ tr {
 <div class="mobile-container shadow-2xl">
     <header class="p-8 pb-2 bg-white sticky top-0 z-50 border-b">
         <div class="flex items-center justify-between mb-6">
-            <button onclick="window.history.back()" class="bg-slate-100 p-3 rounded-2xl active:scale-90 transition-all">
-                <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <h1 class="text-xl font-900 tracking-tight text-slate-800 uppercase italic">Nota <span class="text-slate-400">Digital</span></h1>
+            <div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <h1 class="text-xl font-900 tracking-tight text-slate-800 uppercase italic">Nanda <span class="text-slate-400">Teknik</span></h1>
             <div class="w-10"></div>
         </div>
         <nav class="flex">
@@ -89,29 +64,30 @@ tr {
 
     <main id="contentBuat" class="p-8 space-y-6 flex-1">
         <div class="relative">
-            <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Cari Pelanggan</label>
-            <input type="text" id="custSearch" placeholder="Ketik nama pelanggan..." autocomplete="off" class="w-full bg-slate-50 border-2 border-transparent p-5 rounded-[2rem] font-bold outline-none focus:border-slate-400 focus:bg-white transition-all shadow-sm">
+            <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Pelanggan</label>
+            <input type="text" id="custSearch" placeholder="Cari atau ketik nama..." autocomplete="off" class="w-full bg-slate-50 border-2 border-transparent p-5 rounded-[2rem] font-bold outline-none focus:border-slate-400 focus:bg-white transition-all shadow-sm">
             <div id="autocomplete-list" class="autocomplete-items hidden shadow-2xl"></div>
             <input type="hidden" id="finalEmail">
             <input type="hidden" id="finalNama">
         </div>
 
-        <div>
-            <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Status Pembayaran</label>
-            <div class="status-toggle">
-                <div id="btnUnpaid" onclick="setStatus('UNPAID')" class="status-btn active-unpaid">UNPAID</div>
-                <div id="btnPaid" onclick="setStatus('PAID')" class="status-btn">PAID</div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Status</label>
+                <div class="status-toggle">
+                    <div id="btnUnpaid" onclick="setStatus('UNPAID')" class="status-btn active-unpaid">UNPAID</div>
+                    <div id="btnPaid" onclick="setStatus('PAID')" class="status-btn">PAID</div>
+                </div>
+                <input type="hidden" id="inputStatus" value="UNPAID">
             </div>
-            <input type="hidden" id="inputStatus" value="UNPAID">
-        </div>
-
-        <div>
-            <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Tanggal Nota</label>
-            <input type="date" id="inputTanggal" class="w-full bg-slate-50 border-2 border-transparent p-5 rounded-[2rem] font-bold outline-none focus:border-slate-400 focus:bg-white transition-all shadow-sm text-sm">
+            <div>
+                <label class="text-[10px] font-900 text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Tanggal</label>
+                <input type="date" id="inputTanggal" class="w-full bg-slate-50 p-3 rounded-2xl font-bold outline-none text-xs border-2 border-transparent focus:border-slate-400">
+            </div>
         </div>
 
         <div id="itemContainer" class="space-y-4"></div>
-        <button onclick="tambahItem()" class="w-full py-5 text-[10px] font-900 text-slate-400 border-2 border-dashed border-slate-200 rounded-[1.5rem] hover:bg-slate-50 uppercase tracking-widest">+ Tambah Item Pekerjaan</button>
+        <button onclick="tambahItem()" class="w-full py-5 text-[10px] font-900 text-slate-400 border-2 border-dashed border-slate-200 rounded-[1.5rem] hover:bg-slate-50 uppercase tracking-widest">+ Item Pekerjaan</button>
 
         <div class="bg-slate-800 p-7 rounded-[2.5rem] text-white shadow-xl">
             <div class="flex justify-between items-end">
@@ -130,65 +106,68 @@ tr {
     </main>
 </div>
 
-<div id="modalNota" class="fixed inset-0 bg-slate-900/95 z-[100] hidden items-center justify-center p-4 backdrop-blur-md">
-    <div class="bg-white w-full rounded-[2.5rem] overflow-hidden max-h-[95vh] flex flex-col max-w-sm shadow-2xl">
+<div id="modalNota" class="fixed inset-0 bg-slate-900/95 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white w-full rounded-[2rem] overflow-hidden max-h-[95vh] flex flex-col max-w-sm shadow-2xl shadow-black">
         <div class="p-4 bg-slate-50 flex justify-between items-center border-b">
             <button onclick="updateStatusDialog()" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-[10px] font-900 uppercase">Ganti Status</button>
             <button onclick="tutupModal()" class="text-slate-400 p-2 text-xl font-black">✕</button>
         </div>
 
-        <div id="notaPrintArea" class="p-8 nota-kertas flex-1 overflow-y-auto bg-white text-black relative">
-            <div id="vWatermark" class="watermark">PAID</div>
-            <div class="text-center mb-6 border-b-4 border-black pb-4 relative z-10">
-                <h2 class="font-900 text-xl uppercase tracking-widest mb-1">NANDA TEKNIK BANYUWANGI</h2>
-                <p class="text-[9px] font-bold uppercase">Network, Software & Electrical Engineering</p>
-                <p class="text-[8px] italic">Sukowidi Indah Residence Blok D-5, Banyuwangi. 68421</p>
-                <p class="text-[8px] italic text-blue-600">Email: nandateknik02@gmail.com | WA: +6282331201148</p>
-            </div>
-
-            <div class="grid grid-cols-2 text-[10px] mb-4 relative z-10">
-                <div class="space-y-1">
-                    <p><span class="inline-block w-12 font-black">NOMOR</span>: <span id="vId" class="font-bold"></span></p>
-                    <p><span class="inline-block w-12 font-black">KEPADA</span>: <span id="vCust" class="font-black underline uppercase"></span></p>
+        <div id="scrollContainer" class="overflow-y-auto flex-1 bg-white">
+            <div id="notaPrintArea" class="p-8 nota-kertas bg-white text-black relative">
+                <div id="vWatermark" class="watermark">PAID</div>
+                
+                <div class="text-center mb-6 border-b-4 border-black pb-4">
+                    <h2 class="font-900 text-xl uppercase tracking-tighter mb-1">NANDA TEKNIK BANYUWANGI</h2>
+                    <p class="text-[8px] font-bold uppercase tracking-widest">Network, Software & Electrical Engineering</p>
+                    <p class="text-[8px] italic mt-1">Sukowidi Indah Residence Blok D-5, Banyuwangi.</p>
+                    <p class="text-[8px] italic text-blue-600">WA: +6282331201148</p>
                 </div>
-                <div class="text-right space-y-1">
-                    <p><span class="font-black">TANGGAL</span>: <span id="vTgl" class="font-bold"></span></p>
-                    <p><span id="vStatusText" class="border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase"></span></p>
-                </div>
-            </div>
 
-            <table class="w-full text-[10px] mb-4 border-2 border-black relative z-10">
-                <thead>
-                    <tr class="border-b-2 border-black bg-gray-100 uppercase font-black">
-                        <th class="py-2 px-3 border-r-2 border-black text-left">Deskripsi Pekerjaan</th>
-                        <th class="py-2 px-1 border-r-2 border-black text-center w-10">Qty</th>
-                        <th class="py-2 px-3 text-right w-24">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody id="vItems"></tbody>
-                <tfoot>
-                    <tr class="border-t-2 border-black bg-gray-50 font-black">
-                        <td colspan="2" class="py-2 px-3 text-right uppercase border-r-2 border-black">Total Bayar :</td>
-                        <td class="py-2 px-3 text-right text-[11px]" id="vTotal"></td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <div class="flex justify-between items-start mt-8 relative z-10">
-                <div class="border-2 border-dashed border-gray-300 p-3 rounded-lg w-56">
-                    <p class="text-[8px] font-black uppercase mb-1">Metode Pembayaran:</p>
-                    <p class="text-[10px] font-black underline">BCA - 1801826011</p>
-                    <p class="text-[7px] italic text-gray-500 mt-2 leading-tight">* Simpan nota sebagai bukti garansi.</p>
+                <div class="grid grid-cols-2 text-[10px] mb-4">
+                    <div class="space-y-1">
+                        <p><span class="inline-block w-12 font-black">INV</span>: <span id="vId" class="font-bold"></span></p>
+                        <p><span class="inline-block w-12 font-black">USER</span>: <span id="vCust" class="font-black underline uppercase"></span></p>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <p><span class="font-black">TGL</span>: <span id="vTgl" class="font-bold"></span></p>
+                        <p><span id="vStatusText" class="border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase"></span></p>
+                    </div>
                 </div>
-                <div class="text-center w-32">
-                    <p class="text-[9px] font-bold mb-12">Hormat Kami,</p>
-                    <div class="h-4"></div>
-                    <p class="text-[10px] font-black uppercase underline">NANDA TEKNIK</p>
+
+                <table class="w-full text-[10px] mb-4 border-2 border-black">
+                    <thead>
+                        <tr class="border-b-2 border-black bg-gray-100 uppercase font-black">
+                            <th class="py-2 px-3 border-r-2 border-black text-left">Deskripsi</th>
+                            <th class="py-2 px-1 border-r-2 border-black text-center w-8">Qty</th>
+                            <th class="py-2 px-3 text-right w-24">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vItems"></tbody>
+                    <tfoot>
+                        <tr class="border-t-2 border-black bg-gray-50 font-black">
+                            <td colspan="2" class="py-2 px-3 text-right uppercase border-r-2 border-black">Total :</td>
+                            <td class="py-2 px-3 text-right text-[11px]" id="vTotal"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="flex justify-between items-start mt-8">
+                    <div class="border-2 border-dashed border-gray-300 p-2 rounded-lg w-40">
+                        <p class="text-[7px] font-black uppercase mb-1">Payment:</p>
+                        <p class="text-[9px] font-black underline">BCA 1801826011</p>
+                        <p class="text-[6px] italic text-gray-400 mt-2">* Garansi berlaku jika nota disimpan.</p>
+                    </div>
+                    <div class="text-center w-32">
+                        <p class="text-[8px] font-bold mb-8">Hormat Kami,</p>
+                        <p class="text-[9px] font-black uppercase underline">NANDA TEKNIK</p>
+                    </div>
                 </div>
             </div>
         </div>
+
         <div class="p-6 bg-slate-100">
-            <button onclick="downloadPdf()" class="w-full py-4 rounded-2xl font-900 text-[10px] text-white bg-slate-800 shadow-lg uppercase active:scale-95 transition-all">Download PDF Nota</button>
+            <button id="btnDown" onclick="downloadPdf()" class="w-full py-4 rounded-2xl font-900 text-[10px] text-white bg-slate-800 shadow-lg uppercase active:scale-95 transition-all">Download PDF</button>
         </div>
     </div>
 </div>
@@ -217,29 +196,16 @@ tr {
         document.getElementById('contentRiwayat').classList.toggle('hidden', tab !== 'riwayat');
         document.getElementById('tabBuat').classList.toggle('tab-active', tab === 'buat');
         document.getElementById('tabRiwayat').classList.toggle('tab-active', tab === 'riwayat');
-        
-        if(tab === 'riwayat') {
-            currentPage = 1;
-            currentSearch = "";
-            document.getElementById('searchRiwayat').value = "";
-            loadRiwayat();
-        }
+        if(tab === 'riwayat') { currentPage = 1; currentSearch = ""; loadRiwayat(); }
     }
 
     function setStatus(status) {
         document.getElementById('inputStatus').value = status;
-        const btnP = document.getElementById('btnPaid');
-        const btnU = document.getElementById('btnUnpaid');
-        if(status === 'PAID') {
-            btnP.classList.add('active-paid');
-            btnU.classList.remove('active-unpaid');
-        } else {
-            btnU.classList.add('active-unpaid');
-            btnP.classList.remove('active-paid');
-        }
+        document.getElementById('btnPaid').classList.toggle('active-paid', status === 'PAID');
+        document.getElementById('btnUnpaid').classList.toggle('active-unpaid', status === 'UNPAID');
     }
 
-    // AUTOCOMPLETE LOGIC
+    // AUTOCOMPLETE
     const searchInput = document.getElementById('custSearch');
     const autoList = document.getElementById('autocomplete-list');
 
@@ -250,8 +216,8 @@ tr {
         const filtered = pelangganData.filter(p => (p.nama + p.email).toLowerCase().includes(val.toLowerCase()));
         filtered.slice(0, 5).forEach(p => {
             const div = document.createElement('div');
-            div.className = "p-5 hover:bg-slate-50 cursor-pointer border-b border-slate-50";
-            div.innerHTML = `<div class="font-black text-slate-700 text-sm">${p.nama}</div><div class="text-[10px] text-slate-400 font-bold uppercase">${p.email}</div>`;
+            div.className = "p-4 hover:bg-slate-50 cursor-pointer border-b border-slate-50";
+            div.innerHTML = `<div class="font-black text-slate-700 text-sm">${p.nama}</div><div class="text-[9px] text-slate-400 font-bold uppercase">${p.email}</div>`;
             div.onclick = () => {
                 searchInput.value = p.nama;
                 document.getElementById('finalEmail').value = p.email;
@@ -268,10 +234,10 @@ tr {
         div.className = "bg-white border border-slate-100 p-5 rounded-[1.5rem] shadow-sm space-y-3 item-row relative";
         div.innerHTML = `
             <button onclick="this.parentElement.remove(); hitungTotal();" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 font-black">✕</button>
-            <input type="text" placeholder="Deskripsi Pekerjaan" class="w-full text-sm font-black outline-none item-nama border-b border-slate-50 pb-2">
+            <input type="text" placeholder="Pekerjaan / Barang" class="w-full text-sm font-black outline-none item-nama border-b border-slate-50 pb-2">
             <div class="flex items-center gap-4">
-                <div class="flex-1"><span class="text-[8px] text-slate-400 font-black block mb-1 uppercase">Qty</span><input type="number" oninput="hitungTotal()" value="1" min="1" class="w-full bg-slate-50 p-3 rounded-xl text-sm font-black item-qty"></div>
-                <div class="flex-[2]"><span class="text-[8px] text-slate-400 font-black block mb-1 text-right uppercase">Harga Satuan</span><input type="number" oninput="hitungTotal()" placeholder="0" class="w-full bg-slate-50 p-3 rounded-xl text-sm font-black item-harga text-right"></div>
+                <div class="flex-1"><span class="text-[8px] text-slate-400 font-black block mb-1 uppercase">Qty</span><input type="number" oninput="hitungTotal()" value="1" class="w-full bg-slate-50 p-3 rounded-xl text-sm font-black item-qty"></div>
+                <div class="flex-[2]"><span class="text-[8px] text-slate-400 font-black block mb-1 text-right uppercase">Harga</span><input type="number" oninput="hitungTotal()" placeholder="0" class="w-full bg-slate-50 p-3 rounded-xl text-sm font-black item-harga text-right"></div>
             </div>`;
         document.getElementById('itemContainer').appendChild(div);
     }
@@ -279,116 +245,73 @@ tr {
     function hitungTotal() {
         let total = 0;
         document.querySelectorAll('.item-row').forEach(row => {
-            const q = row.querySelector('.item-qty').value || 0;
-            const h = row.querySelector('.item-harga').value || 0;
-            total += (q * h);
+            total += (row.querySelector('.item-qty').value || 0) * (row.querySelector('.item-harga').value || 0);
         });
         document.getElementById('totalDisplay').innerText = "Rp " + total.toLocaleString('id-ID');
         return total;
     }
 
     async function simpanNota() {
-        const email = document.getElementById('finalEmail').value;
+        const email = document.getElementById('finalEmail').value || document.getElementById('custSearch').value;
         const status = document.getElementById('inputStatus').value;
         const tglManual = document.getElementById('inputTanggal').value;
         const items = [];
-        
         document.querySelectorAll('.item-row').forEach(row => {
-            const n = row.querySelector('.item-nama').value, 
-                  q = row.querySelector('.item-qty').value, 
-                  h = row.querySelector('.item-harga').value;
+            const n = row.querySelector('.item-nama').value, q = row.querySelector('.item-qty').value, h = row.querySelector('.item-harga').value;
             if(n && h) items.push({ nama: n, qty: q, harga: h });
         });
 
-        if(!email || !tglManual || items.length === 0) return Swal.fire('Error', 'Lengkapi data, tanggal, dan item.', 'warning');
+        if(!email || items.length === 0) return Swal.fire('Error', 'Data belum lengkap', 'warning');
         
-        const dateObj = new Date(tglManual);
-        const tglFormatted = dateObj.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
-
         Swal.fire({title: 'Menyimpan...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
+        const tglFormatted = new Date(tglManual).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'});
         
-        const payload = {
-            action: 'simpanNota',
-            id_nota: "INV-" + Date.now().toString().slice(-6),
-            email: email, 
-            items: items,
-            total: hitungTotal(), 
-            status: status,
-            tanggal: tglFormatted
-        };
+        const payload = { action: 'simpanNota', id_nota: "INV-" + Date.now().toString().slice(-6), email, items, total: hitungTotal(), status, tanggal: tglFormatted };
 
         try {
             await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
             Swal.fire('Berhasil', 'Nota Tersimpan', 'success').then(() => location.reload());
-        } catch(e) { Swal.fire('Error', 'Gagal Simpan!', 'error'); }
+        } catch(e) { Swal.fire('Error', 'Gagal Simpan', 'error'); }
     }
 
     async function loadRiwayat(isNext = false) {
-        if(isLoading) return;
-        if(isNext && !hasMore) return;
-        
+        if(isLoading || (isNext && !hasMore)) return;
         isLoading = true;
         const list = document.getElementById('listRiwayat');
-
-        if(!isNext) {
-            list.innerHTML = "";
-            currentPage = 1;
-        }
-
-        const loader = document.createElement('div');
-        loader.id = "loader-temp";
-        loader.className = "flex justify-center py-5";
-        loader.innerHTML = `<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-slate-800"></div>`;
-        list.appendChild(loader);
+        if(!isNext) list.innerHTML = "";
 
         try {
             const res = await fetch(`${SCRIPT_URL}?type=nota&page=${currentPage}&search=${currentSearch}`);
             const result = await res.json();
-            
-            document.getElementById('loader-temp')?.remove();
-            document.getElementById('btnLoadMore')?.remove();
-            
             result.data.forEach(n => {
-                const isPaid = n.status && n.status.toUpperCase() === 'PAID';
-                const sClass = isPaid ? 'status-paid' : 'status-unpaid';
+                const isP = n.status?.toUpperCase() === 'PAID';
                 const card = document.createElement('div');
                 card.onclick = () => bukaDetail(n);
-                card.className = "bg-white p-5 rounded-[2rem] border-2 border-slate-50 shadow-sm flex justify-between items-center cursor-pointer active:scale-95 transition-all mb-4";
-                
-                // Pastikan ID tidak undefined
-                const idTampil = n.id_nota || n.id || "INV-???";
-
+                card.className = "bg-white p-5 rounded-[2rem] border-2 border-slate-50 shadow-sm flex justify-between items-center active:scale-95 transition-all mb-4";
                 card.innerHTML = `
                     <div class="overflow-hidden">
-                        <p class="text-[9px] font-900 text-slate-400 uppercase tracking-tighter">${idTampil} • ${n.tanggal}</p>
+                        <p class="text-[9px] font-900 text-slate-400 uppercase">${n.id_nota || 'INV-?'} • ${n.tanggal}</p>
                         <p class="text-sm font-black text-slate-700 truncate w-40 uppercase">${n.email}</p>
-                        <span class="text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest ${sClass}">${n.status}</span>
+                        <span class="text-[8px] font-black px-3 py-1 rounded-full uppercase ${isP?'status-paid':'status-unpaid'}">${n.status}</span>
                     </div>
                     <p class="text-sm font-black text-slate-800">Rp ${parseInt(n.total).toLocaleString('id-ID')}</p>`;
                 list.appendChild(card);
             });
-
             hasMore = result.hasMore;
             if(hasMore) {
                 const btn = document.createElement('button');
-                btn.id = "btnLoadMore";
-                btn.innerText = "MUAT LEBIH BANYAK...";
-                btn.className = "w-full py-4 text-[10px] font-900 text-slate-400 uppercase tracking-widest";
+                btn.innerText = "LOAD MORE";
+                btn.className = "w-full py-4 text-[10px] font-900 text-slate-400 uppercase";
                 btn.onclick = () => { currentPage++; loadRiwayat(true); };
                 list.appendChild(btn);
             }
-        } catch(e) { 
-            list.innerHTML = "<p class='text-center py-20 text-slate-400 font-black'>Gagal Load Data</p>"; 
-        }
+        } catch(e) { list.innerHTML = "Gagal memuat riwayat"; }
         isLoading = false;
     }
 
     function filterRiwayat() {
-        clearTimeout(window.searchTimer);
-        window.searchTimer = setTimeout(() => {
-            currentSearch = document.getElementById('searchRiwayat').value;
-            loadRiwayat();
-        }, 500);
+        clearTimeout(window.sTimer);
+        window.sTimer = setTimeout(() => { currentSearch = document.getElementById('searchRiwayat').value; currentPage = 1; loadRiwayat(); }, 500);
     }
 
     function bukaDetail(n) {
@@ -396,8 +319,7 @@ tr {
         const statusNota = (n.status || "UNPAID").toUpperCase();
         const isPaid = statusNota === 'PAID';
         
-        // PERBAIKAN ID DI MODAL
-        document.getElementById('vId').innerText = n.id_nota || n.id || 'INV-???';
+        document.getElementById('vId').innerText = n.id_nota || 'INV-???';
         document.getElementById('vCust').innerText = n.email || '-';
         document.getElementById('vTgl').innerText = n.tanggal || '-';
         document.getElementById('vTotal').innerText = "Rp " + parseInt(n.total || 0).toLocaleString('id-ID');
@@ -409,141 +331,92 @@ tr {
 
         const st = document.getElementById('vStatusText');
         st.innerText = statusNota;
-        st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + 
-                      (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
+        st.className = "border-2 border-black px-2 py-0.5 rounded font-black text-[9px] uppercase " + (isPaid ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600');
         
         const body = document.getElementById('vItems'); 
         body.innerHTML = "";
-        
         let items = [];
         try {
             let raw = n.items || n.items_json;
-            if (typeof raw === 'string') {
-                let p1 = JSON.parse(raw);
-                items = typeof p1 === 'string' ? JSON.parse(p1) : p1;
-            } else if (Array.isArray(raw)) {
-                items = raw;
-            }
+            items = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            if (typeof items === 'string') items = JSON.parse(items);
         } catch (e) { console.error(e); }
 
-        if (Array.isArray(items) && items.length > 0) {
+        if (Array.isArray(items)) {
             items.forEach(it => {
-                const d = it.nama || it.nama_barang || "Deskripsi";
-                const q = it.qty || 1;
-                const h = it.harga || 0;
-                const s = Number(q) * Number(h);
+                const s = (it.qty || 1) * (it.harga || 0);
                 body.innerHTML += `
                     <tr class="border-b border-black">
-                        <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${d}</td>
-                        <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${q}</td>
+                        <td class="py-2 px-3 border-r-2 border-black uppercase font-bold text-[10px]">${it.nama || it.nama_barang}</td>
+                        <td class="text-center py-2 px-1 border-r-2 border-black font-bold text-[10px]">${it.qty}</td>
                         <td class="text-right py-2 px-3 font-black text-[10px]">${s.toLocaleString('id-ID')}</td>
                     </tr>`;
             });
-        } else {
-            body.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400 italic text-[10px]">Detail kosong</td></tr>';
         }
         document.getElementById('modalNota').classList.replace('hidden', 'flex');
     }
 
-    async function updateStatusDialog() {
-        if(!selectedNota) return;
-        await Swal.fire({
-            title: 'Update Status',
-            html: `
-                <div class="flex flex-col gap-3 p-2">
-                    <button onclick="window.setNewStatus('PAID')" class="py-4 bg-green-500 text-white rounded-2xl font-black text-xs uppercase">SET LUNAS (PAID)</button>
-                    <button onclick="window.setNewStatus('UNPAID')" class="py-4 bg-red-500 text-white rounded-2xl font-black text-xs uppercase">SET BELUM BAYAR (UNPAID)</button>
-                </div>`,
-            showConfirmButton: false,
-            showCancelButton: true,
-            cancelButtonText: 'BATAL',
-            customClass: { popup: 'rounded-[2rem]' }
-        });
-    }
-
     window.setNewStatus = async (status) => {
-        Swal.close();
         Swal.fire({title: 'Updating...', didOpen: () => Swal.showLoading()});
         try {
-            const id = selectedNota.id_nota || selectedNota.id;
-            await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'updateStatus', id_nota: id, status: status })});
+            await fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'updateStatus', id_nota: selectedNota.id_nota, status })});
             Swal.fire('Berhasil', 'Status Terupdate', 'success').then(() => { tutupModal(); loadRiwayat(); });
         } catch(e) { Swal.fire('Error', 'Gagal', 'error'); }
     };
 
-    // PERBAIKAN DOWNLOAD PDF (RAPI & PAS A4)
- function downloadPdf() {
-    const originalEl = document.getElementById('notaPrintArea');
-    
-    // 1. Buat Container yang VALID dan TERLIHAT sejenak agar tidak blank
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'absolute';
-    tempContainer.style.left = '0';
-    tempContainer.style.top = '0';
-    tempContainer.style.width = '794px'; 
-    tempContainer.style.background = 'white';
-    tempContainer.style.zIndex = '9999'; // Pastikan di paling depan
-    tempContainer.style.visibility = 'visible';
-    
-    // 2. Clone elemen nota
-    const clone = originalEl.cloneNode(true);
-    clone.style.width = '794px';
-    clone.style.padding = '40px';
-    clone.style.margin = '0';
-    
-    // Pastikan watermark ikut terbawa
-    const originalWm = originalEl.querySelector('.watermark');
-    const cloneWm = clone.querySelector('.watermark');
-    if (originalWm && cloneWm) {
-        cloneWm.style.display = originalWm.style.display;
-        cloneWm.style.fontSize = '80px'; // Perbesar sedikit untuk PDF
-    }
-
-    tempContainer.appendChild(clone);
-    document.body.appendChild(tempContainer);
-
-    // 3. Konfigurasi PDF
-    const opt = { 
-        margin: [5, 0, 5, 0],
-        filename: `NOTA-${selectedNota.id_nota || 'NB'}.pdf`, 
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, 
-            useCORS: true,
-            width: 794,
-            windowWidth: 794,
-            scrollY: 0,
-            x: 0,
-            y: 0,
-            logging: false
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    // Tampilkan loading
-    Swal.fire({
-        title: 'Sedang Memproses PDF...',
-        text: 'Jangan tutup aplikasi',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-    });
-
-    // 4. Eksekusi dengan Delay tipis (100ms) agar browser sempat render clone
-    setTimeout(() => {
-        html2pdf().set(opt).from(tempContainer).save().then(() => {
-            document.body.removeChild(tempContainer);
-            Swal.close();
-        }).catch(err => {
-            console.error("PDF Error: ", err);
-            document.body.removeChild(tempContainer);
-            Swal.fire('Error', 'Gagal membuat PDF', 'error');
+    function updateStatusDialog() {
+        Swal.fire({
+            title: 'Update Status',
+            html: `<div class="flex flex-col gap-3 p-2">
+                <button onclick="setNewStatus('PAID')" class="py-4 bg-green-500 text-white rounded-2xl font-black text-xs uppercase">SET LUNAS</button>
+                <button onclick="setNewStatus('UNPAID')" class="py-4 bg-red-500 text-white rounded-2xl font-black text-xs uppercase">SET UNPAID</button>
+            </div>`,
+            showConfirmButton: false,
+            showCancelButton: true
         });
-    }, 150); 
-}
-    function tutupModal() { 
-        document.getElementById('modalNota').classList.replace('flex', 'hidden'); 
-        selectedNota = null; 
     }
+
+    // PDF ENGINE ANTI-BLANK (THE SWITCHER)
+    function downloadPdf() {
+        const area = document.getElementById('notaPrintArea');
+        const scroll = document.getElementById('scrollContainer');
+        const originalStyle = area.getAttribute('style') || '';
+        const originalScroll = scroll.scrollTop;
+
+        Swal.fire({ title: 'Mencetak...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        // Paksa Ukuran A4 sekejap
+        area.style.width = '794px';
+        area.style.minHeight = '1123px';
+        
+        const opt = {
+            margin: [10, 5, 10, 5],
+            filename: `NOTA-${selectedNota.id_nota}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true, 
+                width: 794,
+                windowWidth: 794,
+                scrollY: -window.scrollY // Kunci anti-blank mobile
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        setTimeout(() => {
+            html2pdf().set(opt).from(area).save().then(() => {
+                area.setAttribute('style', originalStyle);
+                scroll.scrollTop = originalScroll;
+                Swal.close();
+            }).catch(e => {
+                area.setAttribute('style', originalStyle);
+                Swal.fire('Error', 'Gagal cetak PDF', 'error');
+            });
+        }, 500);
+    }
+
+    function tutupModal() { document.getElementById('modalNota').classList.replace('flex', 'hidden'); selectedNota = null; }
 </script>
+
 </body>
 </html>
