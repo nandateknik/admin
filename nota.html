@@ -25,6 +25,14 @@
             padding: 40px !important;
         }
 
+        /* Sembunyikan container bayangan agar tidak merusak tampilan HP */
+        #nota-shadow-clone {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 794px; /* Fix A4 Width */
+            background: white;
+        }
         .watermark {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
             font-size: 60px; font-weight: 900; opacity: 0.15; pointer-events: none;
@@ -450,28 +458,48 @@
     };
 
     // PERBAIKAN DOWNLOAD PDF (RAPI & PAS A4)
-    function downloadPdf() {
-        const el = document.getElementById('notaPrintArea');
-        const opt = { 
-            margin: [10, 10, 10, 10],
-            filename: `NOTA-${selectedNota.id_nota || 'NB'}.pdf`, 
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
-                scale: 2, 
-                useCORS: true,
-                letterRendering: true,
-                width: 794, // Paksa lebar A4 pixel agar tidak menciut
-                windowWidth: 794
-            },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
+  function downloadPdf() {
+    // 1. Ambil konten asli
+    const originalEl = document.getElementById('notaPrintArea');
+    
+    // 2. Buat "Clone" atau salinan elemen agar tidak mengganggu tampilan layar HP
+    const clone = originalEl.cloneNode(true);
+    
+    // 3. Buat container sementara untuk si clone
+    const shadowContainer = document.createElement('div');
+    shadowContainer.id = 'nota-shadow-clone';
+    shadowContainer.appendChild(clone);
+    document.body.appendChild(shadowContainer);
 
-        Swal.fire({title: 'Menghasilkan PDF...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
+    // 4. Atur Style Clone agar pas di A4
+    clone.style.width = "794px";
+    clone.style.padding = "40px";
+    clone.style.margin = "0";
+    clone.querySelectorAll('.watermark').forEach(wm => wm.style.fontSize = "80px"); // Watermark lebih gede di PDF
 
-        html2pdf().set(opt).from(el).save().then(() => {
-            Swal.close();
-        });
-    }
+    const opt = { 
+        margin: [5, 5, 5, 5],
+        filename: `NOTA-${selectedNota.id_nota || 'NB'}.pdf`, 
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true,
+            logging: false,
+            letterRendering: true,
+            width: 794
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    Swal.fire({title: 'Generasi PDF...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
+
+    // 5. Proses si Clone, bukan elemen asli yang di layar
+    html2pdf().set(opt).from(shadowContainer).save().then(() => {
+        // 6. Hapus sampah setelah selesai
+        document.body.removeChild(shadowContainer);
+        Swal.close();
+    });
+}
 
     function tutupModal() { 
         document.getElementById('modalNota').classList.replace('flex', 'hidden'); 
