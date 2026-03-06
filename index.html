@@ -2,293 +2,366 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard - Nanda Teknik</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandiri Usaha Teknik | Jasa Servis AC Profesional Banyuwangi</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Mandiri Usaha Teknik (Nanda Teknik) - Jasa servis AC, cuci AC, bongkar pasang, dan perbaikan AC terbaik di Banyuwangi. Profesional, jujur, dan bergaransi.">
+    <meta name="keywords" content="servis ac banyuwangi, cuci ac banyuwangi, mandiri usaha teknik, nanda teknik, perbaikan ac, pasang ac banyuwangi">
+    <meta name="author" content="Mandiri Usaha Teknik">
+    
+    <!-- Tailwind CSS for Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- AOS Library for Scroll Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .mobile-container { max-width: 480px; min-height: 100vh; margin: 0 auto; background: #f8fafc; position: relative; padding-bottom: 100px; }
-        
-        /* Sidebar Styles */
-        #sidebar {
-            position: fixed; top: 0; left: -110%; width: 280px; height: 100%;
-            background: white; z-index: 5000; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column; box-shadow: 20px 0 50px rgba(0,0,0,0.1);
-        }
-        #sidebar.open { left: 0; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #64748b; font-weight: 700; font-size: 0.85rem; transition: 0.2s; cursor: pointer; }
-        .nav-link:hover { background: #f1f5f9; color: #2563eb; }
-        .nav-link.active { background: #2563eb; color: white; }
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.2); z-index: 4999; display: none; backdrop-filter: blur(2px); }
-
-        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
-        .job-card { background: white; border-radius: 24px; transition: all 0.3s ease; border: 1px solid #f1f5f9; }
-        .job-card:active { transform: scale(0.96); }
-        
-        canvas { max-width: 100% !important; }
+        body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
+        .nav-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .hero-gradient { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)); }
+        .card-hover:hover { transform: translateY(-10px); transition: all 0.3s ease; }
     </style>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800">
 
-<div class="mobile-container">
-    <div id="overlay" onclick="toggleSidebar()"></div>
-
- <div id="sidebar">
-            <div class="p-6 flex flex-col h-full">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black shadow-lg">N</div>
-                    <h1 class="font-extrabold text-slate-800 tracking-tight italic text-lg">NANDA <span class="text-blue-600">TEKNIK</span></h1>
+    <!-- ==========================================
+         HEADER (Modular Concept: Layout Header)
+         ========================================== -->
+    <header class="bg-white sticky top-0 z-50 nav-shadow">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo Section -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-md flex items-center justify-center text-white text-xl">
+                    <i class="fas fa-snowflake"></i>
                 </div>
-                <nav class="space-y-1 flex-1 overflow-y-auto">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mb-2 tracking-widest">Utama</p>
-                    <a href="index.html" class="nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        Dashboard Kerja
-                    </a>
-                    <a href="dashboard.html" class="nav-link active">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        Monitoring Maps
-                    </a>
-                    <a href="pelanggan.html" class="nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        Database Pelanggan
-                    </a>
-
-                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Transaksi & Marketing</p>
-                    <a href="input-booking.html" class="nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Input Booking Baru
-                    </a>
-                    <a href="penawaran.html" class="nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Penawaran Harga
-                    </a>
-                    <a href="nota.html" class="nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        Buat Nota Lunas
-                    </a>
-                    <a href="kirim-email.html" class="nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        Kirim Email Notif
-                    </a>
-
-                    <p class="text-[10px] font-bold text-slate-400 uppercase ml-3 mt-6 mb-2 tracking-widest">Manajemen Data</p>
-                    <a href="input-pelanggan.html" class="nav-link">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-                        Tambah Pelanggan
-                    </a>
-                </nav>
-                <div onclick="logout()" class="nav-link logout-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    Logout Admin
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-blue-900">NANDA TEKNIK</h1>
+                    <p class="text-xs text-blue-600 font-semibold uppercase tracking-wider">Banyuwangi</p>
                 </div>
             </div>
-        </div>
 
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex space-x-8 font-medium">
+                <a href="#home" class="hover:text-blue-600 transition">Beranda</a>
+                <a href="#about" class="hover:text-blue-600 transition">Tentang</a>
+                <a href="#services" class="hover:text-blue-600 transition">Layanan</a>
+                <a href="#pricing" class="hover:text-blue-600 transition">Harga</a>
+                <a href="estimasi.html" class="bg-blue-600 text-white px-5 py-2 rounded-full hover:bg-blue-700 transition shadow-md">Estimasi Biaya</a>
+            </nav>
 
-    <header class="p-6 pb-0">
-        <div class="flex justify-between items-center mb-6">
-            <button onclick="toggleSidebar()" class="bg-white p-3 rounded-2xl shadow-sm text-slate-600 border border-slate-50">
-                <i class="fas fa-bars-staggered text-xl"></i>
+            <!-- Mobile Menu Toggle -->
+            <button class="md:hidden text-2xl" id="menuBtn">
+                <i class="fas fa-bars"></i>
             </button>
-            <div class="text-right">
-                <p id="curDate" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">---</p>
-                <h2 id="userName" class="text-lg font-extrabold text-slate-800 italic leading-none">Halo, Admin!</h2>
-            </div>
         </div>
     </header>
 
-    <section class="px-6 mb-6">
-        <div class="bg-white p-5 rounded-[30px] shadow-sm border border-slate-100">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-xs uppercase tracking-widest text-slate-400">Statistik Bulanan</h3>
-                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">Update Otomatis</span>
+    <!-- ==========================================
+         HERO SLIDER
+         ========================================== -->
+    <section id="home" class="relative h-[500px] md:h-[600px] overflow-hidden bg-gray-900">
+        <div id="slider" class="h-full w-full">
+            <!-- Slide 1 -->
+            <div class="slide absolute inset-0 transition-opacity duration-1000 opacity-100">
+                <div class="absolute inset-0 hero-gradient"></div>
+                <img src="https://images.unsplash.com/photo-1590756254933-2873d72a83b6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Servis AC Profesional" class="w-full h-full object-cover">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6">
+                    <h2 class="text-4xl md:text-6xl font-bold mb-4" data-aos="fade-up">Solusi AC Dingin & Sehat</h2>
+                    <p class="text-lg md:text-xl mb-8 max-w-2xl" data-aos="fade-up" data-aos-delay="200">Mandiri Usaha Teknik hadir memberikan layanan perawatan AC terbaik di wilayah Banyuwangi.</p>
+                    <a href="https://wa.me/628123456789" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-bold transition transform hover:scale-105">
+                        <i class="fab fa-whatsapp mr-2"></i> Konsultasi Sekarang
+                    </a>
+                </div>
             </div>
-            <div class="h-[180px] w-full">
-                <canvas id="statsChart"></canvas>
+            <!-- Slide 2 (Hidden initially by JS) -->
+            <div class="slide absolute inset-0 transition-opacity duration-1000 opacity-0">
+                <div class="absolute inset-0 hero-gradient"></div>
+                <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Teknisi AC" class="w-full h-full object-cover">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6">
+                    <h2 class="text-4xl md:text-6xl font-bold mb-4">Teknisi Berpengalaman</h2>
+                    <p class="text-lg md:text-xl mb-8 max-w-2xl">Kami menjamin setiap pekerjaan dilakukan dengan standar SOP yang tinggi.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         WHY CHOOSE US
+         ========================================== -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6 text-center">
+            <h3 class="text-3xl font-bold mb-12" data-aos="fade-down">Kenapa Pilih Kami?</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="p-8 border rounded-2xl card-hover" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-user-check"></i></div>
+                    <h4 class="text-xl font-bold mb-2">Teknisi Profesional</h4>
+                    <p class="text-gray-600">Tim kami ahli di bidangnya dan selalu jujur dalam setiap diagnosa kerusakan.</p>
+                </div>
+                <div class="p-8 border rounded-2xl card-hover" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-shield-alt"></i></div>
+                    <h4 class="text-xl font-bold mb-2">Bergaransi</h4>
+                    <p class="text-gray-600">Kami memberikan jaminan garansi pasca servis untuk kepuasan pelanggan.</p>
+                </div>
+                <div class="p-8 border rounded-2xl card-hover" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-clock"></i></div>
+                    <h4 class="text-xl font-bold mb-2">Respon Cepat</h4>
+                    <p class="text-gray-600">Tim admin dan lapangan kami siap melayani panggilan Anda dengan cepat.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="px-6 grid grid-cols-2 gap-4 mb-8">
-        <div class="bg-slate-900 p-5 rounded-[28px] text-white shadow-xl shadow-slate-200 relative overflow-hidden">
-            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Saldo</p>
-            <h3 id="txtSaldo" class="text-lg font-black italic">Rp 0</h3>
-            <div class="absolute -right-2 -bottom-2 w-12 h-12 bg-blue-600 rounded-full blur-2xl opacity-40"></div>
-        </div>
-        <div class="bg-white p-5 rounded-[28px] border border-slate-100">
-            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 text-red-400">Pengeluaran</p>
-            <h3 id="txtExpense" class="text-lg font-black italic text-slate-800">Rp 0</h3>
-        </div>
-    </section>
-
-    <section class="px-6">
-        <div class="flex justify-between items-center mb-4">
-            <div class="flex items-center gap-2">
-                <h3 class="font-extrabold text-slate-800 italic uppercase text-sm tracking-tight">Antrian Aktif</h3>
-                <span id="txtWorkload" class="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
-            </div>
-            <button onclick="loadData()" class="text-blue-600 text-xs font-bold"><i class="fas fa-sync-alt"></i></button>
-        </div>
-
-        <div id="jobContainer" class="space-y-4">
-            <div class="animate-pulse space-y-4">
-                <div class="h-32 bg-white rounded-[28px]"></div>
-                <div class="h-32 bg-white rounded-[28px]"></div>
+    <!-- ==========================================
+         ABOUT US
+         ========================================== -->
+    <section id="about" class="py-20 bg-blue-50">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2" data-aos="fade-right">
+                    <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ecc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Tentang Kami" class="rounded-3xl shadow-2xl">
+                </div>
+                <div class="md:w-1/2" data-aos="fade-left">
+                    <h3 class="text-blue-600 font-bold mb-2 uppercase">About Us</h3>
+                    <h2 class="text-4xl font-bold mb-6 text-blue-900">Mandiri Usaha Teknik</h2>
+                    <p class="text-gray-700 leading-relaxed mb-6">
+                        Berawal dari semangat pelayanan teknis yang unggul di Banyuwangi, Mandiri Usaha Teknik (dikenal juga sebagai Nanda Teknik) telah melayani ribuan pelanggan rumah tangga hingga perkantoran. Kami fokus pada kualitas pendinginan udara agar aktivitas Anda tetap nyaman.
+                    </p>
+                    <ul class="space-y-3 mb-8">
+                        <li><i class="fas fa-check-circle text-blue-600 mr-2"></i> Melayani Seluruh Area Banyuwangi</li>
+                        <li><i class="fas fa-check-circle text-blue-600 mr-2"></i> Peralatan Lengkap & Modern</li>
+                        <li><i class="fas fa-check-circle text-blue-600 mr-2"></i> Harga Kompetitif & Transparan</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </section>
-</div>
 
-<script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzLIFTAjPdxUDn0eJA0Tga_oHVjyq6NcW0RKxPca_3Ww_EPpQ0ir2D1WR1mUqzvTdydVg/exec";
-    let myChart;
+    <!-- ==========================================
+         SERVICES
+         ========================================== -->
+    <section id="services" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl font-bold">Layanan Kami</h3>
+                <div class="w-20 h-1 bg-blue-600 mx-auto mt-4"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Service 1 -->
+                <div class="bg-gray-50 p-6 rounded-xl hover:bg-blue-600 hover:text-white transition group" data-aos="fade-up">
+                    <i class="fas fa-tint text-3xl text-blue-600 group-hover:text-white mb-4"></i>
+                    <h4 class="font-bold text-xl mb-2">Cuci AC (Maintenance)</h4>
+                    <p class="text-sm opacity-80">Pembersihan unit indoor & outdoor agar udara tetap bersih.</p>
+                </div>
+                <!-- Service 2 -->
+                <div class="bg-gray-50 p-6 rounded-xl hover:bg-blue-600 hover:text-white transition group" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fas fa-tools text-3xl text-blue-600 group-hover:text-white mb-4"></i>
+                    <h4 class="font-bold text-xl mb-2">Perbaikan AC</h4>
+                    <p class="text-sm opacity-80">Menangani AC mati, tidak dingin, bocor air, atau berisik.</p>
+                </div>
+                <!-- Service 3 -->
+                <div class="bg-gray-50 p-6 rounded-xl hover:bg-blue-600 hover:text-white transition group" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-arrow-right-arrow-left text-3xl text-blue-600 group-hover:text-white mb-4"></i>
+                    <h4 class="font-bold text-xl mb-2">Bongkar Pasang</h4>
+                    <p class="text-sm opacity-80">Pemindahan unit AC lama ke lokasi baru dengan aman.</p>
+                </div>
+                <!-- Service 4 -->
+                <div class="bg-gray-50 p-6 rounded-xl hover:bg-blue-600 hover:text-white transition group" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-plus-circle text-3xl text-blue-600 group-hover:text-white mb-4"></i>
+                    <h4 class="font-bold text-xl mb-2">Tambah Freon</h4>
+                    <p class="text-sm opacity-80">Pengisian ulang gas pendingin sesuai spesifikasi unit.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    function toggleSidebar() {
-        const sb = document.getElementById('sidebar');
-        const ov = document.getElementById('overlay');
-        sb.classList.toggle('open');
-        ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
-    }
-
-    // Fungsi Inisialisasi Grafik
-    function initChart(pemasukan = [], pengeluaran = []) {
-        const ctx = document.getElementById('statsChart').getContext('2d');
-        if (myChart) myChart.destroy();
-
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
-                datasets: [{
-                    label: 'Masuk',
-                    data: pemasukan.length ? pemasukan : [0,0,0,0,0,0],
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 0
-                }, {
-                    label: 'Keluar',
-                    data: pengeluaran.length ? pengeluaran : [0,0,0,0,0,0],
-                    borderColor: '#f43f5e',
-                    borderDash: [5, 5],
-                    fill: false,
-                    tension: 0.4,
-                    borderWidth: 2,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { display: false },
-                    x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }
-                }
-            }
-        });
-    }
-
-    async function loadData() {
-        try {
-            // 1. Load Keuangan & Grafik
-            const resFin = await fetch(API_URL + "?type=rekap_keuangan");
-            const dataFin = await resFin.json();
-            
-            document.getElementById('txtSaldo').innerText = "Rp " + (dataFin.saldo || 0).toLocaleString('id-ID');
-            document.getElementById('txtExpense').innerText = "Rp " + (dataFin.pengeluaran || 0).toLocaleString('id-ID');
-            
-            // Render Grafik dengan data dari API (Pastikan API mengirim array grafik_masuk & grafik_keluar)
-            initChart(dataFin.grafik_masuk, dataFin.grafik_keluar);
-
-            // 2. Load Jobs
-            const resWork = await fetch(API_URL);
-            const dataWork = await resWork.json();
-            
-            // FILTER: Hanya ambil yang statusnya BUKAN "Selesai"
-            const activeJobs = dataWork.filter(job => job.status.toLowerCase() !== 'selesai');
-            
-            document.getElementById('txtWorkload').innerText = activeJobs.length;
-            renderJobs(activeJobs);
-
-        } catch (e) {
-            console.error(e);
-            document.getElementById('jobContainer').innerHTML = `<p class="text-center text-red-500 text-xs py-10 font-bold">Gagal Sinkron Server.</p>`;
-        }
-    }
-
-    function renderJobs(data) {
-        let html = "";
-        if (!data || data.length === 0) {
-            html = `<div class="bg-white p-10 rounded-[28px] text-center border-2 border-dashed border-slate-100">
-                        <i class="fas fa-mug-hot text-slate-200 text-3xl mb-3"></i>
-                        <p class="text-slate-400 text-xs font-bold italic">Santai dulu, tidak ada antrian pekerjaan!</p>
-                    </div>`;
-        } else {
-            data.forEach(job => {
-                const statusColor = job.status.toLowerCase() === 'proses' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600';
-                html += `
-                <div class="job-card p-6 shadow-sm mb-4">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="${statusColor} px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider">${job.status}</span>
-                        <div class="text-right">
-                             <p class="text-[9px] font-bold text-slate-300 uppercase">${job.tanggal || ''}</p>
-                        </div>
+    <!-- ==========================================
+         PRICING CARDS
+         ========================================== -->
+    <section id="pricing" class="py-20 bg-gray-100">
+        <div class="container mx-auto px-6 text-center">
+            <h3 class="text-3xl font-bold mb-12">Estimasi Harga Jasa</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Item 1 -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-t-4 border-blue-600" data-aos="flip-left">
+                    <div class="p-8">
+                        <h4 class="text-xl font-bold mb-4 uppercase">Paket Cuci</h4>
+                        <div class="text-4xl font-bold text-blue-600 mb-6">Rp 75rb <span class="text-sm text-gray-500 font-normal">/ unit</span></div>
+                        <ul class="text-left space-y-4 mb-8">
+                            <li><i class="fas fa-check text-green-500 mr-2"></i> Pembersihan Filter</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i> Cuci Indoor & Outdoor</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i> Cek Tekanan Freon</li>
+                        </ul>
+                        <a href="estimasi.html" class="block w-full py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition">Hitung Total</a>
                     </div>
-                    <h4 class="text-xl font-black text-slate-800 italic leading-tight mb-1 uppercase">${job.nama || 'Pelanggan'}</h4>
-                    <p class="text-xs font-bold text-slate-400 mb-5"><i class="fas fa-tools mr-1"></i> ${job.pekerjaan || 'Servis'}</p>
-                    <div class="flex gap-2">
-                        <button onclick="window.location.href='https://www.google.com/maps/search/${encodeURIComponent(job.nama)}'" class="flex-1 bg-slate-900 text-white py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-slate-200">Navigasi Maps</button>
-                        <button onclick="showDetail('${job.nama}', '${job.pekerjaan}')" class="w-14 bg-slate-50 text-slate-400 py-3 rounded-2xl border border-slate-100 active:scale-95 transition-all"><i class="fas fa-ellipsis-h"></i></button>
+                </div>
+                <!-- Item 2 (Featured) -->
+                <div class="bg-blue-600 text-white rounded-2xl shadow-2xl overflow-hidden transform scale-105" data-aos="flip-left" data-aos-delay="100">
+                    <div class="p-8">
+                        <h4 class="text-xl font-bold mb-4 uppercase">Paket Lengkap</h4>
+                        <div class="text-4xl font-bold mb-6">Rp 150rb <span class="text-sm opacity-80 font-normal">/ unit</span></div>
+                        <ul class="text-left space-y-4 mb-8">
+                            <li><i class="fas fa-check text-white mr-2"></i> Cuci AC Bersih</li>
+                            <li><i class="fas fa-check text-white mr-2"></i> Tambah Freon (R22/R32/R410)</li>
+                            <li><i class="fas fa-check text-white mr-2"></i> Cek Kelistrikan</li>
+                            <li><i class="fas fa-check text-white mr-2"></i> Gratis Konsultasi</li>
+                        </ul>
+                        <a href="https://wa.me/628123456789" class="block w-full py-3 bg-white text-blue-600 rounded-lg font-bold hover:bg-gray-100 transition shadow-lg">Pesan Sekarang</a>
                     </div>
-                </div>`;
-            });
+                </div>
+                <!-- Item 3 -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-t-4 border-blue-600" data-aos="flip-left" data-aos-delay="200">
+                    <div class="p-8">
+                        <h4 class="text-xl font-bold mb-4 uppercase">Pasang AC</h4>
+                        <div class="text-4xl font-bold text-blue-600 mb-6">Rp 250rb <span class="text-sm text-gray-500 font-normal">/ titik</span></div>
+                        <ul class="text-left space-y-4 mb-8">
+                            <li><i class="fas fa-check text-green-500 mr-2"></i> Jasa Instalasi</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i> Vakum Unit</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i> Tes Fungsi & Suhu</li>
+                        </ul>
+                        <a href="estimasi.html" class="block w-full py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition">Estimasi Lain</a>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-12 text-gray-500 italic">* Harga dapat berubah tergantung tingkat kesulitan dan material tambahan.</p>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         GALLERY
+         ========================================== -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <h3 class="text-3xl font-bold text-center mb-12">Galeri Pekerjaan</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <img src="https://images.unsplash.com/photo-1621905252507-b354bcadcabc?auto=format&fit=crop&w=400&q=80" alt="Galeri 1" class="rounded-lg h-64 w-full object-cover" data-aos="zoom-in">
+                <img src="https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=400&q=80" alt="Galeri 2" class="rounded-lg h-64 w-full object-cover" data-aos="zoom-in" data-aos-delay="100">
+                <img src="https://images.unsplash.com/photo-1585338665814-d543e2e50b9a?auto=format&fit=crop&w=400&q=80" alt="Galeri 3" class="rounded-lg h-64 w-full object-cover" data-aos="zoom-in" data-aos-delay="200">
+                <img src="https://images.unsplash.com/photo-1590756254933-2873d72a83b6?auto=format&fit=crop&w=400&q=80" alt="Galeri 4" class="rounded-lg h-64 w-full object-cover" data-aos="zoom-in" data-aos-delay="300">
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         FAQ Section
+         ========================================== -->
+    <section class="py-20 bg-blue-900 text-white">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <h3 class="text-3xl font-bold text-center mb-12">Pertanyaan Populer (FAQ)</h3>
+            <div class="space-y-4">
+                <details class="bg-blue-800 p-4 rounded-lg cursor-pointer">
+                    <summary class="font-bold">Berapa lama waktu cuci AC?</summary>
+                    <p class="mt-2 text-blue-200">Rata-rata memakan waktu 45-60 menit tergantung kondisi kotor unit.</p>
+                </details>
+                <details class="bg-blue-800 p-4 rounded-lg cursor-pointer">
+                    <summary class="font-bold">Apakah ada garansi setelah servis?</summary>
+                    <p class="mt-2 text-blue-200">Ya, kami memberikan garansi 30 hari untuk pengerjaan teknis yang sama.</p>
+                </details>
+                <details class="bg-blue-800 p-4 rounded-lg cursor-pointer">
+                    <summary class="font-bold">Apakah melayani panggilan ke luar kota Banyuwangi?</summary>
+                    <p class="mt-2 text-blue-200">Saat ini fokus kami adalah area Banyuwangi kota dan sekitarnya (Radius 20km).</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         FOOTER (Modular Concept: Layout Footer)
+         ========================================== -->
+    <footer class="bg-gray-900 text-gray-400 py-16">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
+            <!-- Left: Info & Sosmed -->
+            <div>
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white">
+                        <i class="fas fa-snowflake"></i>
+                    </div>
+                    <span class="text-white font-bold text-xl uppercase">Nanda Teknik</span>
+                </div>
+                <p class="mb-6">Jalan Gajah Mada No. 123, Banyuwangi, Jawa Timur. Ahli servis AC terpercaya Anda.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:text-blue-500 text-2xl"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="hover:text-blue-400 text-2xl"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="hover:text-pink-500 text-2xl"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="hover:text-green-500 text-2xl"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <!-- Middle: Sitemap -->
+            <div class="md:pl-10">
+                <h4 class="text-white font-bold mb-6 uppercase">Navigasi</h4>
+                <ul class="space-y-4">
+                    <li><a href="#home" class="hover:text-white transition">Beranda</a></li>
+                    <li><a href="#about" class="hover:text-white transition">Tentang Kami</a></li>
+                    <li><a href="#services" class="hover:text-white transition">Layanan</a></li>
+                    <li><a href="#pricing" class="hover:text-white transition">Daftar Harga</a></li>
+                    <li><a href="estimasi.html" class="hover:text-white transition">Estimasi Biaya</a></li>
+                </ul>
+            </div>
+
+            <!-- Right: Maps -->
+            <div>
+                <h4 class="text-white font-bold mb-6 uppercase">Lokasi Workshop</h4>
+                <div class="rounded-xl overflow-hidden h-48 bg-gray-800 flex items-center justify-center">
+                    <!-- Google Maps Iframe Placeholder -->
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126372.58572115668!2d114.28827702816462!3d-8.21173167123985!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd14fe4f71587a3%3A0xc3f8484e56994770!2sBanyuwangi%2C%20Kabupaten%20Banyuwangi%2C%20Jawa%20Timur!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid" 
+                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
+                    </iframe>
+                </div>
+                <p class="mt-4 text-sm"><i class="fas fa-map-marker-alt mr-2"></i> Klik map untuk navigasi</p>
+            </div>
+        </div>
+        <div class="container mx-auto px-6 mt-16 pt-8 border-t border-gray-800 text-center text-sm">
+            <p>&copy; 2024 Mandiri Usaha Teknik (Nanda Teknik Banyuwangi). All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Fixed WA Button -->
+    <a href="https://wa.me/628123456789" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition z-[100]">
+        <i class="fab fa-whatsapp text-3xl"></i>
+    </a>
+
+    <!-- JavaScript & Animations -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            easing: 'ease-in-out'
+        });
+
+        // Simple Image Slider Logic
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        function nextSlide() {
+            slides[currentSlide].classList.remove('opacity-100');
+            slides[currentSlide].classList.add('opacity-0');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.remove('opacity-0');
+            slides[currentSlide].classList.add('opacity-100');
         }
-        document.getElementById('jobContainer').innerHTML = html;
-    }
+        setInterval(nextSlide, 5000);
 
-    function showDetail(nama, task) {
-        Swal.fire({
-            title: nama,
-            text: task,
-            icon: 'info',
-            confirmButtonColor: '#2563eb',
-            confirmButtonText: 'TUTUP'
+        // Mobile Menu Logic
+        const menuBtn = document.getElementById('menuBtn');
+        const nav = document.querySelector('nav');
+        menuBtn.addEventListener('click', () => {
+            nav.classList.toggle('hidden');
+            nav.classList.toggle('flex');
+            nav.classList.toggle('flex-col');
+            nav.classList.toggle('absolute');
+            nav.classList.toggle('top-full');
+            nav.classList.toggle('left-0');
+            nav.classList.toggle('w-full');
+            nav.classList.toggle('bg-white');
+            nav.classList.toggle('p-6');
+            nav.classList.toggle('shadow-lg');
         });
-    }
-
-    function logout() {
-        Swal.fire({
-            title: 'Logout?',
-            text: "Anda akan keluar dari sesi admin.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            confirmButtonText: 'Ya, Keluar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                localStorage.removeItem('user_nanda');
-                window.location.href = 'login.html';
-            }
-        });
-    }
-
-    window.onload = () => {
-        const user = JSON.parse(localStorage.getItem('user_nanda'));
-        if(user) document.getElementById('userName').innerText = "Halo, " + user.nama.split(' ')[0] + "!";
-        document.getElementById('curDate').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' });
-        
-        initChart(); // Load chart kosong dulu
-        loadData();  // Isi dengan data asli
-    };
-</script>
+    </script>
 </body>
 </html>
