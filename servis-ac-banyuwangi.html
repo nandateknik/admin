@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Layanan - Mandiri Usaha Teknik Banyuwangi</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Detail layanan servis AC profesional di Banyuwangi. Mandiri Usaha Teknik melayani cuci AC, perbaikan, bongkar pasang dengan standar SOP tinggi dan bergaransi.">
+    <meta name="keywords" content="layanan ac banyuwangi, spesialis ac banyuwangi, nanda teknik, servis ac jujur">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AOS Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .nav-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .gradient-blue { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+        .step-number { font-size: 4rem; opacity: 0.1; position: absolute; right: 10px; top: -10px; font-weight: 800; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- HEADER (Konsisten) -->
+    <header class="bg-white sticky top-0 z-50 nav-shadow">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-md flex items-center justify-center text-white text-xl">
+                    <i class="fas fa-snowflake"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-blue-900">NANDA TEKNIK</h1>
+                    <p class="text-xs text-blue-600 font-semibold uppercase tracking-wider">Banyuwangi</p>
+                </div>
+            </div>
+            <nav class="hidden md:flex space-x-8 font-medium items-center">
+                <a href="index.html" class="hover:text-blue-600 transition">Beranda</a>
+                <a href="index.html#services" class="hover:text-blue-600 transition text-blue-600">Layanan</a>
+                <a href="estimasi.html" class="bg-blue-600 text-white px-5 py-2 rounded-full shadow-md hover:bg-blue-700 transition">Estimasi Biaya</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO SECTION DETAIL -->
+    <section class="gradient-blue py-20 text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-down">Spesialis AC Banyuwangi</h2>
+            <p class="text-lg opacity-90 max-w-2xl mx-auto" data-aos="fade-up">Kami bukan sekadar tukang servis, kami adalah mitra kenyamanan udara Anda dengan standar kerja profesional.</p>
+        </div>
+    </section>
+
+    <!-- DETAIL LAYANAN UTAMA -->
+    <section class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div data-aos="fade-right">
+                    <h3 class="text-blue-600 font-bold mb-2 uppercase">Service Maintenance</h3>
+                    <h2 class="text-3xl font-bold mb-6">Cuci AC Secara Berkala</h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        Tahukah Anda bahwa AC yang kotor meningkatkan konsumsi listrik hingga 30%? Layanan cuci AC kami mencakup pembersihan total unit indoor, outdoor, pembersihan drainase (pembuangan air), serta pengecekan suhu dan tekanan freon.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <h5 class="font-bold">Tekanan Air High-Pressure</h5>
+                                <p class="text-sm text-gray-500">Membersihkan hingga celah terkecil tanpa merusak sirip evaporator.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <h5 class="font-bold">Pembersihan Anti-Bakteri</h5>
+                                <p class="text-sm text-gray-500">Membunuh kuman dan jamur penyebab bau tidak sedap.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div data-aos="zoom-in">
+                    <img src="https://images.unsplash.com/photo-1621905252507-b354bcadcabc?auto=format&fit=crop&w=800&q=80" alt="Proses Cuci AC" class="rounded-3xl shadow-2xl">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BRANDING: STANDAR SOP KAMI -->
+    <section class="py-20 bg-gray-100">
+        <div class="container mx-auto px-6 text-center mb-16">
+            <h3 class="text-3xl font-bold">Standard Operating Procedure (SOP)</h3>
+            <p class="text-gray-600 mt-4">Inilah yang membuat kami berbeda dari yang lain</p>
+        </div>
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- Step 1 -->
+            <div class="bg-white p-8 rounded-2xl relative overflow-hidden shadow-sm hover:shadow-md transition" data-aos="fade-up">
+                <span class="step-number text-blue-600">01</span>
+                <h4 class="font-bold text-xl mb-3">Inspeksi Awal</h4>
+                <p class="text-gray-500 text-sm">Pengecekan fungsi remote, suara unit, dan hembusan udara sebelum dikerjakan.</p>
+            </div>
+            <!-- Step 2 -->
+            <div class="bg-white p-8 rounded-2xl relative overflow-hidden shadow-sm hover:shadow-md transition" data-aos="fade-up" data-aos-delay="100">
+                <span class="step-number text-blue-600">02</span>
+                <h4 class="font-bold text-xl mb-3">Proteksi Area</h4>
+                <p class="text-gray-500 text-sm">Menutup barang-barang di sekitar unit dengan plastik pelindung agar tidak basah.</p>
+            </div>
+            <!-- Step 3 -->
+            <div class="bg-white p-8 rounded-2xl relative overflow-hidden shadow-sm hover:shadow-md transition" data-aos="fade-up" data-aos-delay="200">
+                <span class="step-number text-blue-600">03</span>
+                <h4 class="font-bold text-xl mb-3">Pengerjaan Inti</h4>
+                <p class="text-gray-500 text-sm">Proses cuci atau perbaikan dilakukan dengan teliti sesuai standar teknis.</p>
+            </div>
+            <!-- Step 4 -->
+            <div class="bg-white p-8 rounded-2xl relative overflow-hidden shadow-sm hover:shadow-md transition" data-aos="fade-up" data-aos-delay="300">
+                <span class="step-number text-blue-600">04</span>
+                <h4 class="font-bold text-xl mb-3">Uji Hasil & Garansi</h4>
+                <p class="text-gray-500 text-sm">Pengetesan suhu dingin pasca pengerjaan dan penyerahan nota garansi resmi.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- BRANDING: KENAPA NANDA TEKNIK? (Expertise) -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="md:w-1/2" data-aos="fade-right">
+                    <h2 class="text-4xl font-bold mb-6 text-blue-900">Teknisi Jujur, Hasil Maksimal</h2>
+                    <p class="text-gray-600 mb-8">Banyak pelanggan di Banyuwangi beralih ke kami karena transparansi. Kami tidak akan menyarankan tambah freon jika memang tekanan masih cukup. Kejujuran adalah modal utama kami membangun **Mandiri Usaha Teknik**.</p>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="p-4 bg-blue-50 rounded-xl">
+                            <h5 class="font-bold text-blue-700">99%</h5>
+                            <p class="text-xs text-blue-500">Tingkat Kepuasan</p>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-xl">
+                            <h5 class="font-bold text-blue-700">1000+</h5>
+                            <p class="text-xs text-blue-500">Unit Terpasang</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 grid grid-cols-2 gap-4" data-aos="fade-left">
+                    <div class="bg-gray-200 h-48 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-certificate text-5xl text-blue-600"></i>
+                    </div>
+                    <div class="bg-blue-600 h-48 rounded-2xl flex flex-col items-center justify-center text-white p-4 text-center">
+                        <i class="fas fa-award text-4xl mb-2"></i>
+                        <span class="text-sm font-bold">Teknisi Bersertifikat</span>
+                    </div>
+                    <div class="bg-gray-800 h-48 rounded-2xl flex flex-col items-center justify-center text-white p-4 text-center">
+                        <i class="fas fa-hand-holding-heart text-4xl mb-2"></i>
+                        <span class="text-sm font-bold">Garansi 30 Hari</span>
+                    </div>
+                    <div class="bg-gray-200 h-48 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-tools text-5xl text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="py-16 bg-blue-600">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold text-white mb-8">AC Anda Kurang Dingin? Jangan Dibiarkan!</h2>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="https://wa.me/628123456789" class="bg-white text-blue-600 px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition shadow-xl">
+                    <i class="fab fa-whatsapp mr-2"></i> Chat Mas Nanda
+                </a>
+                <a href="estimasi.html" class="bg-blue-800 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-blue-900 transition shadow-xl border border-blue-400">
+                    Cek Harga Jasa
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER (Konsisten) -->
+    <footer class="bg-gray-900 text-gray-400 py-16">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex items-center justify-center space-x-3 mb-6">
+                <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white">
+                    <i class="fas fa-snowflake"></i>
+                </div>
+                <span class="text-white font-bold text-xl uppercase tracking-tighter">Nanda Teknik</span>
+            </div>
+            <p class="max-w-md mx-auto mb-8 text-sm">Layanan Spesialis AC Area Banyuwangi Kota, Kalipuro, Giri, Kabat, Rogojampi.</p>
+            <div class="flex justify-center space-x-6 text-2xl">
+                <a href="#" class="hover:text-white"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="hover:text-white"><i class="fab fa-instagram"></i></a>
+            </div>
+            <div class="mt-12 pt-8 border-t border-gray-800 text-xs">
+                &copy; 2024 Mandiri Usaha Teknik.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000, once: true });
+    </script>
+</body>
+</html>
